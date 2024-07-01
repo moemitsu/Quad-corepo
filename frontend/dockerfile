@@ -1,0 +1,25 @@
+# frontend/dockerfile
+# Node.js lts image
+FROM node:lts
+# AS build-stage
+
+# 作業ディレクトリを設定
+WORKDIR /usr/src/app
+
+# package.json と package-lock.json をコピー
+COPY package*.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# ポート 3000 を公開
+EXPOSE 5173
+
+# アプリケーションのソースコードをコピー
+COPY . .
+
+# アプリケーションをビルド
+RUN npm run build
+
+# 起動
+CMD ["npm", "run", "dev"]
