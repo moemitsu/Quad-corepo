@@ -1,14 +1,17 @@
-// src/components/LoginForm.tsx
-import { useState } from 'react';
+// src/_components/LoginForm.tsx
+
+'use client';
+
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
+const LoginForm: React.FC = () => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +19,7 @@ const LoginForm = () => {
 
     try {
       await login(email, password);
-      router.push('/');
+      router.push('/monthly-analysis'); // ログイン成功後にリダイレクト
     } catch (err) {
       setError('ログインに失敗しました。');
     }
@@ -24,13 +27,13 @@ const LoginForm = () => {
 
   return (
     <div>
-      <h1>ログイン</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">メールアドレス</label>
           <input
             type="email"
             id="email"
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -41,6 +44,7 @@ const LoginForm = () => {
           <input
             type="password"
             id="password"
+            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
