@@ -1,6 +1,4 @@
-# section-Final
-
-corepo API仕様書
+# corepo API仕様書
 
 | 機能         | メソッド | パス          | 説明                       |
 |--------------|---------|--------------|----------------------------|
@@ -10,7 +8,7 @@ corepo API仕様書
 | 子どもの追加 | POST | `/api/v1/user/{user_id}/children` | 子どもを追加する |
 | 各月画面の情報を取得 | GET | `/api/v1/main` | 各月画面に表示されるすべてのデータを取得 |
 | 記録の追加 | POST | `/api/v1/records` | 子どもとの時間の記録を登録 |
-| LLM分析 | POST | `/api/v1/analysis` | LLMにテキストを |
+| LLM分析 | POST | `/api/v1/analysis` | LLMにテキストを送信して分析結果を取得する |
 
 
 <!--第2段階で実装
@@ -25,8 +23,8 @@ corepo API仕様書
   + Body
     ```
     {
-      "email": "user@example.com",
-      "password": "password123"
+      "email": "test@test.com",
+      "password": "password"
     }
     ```
 + Response 200 OK
@@ -50,8 +48,8 @@ corepo API仕様書
   + Body
     ```
     {
-      "email": "user@example.com",
-      "password": "password123",
+      "email": "test@test.com",
+      "password": "password",
       "name": "User Name"
     }
     ```
@@ -70,8 +68,8 @@ corepo API仕様書
   + Body
   ```
   {
-    "email": "user@example.com",
-    "password": "password123",
+    "email": "test@test.com",
+    "password": "password",
     "user_name": ["User A", "User B"],
     "children_names": ["Child One", "Child Two"]
   }
