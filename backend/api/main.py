@@ -164,29 +164,29 @@ def getMainData(month: str = Query(...), child_name: Optional[str] = Query(None)
     # TODO 各月画面の情報取得の実装
     # とりあえずのロジック
     return {
-      "summary": {
+        "summary": {
         "dates": [
-          {
-            "date": "2024-06-01",
-            "activities": [
-              {
-                "user_name": "User One",
-                "activity": "Reading",
-                "start_time": "10:00",
-                "end_time": "11:00"
-              }
-            ]
-          }
+                {
+                "date": "2024-06-01",
+                "activities": [
+                    {
+                        "user_name": "User One",
+                        "activity": "Reading",
+                        "start_time": "10:00",
+                        "end_time": "11:00"
+                    }
+                ]
+        }
         ],
         "ratios": {
-          "User One": 50,
-          "User Two": 50
+            "User One": 50,
+            "User Two": 50
         }
-      },
-      "analysis": {
+        },
+        "analysis": {
         "llm_summary": "LLMの要約結果",
         "llm_sentiment": "ポジティブ"
-      }
+        }
     }
 
 # 記録の追加
