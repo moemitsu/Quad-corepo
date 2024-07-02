@@ -36,3 +36,6 @@ coverage.xml
 
 # VS Code
 .vscode/
+
+# Firebase
+.env
