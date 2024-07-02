@@ -1,7 +1,9 @@
 from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-# import jwt #←pip install PyJWTしてね
+
+import jwt  # pip install PyJWTしてね
+
 from datetime import datetime, timedelta
 
 # ベタ打ちデータ
@@ -32,7 +34,7 @@ records = [
 ]
 
 # 型定義たち
-#ログイン用型定義
+# ログイン用型定義
 class LoginReq(BaseModel):
     email: str
     password: str
@@ -85,7 +87,6 @@ class LLMRes(BaseModel):
     sentiment: str
 # 型定義ここまで
 
-
 # FastAPIをインスタンス化する
 app = FastAPI()
 
@@ -101,28 +102,26 @@ def loginUser(email: str, password: str):
         return {'user_id': '12345'}
     raise HTTPException(status_code=401, detail='メールアドレスかパスワードが間違っています。')
 
-def getCurrentUser(token: str = Depends(loginUser)):
+def getCurrentUser(token: str = Depends(lambda: '')):
     try:
-        payload = jwt.decode(token, 'my-secret-key', algrithms=['HS256'])
+        payload = jwt.decode(token, 'my-secret-key', algorithms=['HS256'])
         return payload
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail='トークンが不正です。')
-
 
 # ログイン
 @app.post("/api/v1/auth/login", response_model=LoginRes, responses={401: {'model': Error}})
 def login(request: LoginReq):
     try:
         user = loginUser(request.email, request.password)
-        token = jwt.encode(user, 'my-secret-key', algrithms=['HS256'])
+        token = jwt.encode(user, 'my-secret-key', algorithm='HS256')
         return {'token': token}
     except HTTPException as e:
         raise e
 
 # ユーザー情報登録
 @app.post("/api/v1/user", response_model=UserRes, responses={400: {"model": Error}})
-def postUser(request: UserReq, user: dict = Depends(getCurrentUser)):
-    # TODO ユーザー登録機能を実装
+def postUser(request: UserReq, token: str = Depends(lambda: '')):
     # とりあえずのロジック
     user_id = "12345"
     users[user_id] = {
@@ -134,22 +133,20 @@ def postUser(request: UserReq, user: dict = Depends(getCurrentUser)):
 
 # ユーザー情報編集
 @app.put("/api/v1/user/{user_id}", response_model=UserReq, responses={400: {"model": Error}})
-def updateUser(user_id: str, request: UserReq, user: dict = Depends(getCurrentUser)):
-    # TODO ユーザー情報更新の機能を書く
+def updateUser(user_id: str, request: UserReq, token: str = Depends(lambda: '')):
     # とりあえずのロジック
     if user_id in users:
         users[user_id].update({
             "user_name": request.user_name,
             "children_names": request.children_names
         })
-        return {"message": "User updated successfully", "user_id": user_id}
+        return {"message": "情報を更新しました。", "user_id": user_id}
     else:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status_code=400, detail="ユーザーが見つかりません。")
 
 # 子どもの追加
 @app.post("/api/v1/user/{user_id}/children", response_model=PostChildRes, responses={400: {"model": Error}})
-def addChild(user_id: str, request: PostChildReq, user: dict = Depends(getCurrentUser)):
-    # TODO 子供追加の実装
+def addChild(user_id: str, request: PostChildReq, token: str = Depends(lambda: '')):
     # とりあえずのロジック
     child_id = "54321"
     children[child_id] = {
@@ -160,39 +157,37 @@ def addChild(user_id: str, request: PostChildReq, user: dict = Depends(getCurren
 
 # 各月画面の情報を取得
 @app.get("/api/v1/main", responses={200: {"model": Dict[str, Any]}, 400: {"model": Error}})
-def getMainData(month: str = Query(...), child_name: Optional[str] = Query(None), user: dict = Depends(getCurrentUser)):
-    # TODO 各月画面の情報取得の実装
+def getMainData(month: str = Query(...), child_name: Optional[str] = Query(None), token: str = Depends(lambda: '')):
     # とりあえずのロジック
     return {
         "summary": {
-        "dates": [
+            "dates": [
                 {
-                "date": "2024-06-01",
-                "activities": [
-                    {
-                        "user_name": "User One",
-                        "activity": "Reading",
-                        "start_time": "10:00",
-                        "end_time": "11:00"
-                    }
-                ]
-        }
-        ],
-        "ratios": {
-            "User One": 50,
-            "User Two": 50
-        }
+                    "date": "2024-06-01",
+                    "activities": [
+                        {
+                            "user_name": "User One",
+                            "activity": "Reading",
+                            "start_time": "10:00",
+                            "end_time": "11:00"
+                        }
+                    ]
+                }
+            ],
+            "ratios": {
+                "User One": 50,
+                "User Two": 50
+            }
         },
         "analysis": {
-        "llm_summary": "LLMの要約結果",
-        "llm_sentiment": "ポジティブ"
+            "llm_summary": "LLMの要約結果",
+            "llm_sentiment": "ポジティブ"
         }
     }
 
 # 記録の追加
 @app.post("/api/v1/records", response_model=RecordRes, responses={400: {"model": Error}})
-def addRecord(request: RecordReq, user: dict = Depends(getCurrentUser)):
-    # TODO 記録追加の実装
+def addRecord(request: RecordReq, token: str = Depends(lambda: '')):
     # とりあえずのロジック
     record_id = "67890"
     records.append({
@@ -207,6 +202,6 @@ def addRecord(request: RecordReq, user: dict = Depends(getCurrentUser)):
 
 # LLM分析
 @app.post("/api/v1/analysis", response_model=LLMRes, responses={400: {"model": Error}})
-def getLlmAnalysis(request: LLMReq, user: dict = Depends(getCurrentUser)):
+def getLlmAnalysis(request: LLMReq, token: str = Depends(lambda: '')):
     # TODO LLM分析機能の実装
     return {"summary": "LLMによる要約", "sentiment": "ポジティブ"}
