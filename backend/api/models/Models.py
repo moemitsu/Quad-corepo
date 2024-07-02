@@ -7,6 +7,6 @@ from uuid import uuid4
 # sqlalchemyによってデータベースのテーブルが生成
 
 class User(Base):
-    __tablename__ = 'user'
-    user_id = Column(Integer, primary_key=True, autoincrement= True)  # intで連番で採番される
-    user_name = Column(String)
+  __tablename__ = 'user'
+  user_id = Column(Integer, primary_key=True, autoincrement= True)  # intで連番で採番される
+  user_name = Column(String)
