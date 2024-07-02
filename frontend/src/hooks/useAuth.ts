@@ -1,6 +1,7 @@
 // src/hooks/useAuth.ts
+
 import { useState, useEffect } from 'react';
-import { auth } from '../firebase';
+import { auth } from '../firebase'; // Firebaseの初期化をインポート
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 
 export const useAuth = () => {
@@ -16,13 +17,30 @@ export const useAuth = () => {
     return () => unsubscribe();
   }, []);
 
-  const login = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  const login = async (email: string, password: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential.user);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    return signOut(auth);
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   };
 
-  return { user, loading, login, logout };
+  return {
+    user,
+    loading,
+    login,
+    logout,
+  };
 };
