@@ -1,0 +1,71 @@
+version: '3'
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sectionfdb
+    volumes:
+    - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - msefinal
+  pgadmin4:
+    image: dpage/pgadmin4:8.4
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: samplepass
+    ports:
+      - "8050:80"
+    volumes:
+      - pgadmin4-data:/var/lib/pgadmin
+    networks:
+      - msefinal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    volumes:
+      - ./api:/src/api
+      - ./.dockervenv:/src/.venv:rw
+    tty: true
+    ports:
+      - 8000:8000  # ホストマシンのポート8000を、docker内のポート8000に接続する
+    networks:
+      - msefinal
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontEnd
+      dockerfile: dockerfile
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    working_dir: /usr/src/app
+    command: npm run dev
+    networks:
+      - msefinal
+    depends_on:
+      - backend
+
+networks:
+  msefinal:
+    name: mse
+    external: true
+
+volumes:
+  db-data:
+  pgadmin4-data:
