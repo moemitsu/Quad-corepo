@@ -33,8 +33,8 @@ services:
       context: ./backend
       dockerfile: dockerfile
     volumes:
-      - ./api:/src/api
-      - ./.dockervenv:/src/.venv:rw
+      - ./backend/api:/src/api
+      - ./backend/.dockervenv:/src/.venv:rw
     tty: true
     ports:
       - 8000:8000  # ホストマシンのポート8000を、docker内のポート8000に接続する

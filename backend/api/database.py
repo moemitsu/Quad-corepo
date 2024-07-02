@@ -16,8 +16,8 @@ Base = declarative_base()
 
 # セッションを依存性として定義
 def get_db():
-    db = Session()
-    try:
-        yield db
-    finally:
-        db.close()
+  db = Session()
+  try:
+    yield db
+  finally:
+    db.close()
