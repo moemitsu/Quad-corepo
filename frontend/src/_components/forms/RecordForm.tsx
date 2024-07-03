@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const RecordForm: React.FC = () => {
   const with_members = ['母', '父', '祖母', '祖父', '保育士', '友達', '姉', '兄'];
-  const children = ['子１', '子２', '子３', '子４', '子５'];
   const events = ['遊び', '食事', '睡眠', '勉強', '習い事'];
-  const places = ['家', '公園', '保育園・保育園',  'その他'];
+  const places = ['家', '公園', '保育園・保育園', 'その他'];
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
   const [selectedWithMember, setSelectedWithMember] = useState<string>('');
@@ -19,12 +18,26 @@ const RecordForm: React.FC = () => {
   const [startTime, setStartTime] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
+  const [children, setChildren] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchChildren = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/'); //子供の名前を取得するエンドポイント
+        setChildren(response.data.children);
+      } catch (error) {
+        console.error('Error fetching children: ', error);
+      }
+    };
+
+    fetchChildren();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/activities/', {
+      const response = await axios.post('http://localhost:8000/api/v1/records', {
         with_member: selectedWithMember,
         child: selectedChild,
         events: selectedEvent,
