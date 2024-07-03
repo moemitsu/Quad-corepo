@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import RecordForm from '../../_components/RecordForm';
+import RecordForm from '../../_components/forms/RecordForm';
 
 const RecordActivityPage: React.FC = () => {
   return (

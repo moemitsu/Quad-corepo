@@ -1,10 +1,9 @@
-// src/_components/LoginForm.tsx
-
 'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../hooks/useAuth';
+import axios from 'axios';
+import { useAuth } from '../../hooks/useAuth';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -21,7 +20,18 @@ const LoginForm: React.FC = () => {
       const token = await login(email, password);
       localStorage.setItem('token', token); // トークンをローカルストレージに保存
       console.log('保存したトークン:', localStorage.getItem('token')); // ローカルストレージに保存したトークンをコンソールに出力
-      router.push('/monthly-analysis'); // ログイン成功後にリダイレクト
+
+      // 認証されたリクエストを送信
+      const response = await axios.post('http://localhost:8000/api/v1/auth/login', {
+        // 必要なデータ
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
+        }
+      });
+
+      // ログイン成功後にリダイレクト
+      router.push('/monthly-analysis');
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました。');
     }
@@ -29,7 +39,7 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="p-6 bg-custom-green min-h-screen flex flex-col justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"> {/* max-w-md を max-w-sm に変更 */}
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
         <h2 className="text-4xl font-bold mb-6 text-center">ログイン</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -63,7 +73,5 @@ const LoginForm: React.FC = () => {
     </div>
   );
 };
-
-
 
 export default LoginForm;
