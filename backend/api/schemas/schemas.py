@@ -3,22 +3,17 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 # 型定義たち
-
-# ログイン用型定義
-class LoginReq(BaseModel):
-  email: str
-  password: str
-
-class LoginRes(BaseModel):
-  token: str
-
+# エラー用
 class Error(BaseModel):
   error: str
 
+# 関係者登録
+class stakeHolderReq(BaseModel):
+  id: int
+  stake_holder_name: str
+
 # ユーザー登録用型定義
 class UserReq(BaseModel):
-  email: str
-  password: str
   user_name: List[str]
   children_names: List[str]
 
