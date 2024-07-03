@@ -1,7 +1,7 @@
 from sqlalchemy import String, Column, Integer, ForeignKey, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
-from database import Base
+from backend.api.database.db import Base
 from uuid import uuid4
 
 # データモデルの作成

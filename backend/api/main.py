@@ -1,9 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
-from api.database.models import User, Payments, TimeShareRecords
-
-import jwt  # pip install PyJWTしてね
 
 from datetime import datetime, timedelta
 
