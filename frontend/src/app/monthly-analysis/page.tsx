@@ -1,11 +1,13 @@
 'use client'
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // useRouterフックをインポート
 import BarChart from '../../_components/BarChart';
 import PieChart from '../../_components/PieChart';
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
+  const router = useRouter(); // useRouterフックを使用
 
   useEffect(() => {
     // APIからデータをフェッチするか、ここでデータを設定します
@@ -74,7 +76,7 @@ const MonthlyAnalysis: React.FC = () => {
       </div>
       <div className="flex items-center justify-between mt-12">
         <h2 className="text-4xl font-bold">6月</h2>
-        <button className="p-2 bg-custom-teal text-white rounded">記録を追加+</button>
+        <button className="p-2 bg-custom-teal text-white rounded" onClick={() => router.push('/record-activity')} >記録を追加+</button>
       </div>
       <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-semibold mb-2">LLMでの分析結果</h3>

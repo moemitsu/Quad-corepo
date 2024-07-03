@@ -8,7 +8,6 @@ import LoginForm from '../../_components/LoginForm';
 const LoginPage: React.FC = () => {
   return (
     <div>
-      <h1>ログインページ</h1>
       <LoginForm />
     </div>
   );
