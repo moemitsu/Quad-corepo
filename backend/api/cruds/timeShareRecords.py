@@ -7,13 +7,6 @@ import calendar
 # データベースと直接やりとりする関数。
 # この関数をもとにCRUD処理を動かしてフロントエンドにレスポンスする。
 
-# Userテーブルのidを取得
-def getUserId(db: Session, id: int):
-  return db.query(models.User).filter(models.User.id == id).first()
-# Paymentsテーブルのid取得
-def getPaymentsId(db: Session, id: int):
-  return db.query(models.Payments).filter(models.Payments.id == id)
-
 # クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得
 def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
   startDate = datetime.datetime(year, month, 1) #年、月、1日
