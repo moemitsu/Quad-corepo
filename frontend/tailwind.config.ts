@@ -14,6 +14,7 @@ const config: Config = {
       //     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       // },
       colors: {
+        'custom-light-green':'#f5faeb',
         'custom-green': '#ECF4D6', // 任意の名前を付けて色を定義する
         'custom-blue': '#265073',
         'custom-teal': '#2D9596',
