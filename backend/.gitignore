@@ -39,3 +39,6 @@ coverage.xml
 
 # Firebase
 .env
+
+
+.python-version
