@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import LoginForm from '../../_components/LoginForm';
+import LoginForm from '../../_components/forms/LoginForm';
 
 const LoginPage: React.FC = () => {
   return (

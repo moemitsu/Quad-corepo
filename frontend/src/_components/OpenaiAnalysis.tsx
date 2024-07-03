@@ -21,7 +21,7 @@ interface OpenaiAnalysisProps {
           border-l-8 border-l-custom-light-blue"></div>
         </div>
         <div className="ml-4">
-          <img src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" />
+          {/* <img src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" /> */}
         </div>
       </div>
     );

@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import FamilyRegistrationForm from '../../_components/FamilyRegistrationForm';
+import FamilyRegistrationForm from '../../_components/forms/FamilyRegistrationForm';
 
 const FamilyRegistrationPage: React.FC = () => {
   return (

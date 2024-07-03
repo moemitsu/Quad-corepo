@@ -51,11 +51,12 @@ const MonthlyAnalysis: React.FC = () => {
     <div className="p-6 bg-custom-light-green min-h-screen flex flex-col">
       <div className="flex items-center justify-between">
         <h1 className="text-7xl text-custom-blue">
-          <img src='/corepo.png' alt="LLM Icon" className="w-30 h-41" />
+          {/* <img src='/corepo.png' alt="LLM Icon" className="w-30 h-41" /> */}
         </h1>
         <button className="p-4 bg-custom-blue text-xl text-white rounded 
         shadow-md hover:bg-custom-blue-dark transition-colors">登録情報</button>
       </div>
+
 
       <div className="flex items-center justify-between mt-12">
       
