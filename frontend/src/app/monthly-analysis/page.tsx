@@ -7,6 +7,7 @@ import PieChart from '../../_components/PieChart';
 import OpenaiAnalysis from '../../_components/OpenaiAnalysis'; // LLMAnalysisコンポーネントのインポート
 import { barData, pieData, colors } from '../../data';
 
+
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
@@ -52,20 +53,14 @@ const MonthlyAnalysis: React.FC = () => {
         <h1 className="text-7xl text-custom-blue">
           {/* <img src='/corepo.png' alt="LLM Icon" className="w-30 h-41" /> */}
         </h1>
-        <button className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-blue-dark transition-colors">登録情報</button>
+        <button className="p-4 bg-custom-blue text-xl text-white rounded 
+        shadow-md hover:bg-custom-blue-dark transition-colors">登録情報</button>
       </div>
+
+
       <div className="flex items-center justify-between mt-12">
-
-        
-        {/* 確認するところ */}
-        <h2 className="text-4xl font-bold">6月</h2>
-        <button className="p-2 bg-custom-teal text-white rounded" onClick={() => router.push('/record-activity')} >記録を追加+</button>
-      </div>
+      
       <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-semibold mb-2">LLMでの分析結果</h3>
-        <p>LLMでの分析結果がここに入ります</p>
-
-        
         
         <div className="relative">
           <select
@@ -87,15 +82,21 @@ const MonthlyAnalysis: React.FC = () => {
             >
               <path
                 fillRule="evenodd"
-                d="M7.293 11.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414l-3.5-3.5a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-4 4-4-4a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-3.5 3.5a1 1 0 010 1.414z"
+                d="M7.293 11.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414l-3.5-3.5a1 1 0 010-1.414l3.5-3.5a1 1 0 
+                111.414 1.414l-4 4-4-4a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-3.5 3.5a1 1 0 010 1.414z"
                 clipRule="evenodd"
               />
             </svg>
           </div>
+        
+        <button className="p-4 bg-custom-teal text-xl text-white rounded 
+        shadow-md hover:bg-custom-teal-dark transition-colors" 
+        onClick={() => router.push('/record-activity')}>記録を追加+</button>
+          </div>
         </div>
-        <button className="p-4 bg-custom-teal text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors">記録を追加+</button>
-      </div>
+        </div>
       <OpenaiAnalysis month={selectedMonth} />
+      
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
           <h3 className="text-3xl font-custom-blue mb-2">割合で比較</h3>
