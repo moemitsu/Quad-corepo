@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 # データベースの接続情報を設定
-DATABASE_URL = "postgresql://username:password@postgresserver/db"
+DATABASE_URL = "postgresql://postgres:password@db:5432/sectionfdb"
 
 # データベースエンジンを作成
 engine = create_engine(DATABASE_URL)
