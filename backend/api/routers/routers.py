@@ -18,13 +18,6 @@ def getDB():
   finally:
     db.close()
 
-# # ログイン
-# @app.post('/api/v1/auth/login', response_model=LoginRes, responses={401: {'model': Error}})
-# def login(user: schemas.LoginReq, db: Session = Depends(get_db)):
-#   db_user = crud.email
-#   if db_user:
-#     raise HTTPException(status_code=400, detail='既に登録済みのEメールアドレスです')
-
 # ユーザー情報登録
 @app.post('/api/v1/user', response_model=UserRes, responses={400: {'model': Error}})
 def postUser(request: UserReq, token: str = Depends(lambda: '')):
