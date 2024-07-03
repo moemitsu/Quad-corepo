@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import models, schemas
+import models, backend.api.schemas.schemas as schemas
 
 # データベースと直接やりとりする関数。
 # この関数をもとにCRUD処理を動かしてフロントエンドにレスポンスする。

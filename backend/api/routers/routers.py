@@ -3,27 +3,13 @@ from typing import Optional, Dict, Any
 from data import users, children, records
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-import dataModels, data, database
-from dataModels import LoginReq, LoginRes, UserReq, UserRes,PostChildReq, PostChildRes, RecordReq, RecordRes, LLMReq, LLMRes, Error
+import backend.api.schemas.schemas as schemas, data, database
+from backend.api.schemas.schemas import LoginReq, LoginRes, UserReq, UserRes,PostChildReq, PostChildRes, RecordReq, RecordRes, LLMReq, LLMRes, Error
 import jwt  # pip install PyJWTしてね
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-# # ここから実際のアプリのやつ
-# def loginUser(email: str, password: str):
-#   # 簡易的な（とりあえずの）認証ロジック
-#   if email == 'test@test.com' and password == 'password':
-#     return {'user_id': '12345'}
-#   raise HTTPException(status_code=401, detail='メールアドレスかパスワードが間違っています。')
-
-# def getCurrentUser(token: str = Depends(lambda: '')):
-#   try:
-#     payload = jwt.decode(token, 'my-secret-key', algorithms=['HS256'])
-#     return payload
-#   except jwt.PyJWTError:
-#     raise HTTPException(status_code=401, detail='トークンが不正です。')
 
 def getDB():
   db = SessionLocal()
@@ -32,12 +18,12 @@ def getDB():
   finally:
     db.close()
 
-# ログイン
-@app.post("/api/v1/auth/login", response_model=LoginRes, responses={401: {'model': Error}})
-def login(user: schemas.LoginReq, db: Session = Depends(get_db)):
-  db_user = crud.email
-  if db_user:
-    raise HTTPException(status_code=400, detail='既に登録済みのEメールアドレスです')
+# # ログイン
+# @app.post("/api/v1/auth/login", response_model=LoginRes, responses={401: {'model': Error}})
+# def login(user: schemas.LoginReq, db: Session = Depends(get_db)):
+#   db_user = crud.email
+#   if db_user:
+#     raise HTTPException(status_code=400, detail='既に登録済みのEメールアドレスです')
 
 # ユーザー情報登録
 @app.post("/api/v1/user", response_model=UserRes, responses={400: {"model": Error}})
@@ -119,6 +105,8 @@ def addRecord(request: RecordReq, token: str = Depends(lambda: '')):
     "end_time": request.end_time
   })
   return {"message": "記録を追加しました。", "record_id": record_id}
+
+# 子どもの名前だけ取得するメソッド。
 
 # LLM分析
 @app.post("/api/v1/analysis", response_model=LLMRes, responses={400: {"model": Error}})
