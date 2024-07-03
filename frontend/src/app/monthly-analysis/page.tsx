@@ -1,6 +1,7 @@
 // MonthlyAnalysis.tsx
 'use client'
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; // useRouterフックをインポート
 import BarChart from '../../_components/BarChart';
 import PieChart from '../../_components/PieChart';
 import OpenaiAnalysis from '../../_components/OpenaiAnalysis'; // LLMAnalysisコンポーネントのインポート
@@ -10,6 +11,9 @@ const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
   const [selectedMonth, setSelectedMonth] = useState<number>(6); // 6月を初期選択として設定
+  
+  const router = useRouter(); // useRouterフックを使用
+  
 
   useEffect(() => {
     // グラフデータに色を追加する関数
@@ -51,6 +55,18 @@ const MonthlyAnalysis: React.FC = () => {
         <button className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-blue-dark transition-colors">登録情報</button>
       </div>
       <div className="flex items-center justify-between mt-12">
+
+        
+        //確認するところ
+        <h2 className="text-4xl font-bold">6月</h2>
+        <button className="p-2 bg-custom-teal text-white rounded" onClick={() => router.push('/record-activity')} >記録を追加+</button>
+      </div>
+      <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-xl font-semibold mb-2">LLMでの分析結果</h3>
+        <p>LLMでの分析結果がここに入ります</p>
+
+        
+        
         <div className="relative">
           <select
             className="p-4 text-4xl text-custom-blue bg-custom-light-green"
