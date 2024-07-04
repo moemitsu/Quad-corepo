@@ -33,7 +33,8 @@ interface AnalysisData {
 const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
-
+  const [viewCount, setViewCount] = useState<number>(0);
+// LLMの分析結果を表示
   useEffect(() => {
     if (user) {
       const fetchData = async () => {
@@ -52,6 +53,10 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
     }
   }, [user, month]);
 
+  const handleViewClick = () => {
+    setViewCount(viewCount + 1);
+  };
+
   if (!user) {
     return <p>ログインしてください。</p>;
   }
@@ -64,10 +69,30 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
     <div className="flex mt-4 items-center justify-center">
       <div className="relative bg-white p-6 rounded-lg shadow-md self-start flex items-center">
         <div>
+          {/* ３回表示させたら会員登録を促すロジック */}
+          {/* TODO:必要に応じて今後修正 */}
           <h3 className="text-2xl font-semibold mb-2">LLMでの分析</h3>
           <p>{month}月のLLMでの分析結果がここに入ります</p>
-          <p>{data.analysis.llm_summary}</p>
-          <p>{data.analysis.llm_sentiment}</p>
+          {viewCount < 3 ? (
+            <>
+              <p>{data.analysis.llm_summary}</p>
+              <p>{data.analysis.llm_sentiment}</p>
+              <button onClick={handleViewClick} className="p-2 mt-4 bg-custom-blue text-white rounded">
+                分析結果を表示
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="blur-sm">
+                <p>{data.analysis.llm_summary}</p>
+                <p>{data.analysis.llm_sentiment}</p>
+              </div>
+              <p className="mt-4">続きを見たい場合は会員登録をしてください。</p>
+              <button className="p-2 mt-2 bg-custom-blue text-white rounded">
+                登録はこちら
+              </button>
+            </>
+          )}
         </div>
         <div className="absolute top-1/2 left-full transform -translate-y-1/2 w-0 h-0 border-t-8 
           border-t-transparent border-b-8 border-b-transparent 

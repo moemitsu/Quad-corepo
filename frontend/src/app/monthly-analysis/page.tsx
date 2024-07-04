@@ -1,11 +1,13 @@
-// MonthlyAnalysis.tsx
-'use client'
+// src/_components/MonthlyAnalysis.tsx
+"use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // useRouterフックをインポート
+import { useRouter } from "next/navigation"; // useRouterをインポート
 import BarChart from "../../_components/BarChart";
 import PieChart from "../../_components/PieChart";
 import OpenaiAnalysis from "../../_components/OpenaiAnalysis";
+import Header from "../../_components/layout/header";
 import { barData, pieData, colors } from "../../data";
+import axios from "axios";
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
@@ -15,44 +17,49 @@ const MonthlyAnalysis: React.FC = () => {
   const [llmSentiment, setLlmSentiment] = useState<string>(""); // LLMのセンチメント
 
   const router = useRouter();
-
+  //月別の子供ごとのデータを取得する
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/v1/main?month=2024-${selectedMonth}&child_name=Child One`);
-        if (!response.ok) {
-          throw new Error('データの取得に失敗しました。');
-        }
-        const data = await response.json();
+        // 子供を選択するドロップダウンで選択した子供のみを表示
+        const response = await axios.get(`http://localhost:8000/api/v1/main`, {
+          params: {
+            month: `2024-${selectedMonth}`,
+            child_name: "Child One",
+          },
+        });
+        const data = response.data;
         const { summary, analysis } = data;
 
         // グラフデータに色を追加する関数
         const addColors = (data: any, isPieChart = false) => {
           const newData = { ...data };
-          newData.datasets = newData.datasets.map((dataset: any, index: number) => {
-            if (isPieChart) {
-              const backgroundColor = dataset.data.map(
-                (_: any, i: number) => colors[i % colors.length]
-              );
-              const borderColor = backgroundColor.map((color: string) =>
-                color.replace("0.7", "1")
-              );
-              return {
-                ...dataset,
-                backgroundColor,
-                borderColor,
-                borderWidth: 2,
-              };
-            } else {
-              const color = colors[index % colors.length];
-              return {
-                ...dataset,
-                backgroundColor: color,
-                borderColor: color.replace("0.7", "1"),
-                borderWidth: 1,
-              };
+          newData.datasets = newData.datasets.map(
+            (dataset: any, index: number) => {
+              if (isPieChart) {
+                const backgroundColor = dataset.data.map(
+                  (_: any, i: number) => colors[i % colors.length]
+                );
+                const borderColor = backgroundColor.map((color: string) =>
+                  color.replace("0.7", "1")
+                );
+                return {
+                  ...dataset,
+                  backgroundColor,
+                  borderColor,
+                  borderWidth: 2,
+                };
+              } else {
+                const color = colors[index % colors.length];
+                return {
+                  ...dataset,
+                  backgroundColor: color,
+                  borderColor: color.replace("0.7", "1"),
+                  borderWidth: 1,
+                };
+              }
             }
-          });
+          );
           return newData;
         };
 
@@ -61,7 +68,7 @@ const MonthlyAnalysis: React.FC = () => {
         setLlmSummary(analysis.llm_summary);
         setLlmSentiment(analysis.llm_sentiment);
       } catch (error) {
-        console.error('エラー:', error);
+        console.error("エラー:", error);
       }
     };
 
@@ -70,17 +77,15 @@ const MonthlyAnalysis: React.FC = () => {
 
   return (
     <div className="p-6 bg-custom-light-green min-h-screen flex flex-col">
-      <div className="flex items-center justify-between">
-        <h1 className="text-7xl text-custom-blue">
-          <img src="/corepo.png" alt="LLM Icon" className="w-30 h-41" />
-        </h1>
+      <Header />
+      <div className="mt-4">
         <button
-          className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-blue-dark transition-colors"
+          className="ml-4 p-4 min-w-max bg-white text-custom-blue text-lg rounded shadow-md hover:bg-gray-200 transition-colors"
         >
-          登録情報
+          登録情報を見る
         </button>
       </div>
-      <div className="mt-4 bg-white p-6 rounded-lg shadow-md">
+      <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
         <div className="flex items-center justify-between mt-12">
           <div className="relative">
             <select
@@ -112,16 +117,21 @@ const MonthlyAnalysis: React.FC = () => {
               className="p-4 bg-custom-teal text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
               onClick={() => router.push("/record-activity")}
             >
-              記録を追加+
+              記録を追加＋
+            </button>
+            {/* FIXME:子供の選択コンポーネントを作成後、遷移先修正 */}
+            <button
+              className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
+              onClick={() => router.push("/record-activity")}
+            >
+              お子様を選択＞
             </button>
           </div>
-          {/* FIXME：フェッチできたら表示トライする */}
-             {/* <OpenaiAnalysis month={selectedMonth} /> */}
+          {/* FIXME：GETできたら表示トライする */}
+          {/* <OpenaiAnalysis month={selectedMonth} /> */}
         </div>
       </div>
-
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        
         <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
           <h3 className="text-3xl font-custom-blue mb-2">割合で比較</h3>
           <PieChart data={pieChartData} />
