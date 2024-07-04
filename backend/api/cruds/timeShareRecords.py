@@ -21,6 +21,7 @@ def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
     )
   ).all()
 
+# 記録の追加
 def createRecords(db: Session, user_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
   newRecords = models.TimeShareRecords(
     user_id = user_id,
