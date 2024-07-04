@@ -16,13 +16,21 @@ COPY serviceAccountKey.json /src/serviceAccountKey.json
 RUN poetry config virtualenvs.in-project true
 RUN if [ -f pyproject.toml ]; then poetry install --no-root; fi
 
-# アプリケーションコードをコピー
-COPY ./ /src
+# そのほかの大事なあまり手を加えないファイルをコピーする
+COPY alembic ./alembic
+COPY alembic.ini ./
+COPY entrypoint.sh ./
 
+
+# uvicornのサーバーを立ち上げる
+# ENTRYPOINT ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]
+# CMD ["bash"]
+# RUN poetry run uvicorn api.main:app --host 0.0.0.0 --reload\
+# && poetry run alembic revision --autogenerate -m "Initial migration"\
+# && poetry run alembic upgrade head\
+# && poetry run python -m api.database.seed
 # マイグレーションのスクリプトを実行
 # RUN poetry run alembic revision --autogenerate -m "Initial migration"
 # RUN poetry run alembic upgrade head
-
-# uvicornのサーバーを立ち上げる
-ENTRYPOINT ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--reload"]
-# CMD ["bash"]
+# シーディングのスクリプトを実行
+# RUN poetry run python -m api.database.seed
