@@ -88,7 +88,7 @@ def getMainData(child_name: str, year: str, month: str,db: Session = Depends(get
 # 記録の追加
 # 書き直し済　TODO 動作確認
 @app.post("/time-share-records/", response_model=models.TimeShareRecords)
-def create_time_share_record(record: models.TimeShareRecords, db: Session = Depends(getDB)):
+def CreateRecords(record: models.TimeShareRecords, db: Session = Depends(getDB)):
     dbRecord = crud.createRecords(
         db = db,
         user_id = record.user_id,
