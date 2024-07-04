@@ -37,3 +37,12 @@ def createRecords(db: Session, user_id: int, with_member: str,child_name: str,ev
   db.commit()
   db.refresh(newRecords)
   return newRecords
+
+# LLMに分析してもらうためのデータを取得
+def getRecordsAnalysis(db: Session, user_id: int, child_name: str):
+  return db.query(models.TimeShareRecords).filter(
+    and_(
+      models.TimeShareRecords.user_id == user_id,
+      models.TimeShareRecords.child_name == child_name
+    )
+  ).all()
