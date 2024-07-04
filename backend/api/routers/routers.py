@@ -42,6 +42,23 @@ def formatRecords(records):
 
 
 # 以下メソッド
+# ログイン 書き直し済み　TODO 用動作確認
+@app.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+def login(token: str = Depends(verify_token), db: Session = Depends(getDB)):
+    firebase_id = token['uid']
+    stakeholder = crud.get_stakeholder_by_firebase_id(db, firebase_id)
+    if stakeholder:
+        return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
+    else:
+        raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
+
+# 新規登録　TODO 要動作確認
+@app.post('/api/v1/stakeholder', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+def postStakeholder(request: schemas.StakeHolderReq, db: Session = Depends(getDB)):
+  stakeholder = crud.createStakeholder(db, request)
+  return schemas.StakeholderRes(message='登録完了', stakeholder_id=stakeholder.id)
+
+
 # ユーザー情報登録　書き直し済　TODO 要動作確認
 @app.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def postUser(request: schemas.UserReq, db: Session = Depends(getDB)):

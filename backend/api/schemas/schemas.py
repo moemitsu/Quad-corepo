@@ -1,15 +1,23 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import datetime
-# 型定義たち
-# エラー用
+
+class LoginReq(BaseModel):
+  firebase_id: str
+
+class LoginRes(BaseModel):
+  firebase_id: str
+
 class Error(BaseModel):
   error: str
 
+class StakeHolderReq(BaseModel):
+  stakeholder_name: str
+  firebase_id: str
 
-class stakeHolderReq(BaseModel):
-  id: int
-  stake_holder_name: str
+class StakeholderRes(BaseModel):
+  message: str
+  stakeholder_id: int
 
 
 class UserReq(BaseModel):
