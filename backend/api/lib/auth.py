@@ -4,8 +4,7 @@ from firebase_admin import credentials, auth
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-# Firebase Admin SDKの初期化
-cred = credentials.Certificate("path/to/your/firebase/credentials.json")
+cred = credentials.Certificate("/src/serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 # FastAPIの認証スキーマ
