@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import models, backend.api.schemas.schemas as schemas
+import backend.api.database.models as models, backend.api.schemas.schemas as schemas
 
 # Paymentsテーブルのid取得
 def getPaymentsId(db: Session, id: int):

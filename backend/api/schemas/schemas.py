@@ -1,7 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timedelta
+from typing import List, Dict, Any
 # 型定義たち
 # エラー用
 class Error(BaseModel):

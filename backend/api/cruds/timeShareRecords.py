@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
-import models, backend.api.schemas.schemas as schemas
+import backend.api.database.models as models, backend.api.schemas.schemas as schemas
 import datetime
 import calendar
 
@@ -21,3 +21,18 @@ def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
     )
   ).all()
 
+def createRecords(db: Session, user_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
+  newRecords = models.TimeShareRecords(
+    user_id = user_id,
+    with_member = with_member,
+    child_name = child_name,
+    events = events,
+    child_condition = child_condition,
+    place = place,
+    share_start_at = share_start_at,
+    share_end_at = share_end_at
+  )
+  db.add(newRecords)
+  db.commit()
+  db.refresh(newRecords)
+  return newRecords
