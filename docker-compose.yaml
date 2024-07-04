@@ -22,7 +22,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ushikichi@gmail.com
       PGADMIN_DEFAULT_PASSWORD: samplepass
     ports:
-      - "8050:8050"
+      - "8050:80"
     volumes:
       - pgadmin4-data:/var/lib/pgadmin
     networks:
