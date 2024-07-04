@@ -19,7 +19,6 @@ class Payments(Base):
 
 class TimeShareRecords(Base):
   __tablename__ = 'TimeShareRecords'
-
   id = Column(Integer, UUID(), nullable=False, primary_key=True, autoincrement= True)  # intで連番で採番される
   user_id = Column(UUID(), ForeignKey('user.id'), nullable=False, primary_key=True)
   with_member = Column(String(), nullable=False)
