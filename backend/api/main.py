@@ -11,6 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 # FastAPIをインスタンス化する
 app = FastAPI()
 
+
+# CORS設定
+
 origins = [
   "http://localhost:3000",
   "https://localhost:3000",
@@ -22,9 +25,9 @@ app.add_middleware(
   allow_methods=["*"],
   allow_headers=["GET", "POST", "PUT","DELETE"],
   # allow_headers=["Authorization", "Content-Type"]
+
 )
 
-# 初期のやつ
 @app.get("/")
 def read_root():
   return {"message": "Welcome to the FastAPI application"}
@@ -32,3 +35,4 @@ def read_root():
 @app.get("/protected-route")
 def protected_route(user = Depends(get_current_user)):
   return {"message": "This is a protected route", "user": user}
+
