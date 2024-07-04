@@ -5,6 +5,9 @@ from typing import List, Optional, Dict, Any
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timedelta
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 # FastAPIをインスタンス化する
 app = FastAPI()
 
@@ -17,7 +20,7 @@ app.add_middleware(
   allow_origins=origins,
   allow_credentials=True,
   allow_methods=["*"],
-  allow_headers=["*"],
+  allow_headers=["GET", "POST", "PUT","DELETE"],
   # allow_headers=["Authorization", "Content-Type"]
 )
 
