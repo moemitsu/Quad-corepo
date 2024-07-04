@@ -9,15 +9,16 @@ from datetime import datetime, timedelta
 app = FastAPI()
 
 origins = [
-    "http://localhost:8000",
-    "https://localhost:8000",
+  "http://localhost:3000",
+  "https://localhost:3000",
 ]
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=origins,
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+  # allow_headers=["Authorization", "Content-Type"]
 )
 
 # 初期のやつ
@@ -26,5 +27,5 @@ def read_root():
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")
-def protected_route(user = Depends(get_current_user())):
+def protected_route(user = Depends(get_current_user)):
   return {"message": "This is a protected route", "user": user}
