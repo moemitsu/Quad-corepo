@@ -2,11 +2,11 @@ from fastapi import FastAPI, HTTPException, Depends, Query
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-import backend.api.database.models as models, backend.api.schemas.schemas as schemas, backend.api.cruds as crud , backend.api.database as database
-import openai
 from openai import OpenAI
+import openai
 import os
 import json
+import backend.api.database.models as models, backend.api.schemas.schemas as schemas, backend.api.cruds as crud, backend.api.database as database
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -33,7 +33,7 @@ def analyzeOpenai(text: str):
   )
   return res.choices[0].text.strip()
 
-# LLM分析の@app.post内でデータをフォーマットする関数
+# LLM分析の@app.post内でデータをjson形式へフォーマットする関数
 def formatRecords(records):
   formattedRecords = [record.__dict__ for record in records]
   for record in formattedRecords:
@@ -42,42 +42,39 @@ def formatRecords(records):
 
 
 # 以下メソッド
-# ユーザー情報登録
-# 書き直し済　TODO 要動作確認
+# ログイン 書き直し済み　TODO 用動作確認
+@app.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+def login(token: str = Depends(verify_token), db: Session = Depends(getDB)):
+    firebase_id = token['uid']
+    stakeholder = crud.get_stakeholder_by_firebase_id(db, firebase_id)
+    if stakeholder:
+        return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
+    else:
+        raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
+
+# 新規登録　TODO 要動作確認
+@app.post('/api/v1/stakeholder', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+def postStakeholder(request: schemas.StakeHolderReq, db: Session = Depends(getDB)):
+  stakeholder = crud.createStakeholder(db, request)
+  return schemas.StakeholderRes(message='登録完了', stakeholder_id=stakeholder.id)
+
+
+# ユーザー情報登録　書き直し済　TODO 要動作確認
 @app.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def postUser(request: schemas.UserReq, db: Session = Depends(getDB)):
-  dbUser = crud.createUser(db=db, user=request)
+  dbUser = crud.createUser(db=db, stakeholder_id=request.stakeholder_id, adult_name=request.adult_name, child_name=request.child_name)
   return schemas.UserRes(message='登録完了！', user_id=dbUser.id)
 
-
-# ユーザー情報編集
-# TODO 書き直す　優先順位⓶
+# ユーザー情報編集　書き直し済 TODO 要動作確認
 @app.put('/api/v1/user/{user_id}', response_model=schemas.UserReq, responses={400: {'model': schemas.Error}})
-def updateUser(user_id: str, request: schemas.UserReq, token: str = Depends(getDB)):
-  # とりあえずのロジック
-  if user_id in users:
-    users[user_id].update({
-      'user_name': request.user_name,
-      'children_names': request.children_names
-    })
-    return {'message': '情報を更新しました。', 'user_id': user_id}
+def updateUser(user_id: int, request: schemas.UserReq, db: Session = Depends(getDB)):
+  dbUser = crud.updateUser(db=db, user_id=request.user_id, adult_name=request.adult_name, child_name=request.child_name)
+  if dbUser:
+    return schemas.UserRes(message='情報を更新しました', user_id=dbUser.id)
   else:
-    raise HTTPException(status_code=400, detail='ユーザーが見つかりません。')
+    raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
 
-# 子どもの追加　ユーザー情報の編集に入れられるのでは？？
-# TODO 書き直す　優先順位⓶
-@app.post('/api/v1/user/{user_id}/children', response_model=schemas.PostChildRes, responses={400: {'model': schemas.Error}})
-def addChild(user_id: str, request: schemas.PostChildReq, token: str = Depends(lambda: '')):
-  # とりあえずのロジック
-  child_id = '54321'
-  children[child_id] = {
-    'child_name': request.child_name,
-    'user_id': user_id
-  }
-  return {'child_id': child_id}
-
-# 各月画面の情報を取得
-# 書き直し済　TODO 要動作確認
+# 各月画面の情報を取得　書き直し済　TODO 要動作確認
 @app.get('/api/v1/main', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
 def getMainData(child_name: str, year: str, month: str,db: Session = Depends(getDB)):
   records = crud.getRecordsByMonth(db, child_name, year, month)
@@ -85,8 +82,7 @@ def getMainData(child_name: str, year: str, month: str,db: Session = Depends(get
     raise HTTPException(status_code=404, detail='記録が見つかりません')
   return records
 
-# 記録の追加
-# 書き直し済　TODO 要動作確認
+# 記録の追加　書き直し済　TODO 要動作確認
 @app.post("/time-share-records/", response_model=models.TimeShareRecords)
 def CreateRecords(record: models.TimeShareRecords, db: Session = Depends(getDB)):
     dbRecord = crud.createRecords(
@@ -105,8 +101,7 @@ def CreateRecords(record: models.TimeShareRecords, db: Session = Depends(getDB))
     return dbRecord
 
 
-# LLM分析
-# メソッド書き直し済 TODO 要動作確認
+# LLM分析　メソッド書き直し済 TODO 要動作確認
 @app.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
 def getAnalysis(request: schemas.LLMReq, db: Session = Depends(getDB)):
   records = crud.getRecordsAnalysis(db, request.user_id, request.child_name)
