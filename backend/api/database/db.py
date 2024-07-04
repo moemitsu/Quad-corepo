@@ -9,14 +9,14 @@ DATABASE_URL = "postgresql://postgres:password@db:5432/sectionfdb"
 engine = create_engine(DATABASE_URL)
 
 # セッションファクトリを作成
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # モデルを定義するための基本となるBaseクラスを作成
 Base = declarative_base()
 
 # セッションを依存性として定義
 def get_db():
-  db = Session()
+  db = SessionLocal()
   try:
     yield db
   finally:
