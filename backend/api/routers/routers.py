@@ -43,7 +43,7 @@ def formatRecords(records):
 
 # 以下メソッド
 # ユーザー情報登録
-# 書き直し済　TODO 動作確認
+# 書き直し済　TODO 要動作確認
 @app.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def postUser(request: schemas.UserReq, db: Session = Depends(getDB)):
   dbUser = crud.createUser(db=db, user=request)
@@ -77,7 +77,7 @@ def addChild(user_id: str, request: schemas.PostChildReq, token: str = Depends(l
   return {'child_id': child_id}
 
 # 各月画面の情報を取得
-# 書き直し済　TODO 動作確認
+# 書き直し済　TODO 要動作確認
 @app.get('/api/v1/main', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
 def getMainData(child_name: str, year: str, month: str,db: Session = Depends(getDB)):
   records = crud.getRecordsByMonth(db, child_name, year, month)
@@ -86,7 +86,7 @@ def getMainData(child_name: str, year: str, month: str,db: Session = Depends(get
   return records
 
 # 記録の追加
-# 書き直し済　TODO 動作確認
+# 書き直し済　TODO 要動作確認
 @app.post("/time-share-records/", response_model=models.TimeShareRecords)
 def CreateRecords(record: models.TimeShareRecords, db: Session = Depends(getDB)):
     dbRecord = crud.createRecords(
@@ -106,7 +106,7 @@ def CreateRecords(record: models.TimeShareRecords, db: Session = Depends(getDB))
 
 
 # LLM分析
-# メソッド書き直し済 TODO 動作確認
+# メソッド書き直し済 TODO 要動作確認
 @app.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
 def getAnalysis(request: schemas.LLMReq, db: Session = Depends(getDB)):
   records = crud.getRecordsAnalysis(db, request.user_id, request.child_name)
