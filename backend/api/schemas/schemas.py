@@ -1,49 +1,56 @@
 from pydantic import BaseModel
 from typing import List, Dict, Any
+import datetime
 # 型定義たち
 # エラー用
 class Error(BaseModel):
   error: str
 
-# 関係者登録
+
 class stakeHolderReq(BaseModel):
   id: int
   stake_holder_name: str
 
-# ユーザー登録用型定義
+
 class UserReq(BaseModel):
-  user_name: List[str]
-  children_names: List[str]
+  stakeholder_id: int
+  adult_name: str
+  child_name: str
 
 class UserRes(BaseModel):
   message: str
-  user_id: str
+  user_id: int
 
-# 子供追加
+
 class PostChildReq(BaseModel):
+  stakeholder_id: int
   child_name: str
 
 class PostChildRes(BaseModel):
-  child_id: str
+  message: str
+
 
 class RecordReq(BaseModel):
-  user_id: str
+  stakeholder_id: int
+  with_member: str
   child_name: str
-  activity: str
-  start_time: str
-  end_time: str
+  events: str
+  child_condition: str
+  place: str
+  share_start_at: datetime
+  share_end_at: datetime
 
-# 記録の追加の
 class RecordRes(BaseModel):
   message: str
   record_id: str
 
+
 class LLMReq(BaseModel):
   text: str
-  user_id: str
+  stakeholder_id: int
   child_name: str
+  year: str
   month: str
-  activities: List[Dict[str, Any]]
 
 class LLMRes(BaseModel):
   summary: str
