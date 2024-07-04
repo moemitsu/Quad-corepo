@@ -22,9 +22,9 @@ def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
   ).all()
 
 # 記録の追加
-def createRecords(db: Session, user_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
+def createRecords(db: Session, stakeholder_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
   newRecords = models.TimeShareRecords(
-    user_id = user_id,
+    stakeholder_id = stakeholder_id,
     with_member = with_member,
     child_name = child_name,
     events = events,
@@ -39,10 +39,10 @@ def createRecords(db: Session, user_id: int, with_member: str,child_name: str,ev
   return newRecords
 
 # LLMに分析してもらうためのデータを取得
-def getRecordsAnalysis(db: Session, user_id: int, child_name: str):
+def getRecordsAnalysis(db: Session, stakeholder_id: int, child_name: str):
   return db.query(models.TimeShareRecords).filter(
     and_(
-      models.TimeShareRecords.user_id == user_id,
+      models.TimeShareRecords.stakeholder_id == stakeholder_id,
       models.TimeShareRecords.child_name == child_name
     )
   ).all()
