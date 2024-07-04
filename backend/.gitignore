@@ -41,6 +41,10 @@ coverage.xml
 .env
 
 
+
 .python-version
 
+
+
+serviceAccountKey.json
 

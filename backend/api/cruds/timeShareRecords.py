@@ -1,8 +1,48 @@
 from sqlalchemy.orm import Session
-import models, backend.api.schemas.schemas as schemas
+from sqlalchemy import and_
+import backend.api.database.models as models, backend.api.schemas.schemas as schemas
+import datetime
+import calendar
 
 # データベースと直接やりとりする関数。
 # この関数をもとにCRUD処理を動かしてフロントエンドにレスポンスする。
-def getUser(db: Session, user_id: int):
-  return db.query(models.User).filter(models.User.id == user_id).first()
 
+# クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得
+def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
+  startDate = datetime.datetime(year, month, 1) #年、月、1日
+  lastDay = calendar.monthrange(year, month)[1]
+  endDate = datetime.datetime(year, month, lastDay, 23, 59, 59) # 年、月、最終日、23:59:59
+
+  return  db.query(models.TimeShareRecords).filter(
+    and_(
+      models.TimeShareRecords.child_name == child_name,
+      models.TimeShareRecords.share_start_at >= startDate,
+      models.TimeShareRecords.share_end_at <= endDate
+    )
+  ).all()
+
+# 記録の追加
+def createRecords(db: Session, user_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
+  newRecords = models.TimeShareRecords(
+    user_id = user_id,
+    with_member = with_member,
+    child_name = child_name,
+    events = events,
+    child_condition = child_condition,
+    place = place,
+    share_start_at = share_start_at,
+    share_end_at = share_end_at
+  )
+  db.add(newRecords)
+  db.commit()
+  db.refresh(newRecords)
+  return newRecords
+
+# LLMに分析してもらうためのデータを取得
+def getRecordsAnalysis(db: Session, user_id: int, child_name: str):
+  return db.query(models.TimeShareRecords).filter(
+    and_(
+      models.TimeShareRecords.user_id == user_id,
+      models.TimeShareRecords.child_name == child_name
+    )
+  ).all()

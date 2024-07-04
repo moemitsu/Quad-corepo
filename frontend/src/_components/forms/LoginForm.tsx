@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
+import { AuthErrorCodes } from 'firebase/auth';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,19 +22,37 @@ const LoginForm: React.FC = () => {
       localStorage.setItem('token', token); // トークンをローカルストレージに保存
       console.log('保存したトークン:', localStorage.getItem('token')); // ローカルストレージに保存したトークンをコンソールに出力
 
+      // UIDの確認
+      const uid = user?.uid;
+      if (!uid) {
+        throw new Error('UIDが取得できませんでした。');
+      }
+
       // 認証されたリクエストを送信
-      const response = await axios.post('http://localhost:8000/api/v1/auth/login', {
-        // 必要なデータ
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
+      const response = await axios.post(
+        'http://localhost:8000/api/v1/auth/login',
+        { uid }, // リクエストボディにUIDを含める
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
+          },
         }
-      });
+      );
 
       // ログイン成功後にリダイレクト
       router.push('/monthly-analysis');
     } catch (err: any) {
-      setError(err.message || 'ログインに失敗しました。');
+      console.error('エラーコード:', err.code); // エラーコードをコンソールに出力
+      console.error('エラーメッセージ:', err.message); // エラーメッセージをコンソールに出力
+      if (err.code === 'auth/user-not-found') {
+        // ユーザーが見つからなかった場合、新規登録ページにリダイレクト
+        router.push('/family-registration');
+      } else if (err.code === 'auth/wrong-password') {
+        // パスワードが間違っている場合、エラーメッセージを表示
+        setError('パスワードが違います');
+      } else {
+        setError(err.message || 'ログインに失敗しました。');
+      }
     }
   };
 

@@ -1,0 +1,39 @@
+version: '3'
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sectionfdb
+    volumes:
+    - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - msefinal
+
+  pgadmin4:
+    image: dpage/pgadmin4:8.9
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ushikichi@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: samplepass
+    ports:
+      - "8050:80"
+    volumes:
+      - pgadmin4-data:/var/lib/pgadmin
+    networks:
+      - msefinal
+
+networks:
+  msefinal:
+    name: mse
+    external: true
+
+volumes:
+  db-data:
+  pgadmin4-data:
