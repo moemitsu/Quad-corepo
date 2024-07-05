@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../../_components/layout/header";
 import Footer from "../../_components/layout/footer";
+import Image from 'next/image';
 
 const Hello: React.FC = () => {
   const [data, setData] = useState<{ message: string } | null>(null);
@@ -43,7 +44,7 @@ const Hello: React.FC = () => {
           ></div>
         </div>
         <div className="ml-4">
-          <img src="/LLMicon.png" alt="LLM Icon" className="w-30 h-41" />
+          <Image src="/LLMicon.png" alt="LLM Icon" className="w-30 h-41" />
         </div>
       </div>
       <Footer />

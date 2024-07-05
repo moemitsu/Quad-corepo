@@ -1,6 +1,6 @@
 // src/_components/MonthlyAnalysis.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // useRouterをインポート
 import BarChart from "../../_components/BarChart";
 import PieChart from "../../_components/PieChart";
@@ -32,7 +32,7 @@ const MonthlyAnalysis: React.FC = () => {
   };
 
   // 月別の子供ごとのデータを取得する
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/v1/main`, {
         params: {
@@ -82,7 +82,7 @@ const MonthlyAnalysis: React.FC = () => {
     } catch (error) {
       console.error("エラー:", error);
     }
-  };
+  },[selectedMonth, selectedChild]);
 
   useEffect(() => {
     fetchChildren();
@@ -92,7 +92,7 @@ const MonthlyAnalysis: React.FC = () => {
     if (selectedChild) {
       fetchData();
     }
-  }, [selectedMonth, selectedChild]);
+  }, [selectedMonth, selectedChild, fetchData]);
 
   return (
     <div>

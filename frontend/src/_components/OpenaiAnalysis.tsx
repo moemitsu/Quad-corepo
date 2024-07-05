@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../lib/firebase';
+import Image from 'next/image';
 
 interface OpenaiAnalysisProps {
   month: number;
@@ -99,7 +100,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           border-l-8 border-l-custom-light-blue"></div>
       </div>
       <div className="ml-4">
-        <img src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" />
+        <Image src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" />
       </div>
     </div>
   );
