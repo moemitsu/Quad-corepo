@@ -10,7 +10,7 @@ const LoginForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,19 +19,12 @@ const LoginForm: React.FC = () => {
 
     try {
       const token = await login(email, password);
-      localStorage.setItem('token', token); // トークンをローカルストレージに保存
-      console.log('保存したトークン:', localStorage.getItem('token')); // ローカルストレージに保存したトークンをコンソールに出力
-
-      // UIDの確認
-      const uid = user?.uid;
-      if (!uid) {
-        throw new Error('UIDが取得できませんでした。');
-      }
+      console.log('取得したトークン:', token); // トークンをコンソールに出力
 
       // 認証されたリクエストを送信
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:8000/api/v1/auth/login',
-        { uid }, // リクエストボディにUIDを含める
+        {}, // リクエストボディは空
         {
           headers: {
             Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
@@ -40,7 +33,7 @@ const LoginForm: React.FC = () => {
       );
 
       // ログイン成功後にリダイレクト
-      router.push('/monthly-analysis');
+      router.push('/record-form');
     } catch (err: any) {
       console.error('エラーコード:', err.code); // エラーコードをコンソールに出力
       console.error('エラーメッセージ:', err.message); // エラーメッセージをコンソールに出力

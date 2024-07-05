@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../hooks/useAuth';
 
 const RecordForm: React.FC = () => {
-  const with_members = ['母', '父', '祖母', '祖父', '保育士', '友達', '姉', '兄'];
+  const { user } = useAuth(); // useAuthフックからユーザー情報を取得
   const events = ['遊び', '食事', '睡眠', '勉強', '習い事'];
-  const places = ['家', '公園', '保育園・保育園', 'その他'];
+  const places = ['家', '公園', '保育園・幼稚園', 'その他'];
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
   const [selectedWithMember, setSelectedWithMember] = useState<string>('');
@@ -19,24 +20,50 @@ const RecordForm: React.FC = () => {
   const [endDate, setEndDate] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
   const [children, setChildren] = useState<string[]>([]);
+  const [withMembers, setWithMembers] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchChildren = async () => {
+    const fetchChildrenAndWithMembers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/'); //子供の名前を取得するエンドポイント
-        setChildren(response.data.children);
+        if (!user) {
+          throw new Error('ユーザーが認証されていません。');
+        }
+
+        const token = await user.getIdToken(); // Firebaseトークンを取得
+
+        // 子供の名前を取得するAPI呼び出し
+        const childrenResponse = await axios.get('http://localhost:8000/api/v1/user/{user_id}/child_name', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setChildren(childrenResponse.data.children);
+
+        // 保護者の名前を取得するAPI呼び出し
+        const withMembersResponse = await axios.get('http://localhost:8000/api/v1/stakeholders/{stakeholder_id}/adult_name', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setWithMembers(withMembersResponse.data.with_members);
       } catch (error) {
-        console.error('Error fetching children: ', error);
+        console.error('Error fetching data: ', error);
       }
     };
 
-    fetchChildren();
-  }, []);
+    fetchChildrenAndWithMembers();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      if (!user) {
+        throw new Error('ユーザーが認証されていません。');
+      }
+
+      const token = await user.getIdToken(); // Firebaseトークンを取得
+
       const response = await axios.post('http://localhost:8000/api/v1/records', {
         with_member: selectedWithMember,
         child: selectedChild,
@@ -47,7 +74,12 @@ const RecordForm: React.FC = () => {
         startTime,
         endDate,
         endTime,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       alert('活動が記録されました！');
       console.log('Response:', response.data);
     } catch (error) {
@@ -74,7 +106,7 @@ const RecordForm: React.FC = () => {
             className="w-full p-2 border border-gray-300 rounded"
           >
             <option value="">選択してください</option>
-            {with_members.map((member, index) => (
+            {withMembers.map((member, index) => (
               <option key={index} value={member}>{member}</option>
             ))}
           </select>
