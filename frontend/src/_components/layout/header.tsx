@@ -1,9 +1,8 @@
-// src/_components/Header.tsx
-'use client'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../../firebase'; // Firebaseの初期化ファイルをインポート
+import { auth } from '../../lib/firebase'; // Firebaseの初期化ファイルをインポート
+import MenuIcon from 'feather-icons-react';  // Menuアイコンをインポート
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -28,52 +27,52 @@ const Header: React.FC = () => {
   };
 
   return (
-    <div className="relative bg-white text-custom-blue p-4 shadow-header">
-      <div className="flex items-center justify-between">
-        <h1 className="text-7xl">
-          <img src="/corepo.png" alt="corepoIcon" className="w-30 h-41" />
-        </h1>
-        <div className="relative">
-          <img
-            src='/menuicon.png'
-            alt="Menu Icon"
-            className="cursor-pointer w-5 h-5"
-            onClick={toggleMenu}
-          />
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 py-2 w-96 bg-white rounded-lg shadow-xl">
-              <button
-                className="block px-4 py-2 text-custom-blue text-xl hover:bg-gray-200 w-full text-left"
-                onClick={() => router.push('/help')}
-              >
-                ヘルプ
-              </button>
-              {user ? (
-                <button
-                  className="block px-4 py-2 text-custom-blue text-xl hover:bg-gray-200 w-full text-left"
-                  onClick={handleLogout}
-                >
-                  ログアウト
-                </button>
-              ) : (
-                <button
-                  className="block px-4 py-2 text-custom-blue text-xl hover:bg-gray-200 w-full text-left"
-                  onClick={handleLogin}
-                >
-                  ログイン
-                </button>
-              )}
-              <button
-                className="block px-4 py-2 text-custom-blue text-xl hover:bg-gray-200 w-full text-left"
-                onClick={() => router.push('/register')}
-              >
-                登録情報
-              </button>
-            </div>
-          )}
+    <header className="flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-4 dark:bg-neutral-800">
+      <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
+        <div className="flex items-center justify-between">
+          <a className="flex-none text-8xl font-semibold dark:text-white" href="#">corepo</a>
+          <div className="sm:hidden">
+            <button
+              type="button"
+              className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-x-2 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-transparent dark:border-neutral-700 dark:text-white dark:hover:bg-white/10"
+              data-hs-collapse="#navbar-collapse-with-animation"
+              aria-controls="navbar-collapse-with-animation"
+              aria-label="Toggle navigation"
+              onClick={toggleMenu}
+            >
+              <MenuIcon className={`hs-collapse-open:hidden flex-shrink-0 size-4 ${menuOpen ? 'hidden' : 'block'}`} icon={''} />
+              <MenuIcon className={`hs-collapse-open:block hidden flex-shrink-0 size-4 ${menuOpen ? 'block' : 'hidden'}`} icon={''} />
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+        <div
+          id="navbar-collapse-with-animation"
+          className={`hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block ${menuOpen ? 'block' : 'hidden'}`}
+        >
+          <div className="text-2xl flex flex-col gap-6 mt-6 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-5">
+            {user ? (
+              <a
+                className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500"
+                href="#"
+                onClick={handleLogout}
+              >
+                ログアウト
+              </a>
+            ) : (
+              <a
+                className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500"
+                href="#"
+                onClick={handleLogin}
+              >
+                ログイン
+              </a>
+            )}
+            <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">登録情報</a>
+            <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">ヘルプ</a>
+          </div>
+        </div>
+      </nav>
+    </header>
   );
 };
 
