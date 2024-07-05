@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import backend.api.database.Models as models, backend.api.schemas.schemas as schemas
+import backend.api.database.models as models, backend.api.schemas.schemas as schemas
 
 # stakeholderテーブルのidを取得
 def getStakeHolderId(db: Session, id: int):
