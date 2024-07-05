@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase'; // Firebaseの初期化ファイルをインポート
-import MenuIcon from 'feather-icons-react';  // Menuアイコンをインポート
+import MenuIcon from 'feather-icons-react';
+import ButtonHeader from './ButtonHeader';
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const Header: React.FC = () => {
     <header className="flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-4 dark:bg-neutral-800">
       <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
         <div className="flex items-center justify-between w-full">
-          <a className="flex-none text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="#">corepo</a>
+          <a className="flex-none text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="/">corepo</a>
           <div className="sm:hidden">
             <button
               type="button"
@@ -69,6 +70,7 @@ const Header: React.FC = () => {
             )}
             <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/family-registration">登録情報</a>
             <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">ヘルプ</a>
+            <ButtonHeader />
           </div>
         </div>
       </nav>
