@@ -44,7 +44,7 @@ services:
       - msefinal
     depends_on:
       - db
-    entrypoint: /src/entrypoint.sh
+    entrypoint: 'bash'
 
   frontend:
     container_name: frontend

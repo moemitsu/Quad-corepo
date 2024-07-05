@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const FamilyRegistrationForm: React.FC = () => {
   const [stakeholder_name, setStakeholderName] = useState<string>('');
-  const [adalt_name, setAdaltName] = useState<string[]>(['']);
+  const [adult_name, setAdultName] = useState<string[]>(['']);
   const [child_name, setChildName] = useState<string[]>(['']);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -24,14 +24,14 @@ const FamilyRegistrationForm: React.FC = () => {
     setChildName(newChild);
   };
 
-  const handleAddAdalt = () => {
-    setAdaltName([...adalt_name, '']);
+  const handleAddAdult = () => {
+    setAdultName([...adult_name, '']);
   };
 
-  const handleAdaltChange = (index: number, value: string) => {
-    const newAdalt = [...adalt_name];
-    newAdalt[index] = value;
-    setAdaltName(newAdalt);
+  const handleAdultChange = (index: number, value: string) => {
+    const newAdult = [...adult_name];
+    newAdult[index] = value;
+    setAdultName(newAdult);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,23 +41,18 @@ const FamilyRegistrationForm: React.FC = () => {
       // Firebaseにユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // UIDを取得し、firebase_idとしてバックエンドに送信
-      const firebase_id = userCredential.user.uid;
-
       // IDトークンを取得
       const idToken = await userCredential.user.getIdToken();
 
-      // UIDとトークンをコンソールに表示
-      console.log('UID:', firebase_id);
+      // トークンをコンソールに表示
       console.log('ID Token:', idToken);
 
       // データベースに家族情報を送信
       await axios.post('http://localhost:8000/api/v1/user', 
         { 
           stakeholder_name,
-          adalt_name,
-          child_name,
-          firebase_id,  // UIDをfirebase_idとしてバックエンドに渡す
+          adult_name,
+          child_name
         },
         {
           headers: {
@@ -68,7 +63,7 @@ const FamilyRegistrationForm: React.FC = () => {
 
       alert('家族情報が登録されました！');
       setStakeholderName('');
-      setAdaltName(['']);
+      setAdultName(['']);
       setChildName(['']);
       setEmail('');
       setPassword('');
@@ -96,21 +91,21 @@ const FamilyRegistrationForm: React.FC = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="adalt_name" className="block text-lg font-semibold mb-2">参加する大人の名前</label>
-            {adalt_name.map((adaltName, index) => (
+            <label htmlFor="adult_name" className="block text-lg font-semibold mb-2">参加する大人の名前</label>
+            {adult_name.map((name, index) => (
               <input
                 key={index}
                 type="text"
-                id={`adalt_name-${index}`}
-                value={adaltName}
-                onChange={(e) => handleAdaltChange(index, e.target.value)}
+                id={`adult_name-${index}`}
+                value={name}
+                onChange={(e) => handleAdultChange(index, e.target.value)}
                 required
                 className="w-full p-2 border border-gray-300 rounded mb-2"
               />
             ))}
             <button
               type="button"
-              onClick={handleAddAdalt}
+              onClick={handleAddAdult}
               className="w-full p-2 bg-custom-teal text-white rounded mt-2"
             >
               大人を追加
@@ -118,12 +113,12 @@ const FamilyRegistrationForm: React.FC = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="child_name" className="block text-lg font-semibold mb-2">子供の名前</label>
-            {child_name.map((childName, index) => (
+            {child_name.map((name, index) => (
               <input
                 key={index}
                 type="text"
                 id={`child_name-${index}`}
-                value={childName}
+                value={name}
                 onChange={(e) => handleChildChange(index, e.target.value)}
                 required
                 className="w-full p-2 border border-gray-300 rounded mb-2"

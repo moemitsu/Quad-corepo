@@ -7,7 +7,7 @@ from openai import OpenAI
 import openai
 import os
 import json
-import database.models as models, schemas.schemas as schemas, cruds as crud, database as database
+import backend.api.database.Models as models, backend.api.schemas.schemas as schemas, backend.api.cruds as crud, backend.api.database as database
 
 models.Base.metadata.create_all(bind=engine)
 
