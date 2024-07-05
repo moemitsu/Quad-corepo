@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from api.database.db import SessionLocal
-from api.database.models import Stakeholder, User, Payments, TimeShareRecords
+from api.database.Models import Stakeholder, User, Payments, TimeShareRecords
 from uuid import uuid4
 
 
