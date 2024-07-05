@@ -1,19 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body
 from api.lib.auth import get_current_user
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime, timedelta
-
-from fastapi.middleware.cors import CORSMiddleware
-
 
 # FastAPIをインスタンス化する
 app = FastAPI()
 
-
 # CORS設定
-
 origins = [
   "http://localhost:3000",
   "https://localhost:3000",
@@ -34,5 +26,5 @@ def read_root():
 
 @app.get("/protected-route")
 def protected_route(user = Depends(get_current_user)):
-  return {"message": "This is a protected route", "user": user}
+  return {"message": "This is a protected route", "userid": user.uid}
 
