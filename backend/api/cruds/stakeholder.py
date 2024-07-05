@@ -6,7 +6,7 @@ def getStakeHolderId(db: Session, id: int):
   return db.query(models.Stakeholder).filter(models.Stakeholder.id == id).first()
 
 # フロントエンドから来たトークンを保存する
-def createStakeholder(db: Session, stakeholder:schemas.stakeHolderReq):
+def createStakeholder(db: Session, stakeholder:schemas.stakeholderReq):
   dbStakeholder = models.Stakeholder(
     stakeholder_name=stakeholder.stakeholder_name,
     firebase_id=stakeholder.firebase_id
