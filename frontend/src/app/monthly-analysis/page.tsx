@@ -6,6 +6,7 @@ import BarChart from "../../_components/BarChart";
 import PieChart from "../../_components/PieChart";
 import OpenaiAnalysis from "../../_components/OpenaiAnalysis";
 import Header from "../../_components/layout/header";
+import Footer from "../../_components/layout/footer";
 import { barData, pieData, colors } from "../../data";
 import axios from "axios";
 
@@ -141,6 +142,7 @@ const MonthlyAnalysis: React.FC = () => {
           <BarChart data={barChartData} />
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

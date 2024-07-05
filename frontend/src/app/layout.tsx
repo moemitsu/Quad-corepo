@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
 import { stripePromise } from '../lib/stripe';
+import './globals.css';
 
 interface LayoutProps {
   children: ReactNode;
