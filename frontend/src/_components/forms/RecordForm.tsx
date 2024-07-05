@@ -22,9 +22,11 @@ const RecordForm: React.FC = () => {
   const [children, setChildren] = useState<string[]>([]);
   const [withMembers, setWithMembers] = useState<string[]>([]);
 
+
   useEffect(() => {
     const fetchChildrenAndWithMembers = async () => {
       try {
+        
         if (!user) {
           throw new Error('ユーザーが認証されていません。');
         }
@@ -91,8 +93,6 @@ const RecordForm: React.FC = () => {
   return (
     <div className="p-6 bg-custom-green min-h-screen flex flex-col">
       <div className="flex items-center justify-between">
-        <h1 className="text-7xl text-custom-blue">corepo</h1>
-        <button className="p-4 bg-custom-blue text-white rounded">登録情報</button>
       </div>
       <form onSubmit={handleSubmit} className="mt-12 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-4xl font-bold mb-6">活動の記録</h2>
