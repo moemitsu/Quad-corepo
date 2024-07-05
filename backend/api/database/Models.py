@@ -13,20 +13,20 @@ class Stakeholder(Base):
 
 class User(Base):
   __tablename__ = 'User'
-  id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False)
+  id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
   stakeholder_id = Column(ForeignKey('Stakeholder.id'), nullable=False)
   adult_name = Column(String())
   child_name = Column(String())
 
 class Payments(Base):
   __tablename__ = 'Payments'
-  id = Column(UUID(as_uuid=True), default=uuid4, nullable=False, primary_key=True)
+  id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
   stakeholder_id = Column(ForeignKey('Stakeholder.id'), nullable=False, primary_key=True)
   user_id = Column(ForeignKey('User.id'), nullable=False)
 
 class TimeShareRecords(Base):
   __tablename__ = 'TimeShareRecords'
-  id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False)
+  id = Column(Integer, primary_key=True, nullable=False,  autoincrement=True)
   stakeholder_id = Column(ForeignKey('Stakeholder.id'), nullable=False)
   with_member = Column(String(), nullable=False)
   child_name = Column(String(), nullable=False)
