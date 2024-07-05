@@ -29,8 +29,8 @@ const Header: React.FC = () => {
   return (
     <header className="flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-4 dark:bg-neutral-800">
       <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
-        <div className="flex items-center justify-between">
-          <a className="flex-none text-8xl font-semibold dark:text-white" href="#">corepo</a>
+        <div className="flex items-center justify-between w-full">
+          <a className="flex-none text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="#">corepo</a>
           <div className="sm:hidden">
             <button
               type="button"
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
                 ログイン
               </a>
             )}
-            <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">登録情報</a>
+            <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/family-registration">登録情報</a>
             <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">ヘルプ</a>
           </div>
         </div>

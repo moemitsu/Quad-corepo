@@ -77,69 +77,66 @@ const MonthlyAnalysis: React.FC = () => {
   }, [selectedMonth]);
 
   return (
-    <div className="p-6 bg-custom-light-green min-h-screen flex flex-col">
+    <div>
       <Header />
-      <div className="mt-4">
-        <button
-          className="ml-4 p-4 min-w-max bg-white text-custom-blue text-lg rounded shadow-md hover:bg-gray-200 transition-colors"
-        >
-          登録情報を見る
-        </button>
-      </div>
-      <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-        <div className="flex items-center justify-between mt-12">
-          <div className="relative">
-            <select
-              className="p-4 text-4xl text-custom-blue bg-custom-light-green"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}月
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
-              <svg
-                className="fill-current h-4 w-4 mt-2 mr-2"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
+      <div className="p-6 bg-custom-light-green min-h-screen flex flex-col">
+        <div className="mt-4">
+        </div>
+        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+          <div className="flex items-center justify-between mt-12">
+            <div className="relative">
+              <select
+                className="p-4 text-4xl text-custom-blue bg-custom-light-green"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 11.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414l-3.5-3.5a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-4 4-4-4a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-3.5 3.5a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}月
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <svg
+                  className="fill-current h-4 w-4 mt-2 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 11.293a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414l-3.5-3.5a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-4 4-4-4a1 1 0 010-1.414l3.5-3.5a1 1 0 111.414 1.414l-3.5 3.5a1 1 0 010 1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
 
-            <button
-              className="p-4 bg-custom-teal text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
-              onClick={() => router.push("/record-activity")}
-            >
-              記録を追加＋
-            </button>
-            {/* FIXME:子供の選択コンポーネントを作成後、遷移先修正 */}
-            <button
-              className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
-              onClick={() => router.push("/record-activity")}
-            >
-              お子様を選択＞
-            </button>
+              <button
+                className="p-4 bg-custom-teal text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
+                onClick={() => router.push("/record-activity")}
+              >
+                記録を追加＋
+              </button>
+              {/* FIXME:子供の選択コンポーネントを作成後、遷移先修正 */}
+              <button
+                className="p-4 bg-custom-blue text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors"
+                onClick={() => router.push("/record-activity")}
+              >
+                お子様を選択＞
+              </button>
+            </div>
+            {/* FIXME：GETできたら表示トライする */}
+            {/* <OpenaiAnalysis month={selectedMonth} /> */}
           </div>
-          {/* FIXME：GETできたら表示トライする */}
-          {/* <OpenaiAnalysis month={selectedMonth} /> */}
         </div>
-      </div>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
-          <h3 className="text-3xl font-custom-blue mb-2">割合で比較</h3>
-          <PieChart data={pieChartData} />
-        </div>
-        <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
-          <h3 className="text-3xl font-custom-blue mb-2">週間で見る</h3>
-          <BarChart data={barChartData} />
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
+            <h3 className="text-3xl font-custom-blue mb-2">割合で比較</h3>
+            <PieChart data={pieChartData} />
+          </div>
+          <div className="bg-custom-light-green p-4 md:p-6 rounded-lg">
+            <h3 className="text-3xl font-custom-blue mb-2">週間で見る</h3>
+            <BarChart data={barChartData} />
+          </div>
         </div>
       </div>
       <Footer />

@@ -18,13 +18,13 @@ const RecordForm: React.FC = () => {
   const [startTime, setStartTime] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
-  const [children, setChildren] = useState<string[]>([]);
+  const [children, setChildren] = useState<string[]>([]); // 初期値を空の配列に設定
 
   useEffect(() => {
     const fetchChildren = async () => {
       try {
         const response = await axios.get('http://localhost:8000/'); //子供の名前を取得するエンドポイント
-        setChildren(response.data.children);
+        setChildren(response.data.children || []); // レスポンスが存在しない場合に空の配列を設定
       } catch (error) {
         console.error('Error fetching children: ', error);
       }
@@ -59,8 +59,6 @@ const RecordForm: React.FC = () => {
   return (
     <div className="p-6 bg-custom-green min-h-screen flex flex-col">
       <div className="flex items-center justify-between">
-        <h1 className="text-7xl text-custom-blue">corepo</h1>
-        <button className="p-4 bg-custom-blue text-white rounded">登録情報</button>
       </div>
       <form onSubmit={handleSubmit} className="mt-12 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-4xl font-bold mb-6">活動の記録</h2>
