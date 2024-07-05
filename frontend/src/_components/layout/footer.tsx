@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
         {/* End Col */}
 
         <div className="mt-3">
-          <p className="text-gray-500 dark:text-neutral-500">We're part of the <a href="#" className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">Ms.Engineer</a> Students.</p>
+          <p className="text-gray-500 dark:text-neutral-500">We&apos;re part of the <a href="#" className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400">Ms.Engineer</a> Students.</p>
           <p className="text-gray-500 dark:text-neutral-500">© Preline. 2024 MsE All rights reserved.</p>
         </div>
 
