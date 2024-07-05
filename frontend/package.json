@@ -13,8 +13,10 @@
     "@stripe/stripe-js": "^4.1.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+    "feather-icons-react": "^0.7.0",
     "firebase": "^10.12.3",
     "next": "14.2.4",
+    "preline": "^2.3.0",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
@@ -23,6 +25,7 @@
     "tailwindcss": "^3.4.4"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
     "@types/node": "^20.14.9",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

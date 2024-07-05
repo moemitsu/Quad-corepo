@@ -35,6 +35,8 @@ services:
     volumes:
       - ./backend/api:/src/api
       - ./backend/.dockervenv:/src/.venv:rw
+      - ./backend/test:/src/test
+      - ./backend/.env:/src/.env
     tty: true
     ports:
       - 8000:8000  # ホストマシンのポート8000を、docker内のポート8000に接続する
@@ -42,6 +44,7 @@ services:
       - msefinal
     depends_on:
       - db
+    entrypoint: /src/entrypoint.sh
 
   frontend:
     container_name: frontend
