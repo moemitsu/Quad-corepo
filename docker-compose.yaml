@@ -29,6 +29,7 @@ services:
       - msefinal
 
   backend:
+    container_name: backend
     build:
       context: ./backend
       dockerfile: dockerfile
@@ -37,6 +38,9 @@ services:
       - ./backend/.dockervenv:/src/.venv:rw
       - ./backend/test:/src/test
       - ./backend/.env:/src/.env
+      - ./backend/entp0.sh:/src/entp0.sh
+      - ./backend/entrypoint.sh:/src/entrypoint.sh
+      
     tty: true
     ports:
       - 8000:8000  # ホストマシンのポート8000を、docker内のポート8000に接続する
@@ -44,7 +48,9 @@ services:
       - msefinal
     depends_on:
       - db
-    command: ['poetry', 'run', 'uvicorn', 'api.main:app', '--host', '0.0.0.0', '--reload']
+    entrypoint: ['/src/entp0.sh',
+            '/src/entrypoint.sh']
+#    command: [ "bash", "/src/entrypoint.sh"]
 
   frontend:
     container_name: frontend
