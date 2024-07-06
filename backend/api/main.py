@@ -1,5 +1,17 @@
+import logging
+import logging.config
+import yaml
 from fastapi import FastAPI, HTTPException, Request, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
+
+# ロギング設定をYAMLファイルから読み込む
+def setup_logging():
+    with open("logging.yaml", "r") as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+
+# ロギングをセットアップ
+setup_logging()
 
 
 # FastAPIをインスタンス化する

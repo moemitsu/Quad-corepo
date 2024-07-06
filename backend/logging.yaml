@@ -1,0 +1,55 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  # uvicorn用のフォーマット
+  f_uvicorn:
+    format: '[UVICORN] %(asctime)s %(levelname)s %(name)s %(message)s'
+  # カスタムログ用のフォーマット    
+  f_custom:
+    format: "[CUSTOM] %(asctime)s %(levelname)s %(name)s (%(funcName)s[%(lineno)s]) %(message)s"
+handlers:
+  # uvicornで備わっているlogを標準出力するハンドラ
+  h_console_uvicorn:
+    class: logging.StreamHandler
+    formatter: f_uvicorn
+    stream: ext://sys.stdout
+  # 自分で設定したカスタムログを標準出力するハンドラ
+  h_console_custom:
+    class: logging.StreamHandler
+    formatter: f_custom
+    stream: ext://sys.stdout
+  # uvicornで備わっているlogをファイル出力(毎日ファイルを更新しながら365日分出力)するハンドラ
+  h_file_uvicorn:
+    class : logging.handlers.TimedRotatingFileHandler
+    formatter: f_custom
+    filename: logs/uvicorn/uvicorn.log
+    when: midnight
+    backupCount: 365
+    encoding: utf-8    
+  # 自分で設定したカスタムログをファイル出力(毎日ファイルを更新しながら365日分出力)するハンドラ
+  h_file_custom:
+    class : logging.handlers.TimedRotatingFileHandler
+    formatter: f_custom
+    filename: logs/costom/custom.log
+    when: midnight
+    backupCount: 365
+    encoding: utf-8
+loggers:
+  # uvicornで備わっているログはpropagateをtrueにしてroot設定を引継ぐ
+  uvicorn.error:
+    propagate: true
+  uvicorn.access:
+    propagate: true
+  # カスタムログでは、標準出力とlogs/custom/custom.logへ出力
+  custom:
+    level: INFO
+    handlers:
+      - h_console_custom
+      - h_file_custom
+    propagate: false
+  # uvicornでは標準出力とlogs/uvicorn/uvicorn.logへ出力 (propagateされて来る)
+  root:
+    level: INFO
+    handlers: 
+      - h_console_uvicorn
+      - h_file_uvicorn    

@@ -1,14 +1,18 @@
+import logging
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 import api.database.models as models, api.schemas.schemas as schemas
 import datetime
 import calendar
 
+logger = logging.getLogger(f'custom.{__name__}')
+
 # データベースと直接やりとりする関数。
 # この関数をもとにCRUD処理を動かしてフロントエンドにレスポンスする。
 
 # クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得
 def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
+  logger.info(f"Fetching RecordByMonth: {month}")
   startDate = datetime.datetime(year, month, 1) #年、月、1日
   lastDay = calendar.monthrange(year, month)[1]
   endDate = datetime.datetime(year, month, lastDay, 23, 59, 59) # 年、月、最終日、23:59:59
@@ -23,6 +27,7 @@ def getRecordsByMonth(db: Session, child_name: str, year: int, month: int):
 
 # 記録の追加
 def createRecords(db: Session, stakeholder_id: int, with_member: str,child_name: str,events: str, child_condition: str, place :str, share_start_at: datetime, share_end_at: datetime):
+  logger.info(f"Fetching createRecords: {child_name}&from{share_start_at}to{share_end_at}")
   newRecords = models.TimeShareRecords(
     stakeholder_id = stakeholder_id,
     with_member = with_member,
@@ -40,6 +45,7 @@ def createRecords(db: Session, stakeholder_id: int, with_member: str,child_name:
 
 # LLMに分析してもらうためのデータを取得
 def getRecordsAnalysis(db: Session, stakeholder_id: int, child_name: str):
+  logger.info(f"Fetching getRecordsAnalysis: {child_name}")
   return db.query(models.TimeShareRecords).filter(
     and_(
       models.TimeShareRecords.stakeholder_id == stakeholder_id,
