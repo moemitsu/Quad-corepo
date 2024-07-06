@@ -1,9 +1,11 @@
-from sqlalchemy import String, Column, ForeignKey, TIMESTAMP, Integer
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy import String, Column, ForeignKey, TIMESTAMP, Integer # type: ignore
+from sqlalchemy.dialects.postgresql import UUID # type: ignore
+from sqlalchemy.ext.declarative import declarative_base # type: ignore
+from sqlalchemy.orm import relationship # type: ignore
 from api.database.db import Base
 from uuid import uuid4
+
+
 
 class Stakeholder(Base):
   __tablename__ = 'Stakeholder'

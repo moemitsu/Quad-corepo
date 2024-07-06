@@ -1,5 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request, Depends, Response
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException, Request, Depends, Response # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
 
 
 # FastAPIをインスタンス化する
