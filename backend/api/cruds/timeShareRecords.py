@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
-import backend.api.database.models as models, backend.api.schemas.schemas as schemas
+import api.database.models as models, api.schemas.schemas as schemas
 import datetime
 import calendar
 
