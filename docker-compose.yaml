@@ -38,7 +38,6 @@ services:
       - ./backend/.dockervenv:/src/.venv:rw
       - ./backend/test:/src/test
       - ./backend/.env:/src/.env
-      - ./backend/entp0.sh:/src/entp0.sh
       - ./backend/entrypoint.sh:/src/entrypoint.sh
       
     tty: true
@@ -48,8 +47,7 @@ services:
       - msefinal
     depends_on:
       - db
-    entrypoint: ['/src/entp0.sh',
-            '/src/entrypoint.sh']
+    entrypoint: [  "bash", '/src/entrypoint.sh' ]
 #    command: [ "bash", "/src/entrypoint.sh"]
 
   frontend:

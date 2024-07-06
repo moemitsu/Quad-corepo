@@ -19,7 +19,7 @@ RUN if [ -f pyproject.toml ]; then poetry install --no-root; fi
 # そのほかの大事なあまり手を加えないファイルをコピーする
 COPY alembic ./alembic
 COPY alembic.ini ./
-COPY entrypoint.sh ./
+#COPY entrypoint.sh ./
 
 
 # uvicornのサーバーを立ち上げる
