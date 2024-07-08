@@ -1,5 +1,3 @@
-// app/family-registration/page.tsx
-
 "use client";
 
 import React from "react";
@@ -11,7 +9,7 @@ const FamilyRegistrationPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="p-6 bg-custom-green min-h-screen flex flex-col justify-center items-center">
+      <div className="p-6 min-h-screen flex flex-col justify-center items-center">
         <FamilyRegistrationForm />
       </div>
       <Footer />
