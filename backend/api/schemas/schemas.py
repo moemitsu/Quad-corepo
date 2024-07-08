@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List, Dict, Any
-import datetime
+from datetime import datetime
+from uuid import UUID
 
 class LoginReq(BaseModel):
   firebase_id: str
@@ -17,11 +17,11 @@ class StakeHolderReq(BaseModel):
 
 class StakeholderRes(BaseModel):
   message: str
-  stakeholder_id: int
+  stakeholder_id: UUID
 
 
 class UserReq(BaseModel):
-  stakeholder_id: int
+  stakeholder_id: UUID
   adult_name: str
   child_name: str
 
@@ -31,15 +31,50 @@ class UserRes(BaseModel):
 
 
 class PostChildReq(BaseModel):
-  stakeholder_id: int
+  stakeholder_id: UUID
   child_name: str
 
 class PostChildRes(BaseModel):
   message: str
 
 
-class RecordReq(BaseModel):
-  stakeholder_id: int
+class RecordBase(BaseModel):
+    stakeholder_id: UUID
+    with_member: str
+    child_name: str
+    events: str
+    child_condition: str
+    place: str
+    share_start_at: datetime
+    share_end_at: datetime
+
+class RecordReq(RecordBase):
+    pass
+
+class RecordRes(BaseModel):
+  message: str
+  record_id: str
+
+  class Config:
+    from_attributes: True
+
+
+class LLMReq(BaseModel):
+  text: str
+  stakeholder_id: UUID
+  child_name: str
+  year: str
+  month: str
+
+class LLMRes(BaseModel):
+  summary: str
+  sentiment: str
+
+
+# とりあえずの確認用
+class TimeShareRecordResponse(BaseModel):
+  id: int
+  stakeholder_id: UUID
   with_member: str
   child_name: str
   events: str
@@ -48,18 +83,5 @@ class RecordReq(BaseModel):
   share_start_at: datetime
   share_end_at: datetime
 
-class RecordRes(BaseModel):
-  message: str
-  record_id: str
-
-
-class LLMReq(BaseModel):
-  text: str
-  stakeholder_id: int
-  child_name: str
-  year: str
-  month: str
-
-class LLMRes(BaseModel):
-  summary: str
-  sentiment: str
+  class Config:
+    from_attributes = True
