@@ -37,6 +37,7 @@ services:
       - ./backend/api:/src/api
       - ./backend/.dockervenv:/src/.venv:rw
       - ./backend/test:/src/test
+      - ./backend/logs:/src/logs
       - ./backend/.env:/src/.env
       - ./backend/entrypoint.sh:/src/entrypoint.sh
       
@@ -47,8 +48,8 @@ services:
       - msefinal
     depends_on:
       - db
-    entrypoint: [  "bash", '/src/entrypoint.sh' ]
-#    command: [ "bash", "/src/entrypoint.sh"]
+    # entrypoint: [ 'poetry', 'run', 'uvicorn', 'api.main:app', '--host', '0.0.0.0', '--reload', '--log-config', 'logging.yaml' ]
+    command: [ "bash", "/src/entrypoint.sh"]
 
   frontend:
     container_name: frontend
