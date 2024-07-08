@@ -8,6 +8,7 @@ import json
 import api.database.models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
 
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

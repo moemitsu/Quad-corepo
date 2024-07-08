@@ -1,5 +1,7 @@
+import logging
 from sqlalchemy.orm import Session
 import api.database.models as models, api.schemas.schemas as schemas
+
 
 # Userテーブルから利用者の名前を取得
 def getStakeholder(db: Session, adult_name: str):
