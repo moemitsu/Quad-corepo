@@ -5,10 +5,18 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'f
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUser(user);
+        const token = await user.getIdToken();
+        setToken(token);
+      } else {
+        setUser(null);
+        setToken(null);
+      }
       setLoading(false);
     });
 
@@ -20,7 +28,7 @@ export const useAuth = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setUser(userCredential.user);
       const token = await userCredential.user.getIdToken(); // トークンを取得
-      console.log('ユーザーUID:', userCredential.user.uid); // UIDをコンソールに出力
+      setToken(token);
       return token; // トークンを返す
     } catch (error: any) {
       console.error('Login error:', error);
@@ -32,6 +40,7 @@ export const useAuth = () => {
     try {
       await signOut(auth);
       setUser(null);
+      setToken(null);
     } catch (error) {
       console.error('Logout error:', error);
       throw error; // エラーを投げて上位コンポーネントで処理
@@ -41,6 +50,7 @@ export const useAuth = () => {
   return {
     user,
     loading,
+    token,
     login,
     logout,
   };

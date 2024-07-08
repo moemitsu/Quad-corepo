@@ -128,10 +128,6 @@
           "User One": 50,
           "User Two": 50
         }
-      },
-      "analysis": {
-        "llm_summary": "LLMの要約結果",
-        "llm_sentiment": "ポジティブ"
       }
     }
     ```
