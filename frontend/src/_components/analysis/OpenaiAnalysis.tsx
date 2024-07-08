@@ -1,4 +1,4 @@
-// src/_components/OpenaiAnalysis.tsx
+// src/_components/analysis/OpenaiAnalysis.tsx
 'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -41,9 +41,13 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
     if (user) {
       const fetchData = async () => {
         try {
+          const token = await user.getIdToken(); // Firebaseトークンを取得
           const response = await axios.get('http://localhost:8000/api/v1/main', {
             params: {
               month: `2024-${month.toString().padStart(2, '0')}`,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`, // Bearerトークンをヘッダーに追加
             },
           });
           setData(response.data);
@@ -105,8 +109,14 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           border-l-8 border-l-custom-light-blue"></div>
       </div>
       <div className="ml-4">
-        <img src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" />
-      </div>
+          <video
+            src="/LLMicon1.mp4"
+            loop
+            muted
+            autoPlay
+            className="w-26 h-40"
+          />
+        </div>
     </div>
   );
 };
