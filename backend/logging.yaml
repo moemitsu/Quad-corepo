@@ -30,19 +30,20 @@ handlers:
     level: INFO
 loggers:
   uvicorn:
-    handlers: [uvicorn_file, console]
+    handlers: [file_uvicorn, console]
     level: INFO
+    propagate: false
   uvicorn.error:
-    handlers: [uvicorn_file, console]
+    handlers: [file_uvicorn, console]
     level: INFO
     propagate: True
   uvicorn.access:
-    handlers: [uvicorn_file, console]
+    handlers: [file_uvicorn, console]
     level: INFO
     propagate: True
   watchfiles:
     level: WARNING
-    handlers: [uvicorn_file, console]
+    handlers: [file_uvicorn, console]
     propagate: True
 
 root:
