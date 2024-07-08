@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Query, APIRouter
+from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from api.database.db import SessionLocal, engine
@@ -41,39 +41,67 @@ def formatRecords(records):
     record.pop('_sa_instance_state', None)
   return json.dumps(formattedRecords, indent=2)
 
-# メソッド
-# メモ：ログイン（GET）、新規登録（POST）、各月画面（GET）、記録を追加するときの利用者・子供選択（GET）、記録を追加する（POST）、登録情報の編集（PUT）、LLMに情報渡して値貰う(POST)
-# ログイン 書き直し済み　TODO 用動作確認
+
+# 以下メソッド
+# メモ：記録を追加する（POST）、登録情報の編集（PUT）、LLMに情報渡して値貰う(POST)
+
+# ログイン（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
 @router.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
 def login(token: str = Depends(verify_token), db: Session = Depends(get_db)):
-    firebase_id = token['uid']
-    stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
-    if stakeholder:
-        return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
-    else:
-        # ユーザーが存在しない場合、新しいユーザーを作成するかエラーを返す
-        stakeholder_name = "default_name"  # 必要に応じてフロントエンドから受け取るか、適切なデフォルト値を設定
-        new_stakeholder = schemas.StakeHolderReq(stakeholder_name=stakeholder_name, firebase_id=firebase_id)
-        try:
-            created_stakeholder = stakeholderCrud.createStakeholder(db, new_stakeholder)
-            return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+  if stakeholder:
+    return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
+  else:
+    # ユーザーが存在しない場合、新しいユーザーを作成するかエラーを返す
+    stakeholder_name = "default_name"  # 必要に応じてフロントエンドから受け取るか、適切なデフォルト値を設定
+    new_stakeholder = schemas.StakeHolderReq(stakeholder_name=stakeholder_name, firebase_id=firebase_id)
+    try:
+      created_stakeholder = stakeholderCrud.createStakeholder(db, new_stakeholder)
+      return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
+    except Exception as e:
+      raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
 
-# 新規登録　TODO 要動作確認
-@router.post('/api/v1/stakeholder', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
-def postStakeholder(request: schemas.StakeHolderReq, db: Session = Depends(get_db)):
-  stakeholder = stakeholderCrud.createStakeholder(db, request)
-  return schemas.StakeholderRes(message='登録完了', stakeholder_id=stakeholder.id)
+# 新規登録（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
+@router.post('/api/v1/signup', response_model=schemas.SignUpRes, responses={400: {'model': schemas.Error}})
+def signup(token: str = Depends(verify_token), db: Session = Depends(get_db)):
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+  if stakeholder:
+    raise HTTPException(status_code=400, detail="ユーザーは既に存在します")
+  try:
+    created_stakeholder = stakeholderCrud.create_new_stakeholder(db, firebase_id)
+    return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
 
 
-# ユーザー情報登録　書き直し済　TODO 要動作確認
+# ユーザー情報登録（登録画面⓷）トークン認証込みで書き直し済み TODO 要動作確認
 @router.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
-def postUser(request: schemas.UserReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
-  dbUser = userCrud.createUser(db=db, stakeholder_id=request.stakeholder_id, adult_name=request.adult_name, child_name=request.child_name)
-  return schemas.UserRes(message='登録完了！', user_id=dbUser.id)
+def post_user(
+  token: str = Depends(verify_token),
+  stakeholder_name: str = Body(...),
+  adult_name: str = Body(...),
+  child_name: str = Body(...),
+  db: Session = Depends(get_db)
+):
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+  if not stakeholder:
+    raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+  # stakeholder_nameの更新
+  try:
+    updated_stakeholder_name = stakeholderCrud.update_stakeholder_name(db, stakeholder.id, stakeholder_name)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail='家族名の更新に失敗しました：{}'.format(str(e)))
+  # userテーブルのadult_name,child_nameの登録
+  try:
+    new_user = userCrud.createUser(db, stakeholder.id, adult_name, child_name)
+    return schemas.UserRes(message='ユーザー情報を登録しました',user_id=new_user.id)
+  except Exception as e:
+    raise HTTPException(status_code=500, detail='ユーザー情報の登録に失敗しました：{}'.format(str(e)))
 
-# ユーザー情報編集　書き直し済 TODO 要動作確認
+# ユーザー情報編集（情報編集画面⓸） TODO トークン認証込みで書き直し
 @router.put('/api/v1/user/{user_id}', response_model=schemas.UserReq, responses={400: {'model': schemas.Error}})
 def updateUser(user_id: int, request: schemas.UserReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
   dbUser = userCrud.updateUser(db=db, user_id=request.user_id, adult_name=request.adult_name, child_name=request.child_name)
@@ -82,27 +110,41 @@ def updateUser(user_id: int, request: schemas.UserReq, token: str = Depends(veri
   else:
     raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
 
+# adult_nameとchild_nameの取得（記録画面⓶）トークン認証込みで書き直し済み　TODO　要動作確認
+@router.get('api/v1/names', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
+def get_names(
+  token: str = Depends(verify_token),
+  db: Session = Depends(get_db)
+):
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+  if not stakeholder:
+    raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+  names = userCrud.get_adult_child_name(db, stakeholder.id)
+  if not names:
+    raise HTTPException(status_code=404, detail='名前が見つかりません')
+  return {'名前': names}
 
-# 記録の追加　書き直し済　TODO 要動作確認
+# 記録の追加（記録画面⓶）　TODO 書き直す
 @router.post("/api/v1/time-share-records/", response_model=schemas.RecordRes)
 def CreateRecords(record: schemas.RecordReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
-    dbRecord = timeShareRecordsCrud.createRecords(
-      db = db,
-      stakeholder_id = record.stakeholder_id,
-      with_member = record.with_member,
-      child_name = record.child_name,
-      events = record.events,
-      child_condition = record.child_condition,
-      place = record.place,
-      share_start_at = record.share_start_at,
-      share_end_at = record.share_end_at
-    )
-    if not dbRecord:
-      raise HTTPException(status_code=400, detail="記録の作成に失敗しました。")
-    return dbRecord
+  dbRecord = timeShareRecordsCrud.createRecords(
+    db = db,
+    stakeholder_id = record.stakeholder_id,
+    with_member = record.with_member,
+    child_name = record.child_name,
+    events = record.events,
+    child_condition = record.child_condition,
+    place = record.place,
+    share_start_at = record.share_start_at,
+    share_end_at = record.share_end_at
+  )
+  if not dbRecord:
+    raise HTTPException(status_code=400, detail="記録の作成に失敗しました。")
+  return dbRecord
 
 
-# 各月画面の情報を取得　FIXME 棒グラフ用GET　円グラフ用GETに変更
+# 各月画面の情報を取得　トークン認証込みで書き直し済み　TODO 動作確認
 # 棒グラフ用GET
 @router.get('/api/v1/bar-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
 def get_bar_data(
@@ -131,30 +173,30 @@ def get_bar_data(
 
     return result
   
-# 円グラフ用GET
+# 円グラフ用GET　トークン認証込みで書き直し済み　TODO　動作チェック
 @router.get('/api/v1/pie-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
 def get_share_time_percentage(
-    token: str = Depends(verify_token),
-    child_name: str = Query(...),
-    year: int = Query(...),
-    month: int = Query(...),
-    db: Session = Depends(get_db)
+  token: str = Depends(verify_token),
+  child_name: str = Query(...),
+  year: int = Query(...),
+  month: int = Query(...),
+  db: Session = Depends(get_db)
 ):
-    firebase_id = token['uid']
-    stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
-    if not stakeholder:
-        raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+  if not stakeholder:
+    raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
 
-    share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
-    if not share_time_percentages:
-        raise HTTPException(status_code=404, detail='記録が見つかりません')
+  share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
+  if not share_time_percentages:
+    raise HTTPException(status_code=404, detail='記録が見つかりません')
 
-    result = {record[0]: record[1] for record in share_time_percentages}
+  result = {record[0]: record[1] for record in share_time_percentages}
 
-    return result
+  return result
 
 
-# LLM分析　メソッド書き直し済 TODO 要動作確認
+# LLM分析　 TODO トークン認証込みで書き直す
 @router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
 def getAnalysis(request: schemas.LLMReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
   records = timeShareRecordsCrud.getRecordsAnalysis(db, request.user_id, request.child_name)
@@ -166,6 +208,7 @@ def getAnalysis(request: schemas.LLMReq, token: str = Depends(verify_token), db:
   analysisResult = analyzeOpenai(formattedRecords)
   return schemas.LLMRes(summary=analysisResult, sentiment='N/A')
 
+# 確認用　FIXME あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(get_db)):
   records = timeShareRecordsCrud.getAllRecords(db)

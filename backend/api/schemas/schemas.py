@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
+from typing import List, Dict, Any
 
 class LoginReq(BaseModel):
   firebase_id: str
@@ -37,6 +38,9 @@ class PostChildReq(BaseModel):
 class PostChildRes(BaseModel):
   message: str
 
+
+class NamesRes(BaseModel):
+  names: List[Dict[str, str]]
 
 class RecordBase(BaseModel):
     stakeholder_id: UUID
@@ -85,3 +89,12 @@ class TimeShareRecordResponse(BaseModel):
 
   class Config:
     from_attributes = True
+
+# 新規登録のためのリクエストとレスポンスモデル
+class SignUpReq(BaseModel):
+  stakeholder_name: UUID
+  firebase_id: str
+
+class SignUpRes(BaseModel):
+  message: str
+  stakeholder_id: UUID
