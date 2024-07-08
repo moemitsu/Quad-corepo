@@ -17,8 +17,8 @@ export default function Home() {
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
           src="/index.jpg"
           alt="Index Logo"
-          width={900}
-          height={120}
+          width={1200}
+          height={160}
           priority
         />
         <div className="text-2xl text-custom-blue ">
@@ -30,7 +30,7 @@ export default function Home() {
         <div className="flex items-center mt-4">
           <button
             className="px-6 py-3 bg-custom-teal text-md text-white rounded-full shadow-md hover:bg-custom-blue transition-colors"
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/family-registration")}
           >
             使ってみる
           </button>

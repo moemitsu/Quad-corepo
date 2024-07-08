@@ -48,16 +48,17 @@ const Header: React.FC = () => {
               </>
             ) : (
               <>
-              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">
-                  アプリの使い方
-                </a>
-                <a
+              <a
                   className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500"
                   href="#"
                   onClick={handleLogin}
                 >
                     ログイン
-                  </a></>
+                  </a>
+              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">
+                  アプリの使い方
+                </a>
+                </>
             )}
           </div>
         </div>
