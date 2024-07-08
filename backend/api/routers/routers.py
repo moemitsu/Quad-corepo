@@ -92,7 +92,7 @@ def getMainData(child_name: str, year: str, month: str,db: Session = Depends(get
   return records
 
 # 記録の追加　書き直し済　TODO 要動作確認
-@router.post("/api/v1/time-share-records/", response_model=schemas.RecordRes)
+@router.post("/api/v1/time-share-records", response_model=schemas.RecordRes)
 def CreateRecords(record: schemas.RecordReq, db: Session = Depends(getDB)):
     dbRecord = timeShareRecordsCrud.createRecords(
       db = db,
