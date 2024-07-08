@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-import backend.api.database.Models as models, backend.api.schemas.schemas as schemas
+import api.database.Models as models, api.schemas.schemas as schemas
 
 # Userテーブルから利用者の名前を取得
 def getStakeholder(db: Session, adult_name: str):
