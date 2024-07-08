@@ -45,4 +45,6 @@ serviceAccountKey.json
 # log
 uvicorn.log
 custom.log
+uvicorn.log.*
+custom.log.*
 

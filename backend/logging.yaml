@@ -1,55 +1,50 @@
 version: 1
 disable_existing_loggers: False
 formatters:
+  standard:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   # uvicorn用のフォーマット
-  f_uvicorn:
-    format: '[UVICORN] %(asctime)s %(levelname)s %(name)s %(message)s'
-  # カスタムログ用のフォーマット    
-  f_custom:
-    format: "[CUSTOM] %(asctime)s %(levelname)s %(name)s (%(funcName)s[%(lineno)s]) %(message)s"
+  uvicorn:
+    "()": uvicorn.logging.DefaultFormatter
+    format: '[UVICORN] %(asctime)s %(levelname)s %(name)s (%(funcName)s[%(lineno)s]) %(message)s'
 handlers:
-  # uvicornで備わっているlogを標準出力するハンドラ
-  h_console_uvicorn:
+  console:
     class: logging.StreamHandler
-    formatter: f_uvicorn
-    stream: ext://sys.stdout
-  # 自分で設定したカスタムログを標準出力するハンドラ
-  h_console_custom:
-    class: logging.StreamHandler
-    formatter: f_custom
-    stream: ext://sys.stdout
-  # uvicornで備わっているlogをファイル出力(毎日ファイルを更新しながら365日分出力)するハンドラ
-  h_file_uvicorn:
+    formatter: standard
+    level: INFO
+  file_uvicorn:
     class : logging.handlers.TimedRotatingFileHandler
-    formatter: f_custom
+    formatter: uvicorn
     filename: logs/uvicorn/uvicorn.log
     when: midnight
     backupCount: 365
-    encoding: utf-8    
-  # 自分で設定したカスタムログをファイル出力(毎日ファイルを更新しながら365日分出力)するハンドラ
-  h_file_custom:
+    encoding: utf-8
+    level: INFO
+  file_custom:
     class : logging.handlers.TimedRotatingFileHandler
-    formatter: f_custom
-    filename: logs/costom/custom.log
+    formatter: standard
+    filename: logs/custom/custom.log
     when: midnight
     backupCount: 365
     encoding: utf-8
+    level: INFO
 loggers:
-  # uvicornで備わっているログはpropagateをtrueにしてroot設定を引継ぐ
+  uvicorn:
+    handlers: [uvicorn_file, console]
+    level: INFO
   uvicorn.error:
-    propagate: true
+    handlers: [uvicorn_file, console]
+    level: INFO
+    propagate: True
   uvicorn.access:
-    propagate: true
-  # カスタムログでは、標準出力とlogs/custom/custom.logへ出力
-  custom:
+    handlers: [uvicorn_file, console]
     level: INFO
-    handlers:
-      - h_console_custom
-      - h_file_custom
-    propagate: false
-  # uvicornでは標準出力とlogs/uvicorn/uvicorn.logへ出力 (propagateされて来る)
-  root:
-    level: INFO
-    handlers: 
-      - h_console_uvicorn
-      - h_file_uvicorn    
+    propagate: True
+  watchfiles:
+    level: WARNING
+    handlers: [uvicorn_file, console]
+    propagate: True
+
+root:
+  handlers: [file_custom, console]
+  level: INFO

@@ -4,14 +4,12 @@ import yaml
 from fastapi import FastAPI, HTTPException, Request, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 
-# ロギング設定をYAMLファイルから読み込む
-def setup_logging():
-    with open("logging.yaml", "r") as f:
-        config = yaml.safe_load(f.read())
-        logging.config.dictConfig(config)
+# YAMLファイルを読み込み、ログ設定を適用
+with open("logging.yaml", "r") as file:
+    config = yaml.safe_load(file)
+    logging.config.dictConfig(config)
 
-# ロギングをセットアップ
-setup_logging()
+logger = logging.getLogger(__name__)
 
 
 # FastAPIをインスタンス化する
@@ -34,6 +32,7 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
+  logger.info("Root endpoint called")
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")
