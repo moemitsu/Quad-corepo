@@ -16,20 +16,54 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
 
   const chartOptions = {
     ...options,
+    responsive: true,
+    maintainAspectRatio: false, // 縦横比を維持しない
     plugins: {
       legend: {
         display: true,
-        position: 'bottom', // 凡例の位置を設定
+        position: 'bottom',
         labels: {
           font: {
-            size: 16, // 凡例のフォントサイズを設定
+            size: 16,
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        display: true,
+        title: {
+          display: true,
+          text: '日付',
+          font: {
+            size: 16,
+          },
+        },
+        ticks: {
+          maxRotation: 0,
+          minRotation: 0,
+        },
+      },
+      y: {
+        display: true,
+        title: {
+          display: true,
+          text: '値',
+          font: {
+            size: 16,
           },
         },
       },
     },
   };
 
-  return <Bar data={data} options={chartOptions} />;
+  return (
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <div style={{ width: `${data.labels.length * 100}px` }}>
+        <Bar data={data} options={chartOptions} />
+      </div>
+    </div>
+  );
 };
 
 export default BarChart;
