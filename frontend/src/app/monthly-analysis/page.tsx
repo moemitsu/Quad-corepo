@@ -45,7 +45,7 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchChildren = async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get('http://localhost:8000/api/v1/children', {
+      const response = await axios.get('http://localhost:8000/api/v1/user/{user_id}/children', {
         headers: {
           Authorization: `Bearer ${bearerToken}`,
         },
@@ -60,9 +60,10 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchData = async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get(`http://localhost:8000/api/v1/main`, {
+      const response = await axios.get('http://localhost:8000/api/v1/main', {
         params: {
-          month: `${selectedYear}-${selectedMonth}`,
+          year: selectedYear,
+          month: selectedMonth,
           child_name: selectedChild,
         },
         headers: {
@@ -138,16 +139,17 @@ const MonthlyAnalysis: React.FC = () => {
     <div>
       <Header />
       <div className="p-6  min-h-screen flex flex-col">
-        <div className="mt-4"></div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <div className="flex items-center justify-between mt-12">
+        分析条件を選択してください
+          <div className="flex items-center justify-between mt-6">
+          
             <div className="relative flex items-center space-x-4">
+              
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
               >
-                {/* ダイナミックに年を生成 */}
                 {Array.from({ length: 1 }, (_, i) => (
                   <option key={selectedYear - i} value={selectedYear - i}>
                     {selectedYear - i}年
@@ -183,7 +185,7 @@ const MonthlyAnalysis: React.FC = () => {
                 className="p-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
                 onClick={() => router.push("/record-activity")}
               >
-                記録を追加＋
+                記録を追加
               </button>
             </div>
           </div>
@@ -205,11 +207,11 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-              <h3 className="text-xl text-custom-blue mb-2">割合で比較</h3>
+              <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
               <PieChart data={pieChartData} />
             </div>
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-              <h3 className="text-xl text-custom-blue mb-2">週間で見る</h3>
+              <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
               <BarChart data={barChartData} />
             </div>
           </div>
