@@ -1,4 +1,4 @@
-from sqlalchemy import String, Column, ForeignKey, TIMESTAMP, Integer # type: ignore
+from sqlalchemy import String, Column, ForeignKey, TIMESTAMP, Integer, DateTime # type: ignore
 from sqlalchemy.dialects.postgresql import UUID # type: ignore
 from sqlalchemy.ext.declarative import declarative_base # type: ignore
 from sqlalchemy.orm import relationship # type: ignore
@@ -35,5 +35,5 @@ class TimeShareRecords(Base):
   events = Column(String(), nullable=False)
   child_condition = Column(String(), nullable=False)
   place = Column(String(), nullable=False)
-  share_start_at = Column(TIMESTAMP, nullable=False)
-  share_end_at = Column(TIMESTAMP, nullable=False)
+  share_start_at = Column(DateTime, nullable=False)
+  share_end_at = Column(DateTime, nullable=False)

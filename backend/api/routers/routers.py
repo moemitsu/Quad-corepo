@@ -44,7 +44,7 @@ def formatRecords(records):
 
 # メソッド
 # ログイン 書き直し済み　TODO 用動作確認
-@router.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+@router.post('/api/v1/auth/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
 def login(token: str = Depends(verify_token), db: Session = Depends(getDB)):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
