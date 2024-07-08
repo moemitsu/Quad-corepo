@@ -1,5 +1,7 @@
-
-from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response
+import logging
+import logging.config
+import yaml
+from fastapi import FastAPI, HTTPException, Request, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
@@ -9,12 +11,19 @@ from api.routers import routers
 from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
 
+# YAMLファイルを読み込み、ログ設定を適用
+with open("logging.yaml", "r") as file:
+    config = yaml.safe_load(file)
+    logging.config.dictConfig(config)
+
+logger = logging.getLogger(__name__)
+
 
 # FastAPIをインスタンス化する
 app = FastAPI()
 app.include_router(routers.router)
 
-def getDB():
+def get_db():
   db = SessionLocal()
   try:
     yield db
@@ -38,6 +47,7 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
+  logger.info("Root endpoint called")
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")
@@ -46,7 +56,7 @@ async def protected_route(request: Request):
   return {"message": f"Hello, {user['name']}"}
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(getDB)):
+def get_all_time_share_records(db: Session = Depends(get_db)):
     records = crud.getAllRecords(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")

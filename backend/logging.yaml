@@ -1,0 +1,50 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  standard:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  # uvicorn用のフォーマット
+  uvicorn:
+    "()": uvicorn.logging.DefaultFormatter
+    format: '[UVICORN] %(asctime)s %(levelname)s %(name)s (%(funcName)s[%(lineno)s]) %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: standard
+    level: INFO
+  file_uvicorn:
+    class : logging.handlers.TimedRotatingFileHandler
+    formatter: uvicorn
+    filename: logs/uvicorn/uvicorn.log
+    when: midnight
+    backupCount: 365
+    encoding: utf-8
+    level: INFO
+  file_custom:
+    class : logging.handlers.TimedRotatingFileHandler
+    formatter: standard
+    filename: logs/custom/custom.log
+    when: midnight
+    backupCount: 365
+    encoding: utf-8
+    level: INFO
+loggers:
+  uvicorn:
+    handlers: [uvicorn_file, console]
+    level: INFO
+  uvicorn.error:
+    handlers: [uvicorn_file, console]
+    level: INFO
+    propagate: True
+  uvicorn.access:
+    handlers: [uvicorn_file, console]
+    level: INFO
+    propagate: True
+  watchfiles:
+    level: WARNING
+    handlers: [uvicorn_file, console]
+    propagate: True
+
+root:
+  handlers: [file_custom, console]
+  level: INFO

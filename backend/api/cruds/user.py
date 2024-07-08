@@ -1,13 +1,7 @@
+import logging
 from sqlalchemy.orm import Session
 import api.database.models as models, api.schemas.schemas as schemas
 
-# Userテーブルから利用者の名前を取得
-def getStakeholder(db: Session, adult_name: str):
-  return db.query(models.User).filter(models.User.adult_name == adult_name).first
-
-# Userテーブルから子どもの名前を取得
-def getChild(db: Session, child_name: str):
-  return db.query(models.User).filter(models.User.child_name == child_name).first
 
 # ユーザーを登録
 def createUser(db: Session, stakeholder_id: int, adult_name: str, child_name: str):
@@ -28,3 +22,7 @@ def updateUser(db: Session, user_id: int, adult_name: str, child_name: str):
     return dbUser
   else:
     return None
+  
+# userテーブルからadult_nameとchild_nameを取得
+def get_adult_child_name(db: Session, stakeholder_id: str):
+  db_user = db.query(models.User.adult_name, models.User.child_name).filter(models.User.stakeholder_id == stakeholder_id).all()

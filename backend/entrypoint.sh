@@ -1,8 +1,23 @@
-#!/bin/bash
-cd /src
-echo "Starting the application..."
-poetry run uvicorn api.main:app --host 0.0.0.0 --reload
-sleep 30
+#! usr/bin/bash
+set -e  # エラーが発生した場合にスクリプトを終了する
+# server立ち上げ
+poetry run uvicorn api.main:app --host 0.0.0.0 --reload --log-config logging.yaml
+# 初期マイグレーションの作成
 poetry run alembic revision --autogenerate -m "Initial migration"
+if grep -q "done"
+  echo "Initial migration generated successfully."
+else
+  echo "Failed to generate initial migration." >&2
+  exit 1
+fi
+# マイグレーションの適用
 poetry run alembic upgrade head
+if grep -q "Initial migration"
+  echo "Migration applied successfully."
+else
+  echo "Failed to apply migration." >&2
+  exit 1
+fi
+# データベースのシード
 poetry run python -m api.database.seed
+echo "All steps completed successfully."
