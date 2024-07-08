@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.include_router(routers.router)
 
-def getDB():
+def get_db():
   db = SessionLocal()
   try:
     yield db
@@ -56,7 +56,7 @@ async def protected_route(request: Request):
   return {"message": f"Hello, {user['name']}"}
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(getDB)):
+def get_all_time_share_records(db: Session = Depends(get_db)):
     records = crud.getAllRecords(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")
