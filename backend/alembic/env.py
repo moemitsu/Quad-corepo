@@ -1,6 +1,6 @@
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config # type: ignore
+from sqlalchemy import pool # type: ignore
 
 from alembic import context
 
@@ -20,6 +20,7 @@ if config.config_file_name is not None:
 # target_metadata = None
 from api.database.db import Base
 from api.database import Models  # modelsモジュールをインポート
+
 # データベース接続文字列を設定
 config.set_main_option("sqlalchemy.url", "postgresql://postgres:password@db:5432/sectionfdb")
 target_metadata = Base.metadata

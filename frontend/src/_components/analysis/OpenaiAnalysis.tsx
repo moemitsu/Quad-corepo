@@ -1,9 +1,9 @@
-// src/_components/OpenaiAnalysis.tsx
+// src/_components/analysis/OpenaiAnalysis.tsx
 'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../lib/firebase';
+import { auth } from '../../lib/firebase';
 
 interface OpenaiAnalysisProps {
   month: number;
@@ -34,19 +34,27 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [viewCount, setViewCount] = useState<number>(0);
-// LLMの分析結果を表示
+  const [loading, setLoading] = useState<boolean>(true); // データ読み込み中の状態
+
+  // LLMの分析結果を取得
   useEffect(() => {
     if (user) {
       const fetchData = async () => {
         try {
+          const token = await user.getIdToken(); // Firebaseトークンを取得
           const response = await axios.get('http://localhost:8000/api/v1/main', {
             params: {
               month: `2024-${month.toString().padStart(2, '0')}`,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`, // Bearerトークンをヘッダーに追加
             },
           });
           setData(response.data);
         } catch (error) {
           console.error('データ取得に失敗しました', error);
+        } finally {
+          setLoading(false); // 読み込み完了
         }
       };
       fetchData();
@@ -61,16 +69,18 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
     return <p>ログインしてください。</p>;
   }
 
-  if (!data) {
+  if (loading) {
     return <p>データを読み込んでいます...</p>;
+  }
+
+  if (!data) {
+    return <p>データを取得できませんでした。</p>;
   }
 
   return (
     <div className="flex mt-4 items-center justify-center">
       <div className="relative bg-white p-6 rounded-lg shadow-md self-start flex items-center">
         <div>
-          {/* ３回表示させたら会員登録を促すロジック */}
-          {/* TODO:必要に応じて今後修正 */}
           <h3 className="text-2xl font-semibold mb-2">LLMでの分析</h3>
           <p>{month}月のLLMでの分析結果がここに入ります</p>
           {viewCount < 3 ? (
@@ -99,8 +109,14 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           border-l-8 border-l-custom-light-blue"></div>
       </div>
       <div className="ml-4">
-        <img src='/LLMicon.png' alt="LLM Icon" className="w-30 h-41" />
-      </div>
+          <video
+            src="/LLMicon1.mp4"
+            loop
+            muted
+            autoPlay
+            className="w-26 h-40"
+          />
+        </div>
     </div>
   );
 };

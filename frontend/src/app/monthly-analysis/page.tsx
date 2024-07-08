@@ -1,18 +1,20 @@
 // src/_components/MonthlyAnalysis.tsx
-"use client";
+'use client';
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // useRouterをインポート
-import BarChart from "../../_components/BarChart";
-import PieChart from "../../_components/PieChart";
-import OpenaiAnalysis from "../../_components/OpenaiAnalysis";
+import BarChart from "../../_components/analysis/BarChart";
+import PieChart from "../../_components/analysis/PieChart";
+import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
 import Header from "../../_components/layout/header";
 import Footer from "../../_components/layout/footer";
 import { barData, pieData, colors } from "../../data";
 import axios from "axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebaseのauthモジュールから必要な関数をインポート
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
+  const [selectedYear, setSelectedYear] = useState<number>(2024); // 初期選択: 2024年
   const [selectedMonth, setSelectedMonth] = useState<number>(6); // 初期選択: 6月
   const [llmSummary, setLlmSummary] = useState<string>(""); // LLMの要約結果
   const [llmSentiment, setLlmSentiment] = useState<string>(""); // LLMのセンチメント
@@ -21,10 +23,33 @@ const MonthlyAnalysis: React.FC = () => {
 
   const router = useRouter();
 
+  useEffect(() => {
+    fetchChildren();
+  }, []);
+
+  // FirebaseのAuthインスタンスを取得する
+  const auth = getAuth();
+
+  // ユーザーの認証状態が変更されたら、子供データを取得する
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchChildren();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
   // 子供データの取得
   const fetchChildren = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/v1/children');
+      const bearerToken = await getAuthToken();
+      const response = await axios.get('http://localhost:8000/api/v1/user/{user_id}/children', {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
       setChildren(response.data.children);
     } catch (error) {
       console.error('Error fetching children:', error);
@@ -34,10 +59,15 @@ const MonthlyAnalysis: React.FC = () => {
   // 月別の子供ごとのデータを取得する
   const fetchData = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/v1/main`, {
+      const bearerToken = await getAuthToken();
+      const response = await axios.get('http://localhost:8000/api/v1/main', {
         params: {
-          month: `2024-${selectedMonth}`,
+          year: selectedYear,
+          month: selectedMonth,
           child_name: selectedChild,
+        },
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
         },
       });
       const data = response.data;
@@ -85,25 +115,49 @@ const MonthlyAnalysis: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchChildren();
-  }, []);
-
-  useEffect(() => {
     if (selectedChild) {
       fetchData();
     }
-  }, [selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChild]);
+
+  // 認証トークンを取得する関数
+  const getAuthToken = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        return await user.getIdToken(/* forceRefresh */ true);
+      } else {
+        throw new Error("User not logged in.");
+      }
+    } catch (error) {
+      console.error("Error getting auth token:", error);
+      throw error;
+    }
+  };
 
   return (
     <div>
       <Header />
-      <div className="p-6 bg-custom-light-green min-h-screen flex flex-col">
-        <div className="mt-4"></div>
+      <div className="p-6  min-h-screen flex flex-col">
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <div className="flex items-center justify-between mt-12">
-            <div className="relative">
+        分析条件を選択してください
+          <div className="flex items-center justify-between mt-6">
+          
+            <div className="relative flex items-center space-x-4">
+              
               <select
-                className="p-4 text-2xl text-custom-blue bg-custom-light-green mt-4"
+                className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              >
+                {Array.from({ length: 1 }, (_, i) => (
+                  <option key={selectedYear - i} value={selectedYear - i}>
+                    {selectedYear - i}年
+                  </option>
+                ))}
+              </select>
+              <select
+                className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
               >
@@ -114,27 +168,30 @@ const MonthlyAnalysis: React.FC = () => {
                 ))}
               </select>
               <select
-                className="p-4 text-2xl text-custom-blue bg-custom-light-green mt-4"
+                className="p-4 text-md text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedChild}
                 onChange={(e) => setSelectedChild(e.target.value)}
               >
-                <option value="">お子様を選択してください</option>
+                <option value="">お子様を選択</option>
                 {children.map((child, index) => (
                   <option key={index} value={child}>
                     {child}
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="flex items-center">
               <button
-                className="p-4 bg-custom-teal text-xl text-white rounded shadow-md hover:bg-custom-teal-dark transition-colors mt-4"
+                className="p-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
                 onClick={() => router.push("/record-activity")}
               >
-                記録を追加＋
+                記録を追加
               </button>
             </div>
-            {/* FIXME：GETできたら表示トライする */}
-            {/* <OpenaiAnalysis month={selectedMonth} /> */}
           </div>
+        </div>
+        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+          <OpenaiAnalysis month={selectedMonth} />
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
           <div className="flex justify-center space-x-4 mb-4">
@@ -148,13 +205,13 @@ const MonthlyAnalysis: React.FC = () => {
               日別
             </button>
           </div>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-              <h3 className="text-3xl text-custom-blue mb-2">割合で比較</h3>
+              <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
               <PieChart data={pieChartData} />
             </div>
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-              <h3 className="text-3xl text-custom-blue mb-2">週間で見る</h3>
+              <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
               <BarChart data={barChartData} />
             </div>
           </div>
