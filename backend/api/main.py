@@ -1,5 +1,7 @@
-
-from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response
+import logging
+import logging.config
+import yaml
+from fastapi import FastAPI, HTTPException, Request, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
@@ -8,6 +10,13 @@ from api.lib.auth import get_current_user
 from api.routers import routers
 from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
+
+# YAMLファイルを読み込み、ログ設定を適用
+with open("logging.yaml", "r") as file:
+    config = yaml.safe_load(file)
+    logging.config.dictConfig(config)
+
+logger = logging.getLogger(__name__)
 
 
 # FastAPIをインスタンス化する
@@ -38,6 +47,7 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
+  logger.info("Root endpoint called")
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")

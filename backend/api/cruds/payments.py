@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy.orm import Session
 import api.database.models as models, api.schemas.schemas as schemas
 

@@ -1,5 +1,7 @@
+import logging
 from sqlalchemy.orm import Session
 import api.database.models as models, api.schemas.schemas as schemas
+
 
 # ユーザーを登録
 def createUser(db: Session, stakeholder_id: int, adult_name: str, child_name: str):

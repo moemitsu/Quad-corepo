@@ -39,12 +39,12 @@ coverage.xml
 
 # Firebase
 .env
-
-
-
 .python-version
-
-
-
 serviceAccountKey.json
+
+# log
+uvicorn.log
+custom.log
+uvicorn.log.*
+custom.log.*
 
