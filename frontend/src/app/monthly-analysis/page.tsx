@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation"; // useRouterをインポート
 import BarChart from "../../_components/analysis/BarChart";
 import PieChart from "../../_components/analysis/PieChart";
 import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
-import Header from "../../_components/layout/header";
-import Footer from "../../_components/layout/footer";
+import Header from "../../_components/layout/Header";
+import Footer from "../../_components/layout/Footer";
 import { barData, pieData, colors } from "../../data";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebaseのauthモジュールから必要な関数をインポート
-
+import RecordList from "../../_components/analysis/RecordList"; // RecordListをインポート
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
@@ -45,7 +45,7 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchChildren = async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get('http://localhost:8000/api/v1/user/{user_id}/children', {
+      const response = await axios.get('http://localhost:8000/api/v1/user/{user_id}/child_name', {
         headers: {
           Authorization: `Bearer ${bearerToken}`,
         },
@@ -214,7 +214,10 @@ const MonthlyAnalysis: React.FC = () => {
               <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
               <BarChart data={barChartData} />
             </div>
-          </div>
+          </div> 
+        </div>
+        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+        <RecordList /> {/* ここにRecordListコンポーネントを追加 */}
         </div>
       </div>
       <Footer />

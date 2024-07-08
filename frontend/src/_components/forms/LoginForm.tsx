@@ -22,18 +22,18 @@ const LoginForm: React.FC = () => {
       console.log('取得したトークン:', token); // トークンをコンソールに出力
 
       // 認証されたリクエストを送信
-      await axios.post(
-        'http://localhost:8000/api/v1/auth/login',
-        {}, // リクエストボディは空
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
-          },
-        }
-      );
+      // await axios.post(
+      //   'http://localhost:8000/api/v1/auth/login',
+      //   {}, // リクエストボディは空
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`, // ヘッダーにトークンを含める
+      //     },
+      //   }
+      // );
 
       // ログイン成功後にリダイレクト
-      router.push('/record-form');
+      router.push('/mothly-analysis');
     } catch (err: any) {
       console.error('エラーコード:', err.code); // エラーコードをコンソールに出力
       console.error('エラーメッセージ:', err.message); // エラーメッセージをコンソールに出力

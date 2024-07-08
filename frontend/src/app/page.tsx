@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
-import Header from "../_components/layout/header";
-import Footer from "../_components/layout/footer";
+import Header from "../_components/layout/Header";
+import Footer from "../_components/layout/Footer";
 import { useRouter } from 'next/navigation';
 
 
@@ -32,7 +32,7 @@ export default function Home() {
             className="px-6 py-3 bg-custom-teal text-md text-white rounded-full shadow-md hover:bg-custom-blue transition-colors"
             onClick={() => router.push("/login")}
           >
-            使ってみる／ログイン
+            使ってみる
           </button>
         </div>
       </main>
