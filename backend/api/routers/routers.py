@@ -42,7 +42,6 @@ def formatRecords(records):
     record.pop('_sa_instance_state', None)
   return json.dumps(formattedRecords, indent=2)
 
-
 # 以下メソッド
 # メモ：記録を追加する（POST）、登録情報の編集（PUT）、LLMに情報渡して値貰う(POST)
 
@@ -75,7 +74,6 @@ def signup(token: str = Depends(verify_token), db: Session = Depends(get_db)):
     return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
   except Exception as e:
     raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
-
 
 # ユーザー情報登録（登録画面⓷）トークン認証込みで書き直し済み TODO 要動作確認
 @router.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
