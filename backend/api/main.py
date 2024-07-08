@@ -34,13 +34,15 @@ app.add_middleware(
   # allow_headers=["Authorization", "Content-Type"]
 )
 
+
 @app.get("/")
-def read_root():
+async def read_root():
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")
-def protected_route(user = Depends(get_current_user)):
-  return {"message": "This is a protected route", "user": user}
+async def protected_route(request: Request):
+  user = request.state.user
+  return {"message": f"Hello, {user['name']}"}
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(getDB)):

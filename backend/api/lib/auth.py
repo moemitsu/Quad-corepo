@@ -1,11 +1,8 @@
-# firebase関係のコード
-import firebase_admin
-from firebase_admin import credentials, auth
+# firebaseのトークン検証
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-cred = credentials.Certificate("/src/serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
+from firebase_admin import credentials, auth
+from api.lib.firebase import cred
 
 # FastAPIの認証スキーマ
 security = HTTPBearer()

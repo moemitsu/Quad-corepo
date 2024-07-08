@@ -5,7 +5,7 @@ from api.database.db import SessionLocal, engine
 import openai
 import os
 import json
-import api.database.Models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
+import api.database.models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
 
 models.Base.metadata.create_all(bind=engine)
@@ -40,7 +40,6 @@ def formatRecords(records):
   for record in formattedRecords:
     record.pop('_sa_instance_state', None)
   return json.dumps(formattedRecords, indent=2)
-
 
 # メソッド
 # ログイン 書き直し済み　TODO 用動作確認
@@ -122,10 +121,7 @@ def getAnalysis(request: schemas.LLMReq, db: Session = Depends(getDB)):
   analysisResult = analyzeOpenai(formattedRecords)
   return schemas.LLMRes(summary=analysisResult, sentiment='N/A')
 
-
-
-# ログイン（GET）　新規登録（POST）　各月画面（GET）　記録を追加するときの利用者・子供選択（GET）　記録を追加する（POST）　登録情報の編集　（PUT）
-
+# メモ：ログイン（GET）　新規登録（POST）　各月画面（GET）　記録を追加するときの利用者・子供選択（GET）　記録を追加する（POST）　登録情報の編集　（PUT）
 
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(getDB)):
