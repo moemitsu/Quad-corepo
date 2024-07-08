@@ -1,10 +1,15 @@
-// src/_components/layout/ButtonHeader.tsx
-"use client";
+'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../lib/firebase'; // Firebaseの初期化ファイルをインポート
+import MenuIcon from 'feather-icons-react';
 
 const ButtonHeader: React.FC = () => {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user] = useAuthState(auth); // Firebase Authのユーザー状態を取得
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -12,6 +17,15 @@ const ButtonHeader: React.FC = () => {
 
   const closeMenu = () => {
     setMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut(); // Firebaseでサインアウト
+      router.push('/login'); // ログインページにリダイレクト
+    } catch (error) {
+      console.error('サインアウトに失敗しました:', error);
+    }
   };
 
   return (
@@ -25,7 +39,7 @@ const ButtonHeader: React.FC = () => {
           aria-haspopup="true"
           onClick={toggleMenu}
         >
-          Options
+          Menu
           <svg className="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path
               fillRule="evenodd"
@@ -38,39 +52,54 @@ const ButtonHeader: React.FC = () => {
 
       {menuOpen && (
         <div
-          className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="fixed right-0 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="menu-button"
           tabIndex={-1}
+          style={{ top: 'auto', left: 'auto' }} // 固定位置を設定
         >
           <div className="py-1" role="none">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-0" onClick={closeMenu}>
-              Edit
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-1" onClick={closeMenu}>
-              Duplicate
+          <a href="monthly-analysis" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              分析結果を見る
             </a>
           </div>
           <div className="py-1" role="none">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-2" onClick={closeMenu}>
-              Archive
+            <a href="record-activity" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              記録を追加する
             </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-3" onClick={closeMenu}>
-              Move
-            </a>
-          </div>
-          <div className="py-1" role="none">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-4" onClick={closeMenu}>
-              Share
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-5" onClick={closeMenu}>
-              Add to favorites
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              記録を変更する
             </a>
           </div>
           <div className="py-1" role="none">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="menu-item-6" onClick={closeMenu}>
-              Delete
+            <a href="/family-registration" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              登録情報の変更
+            </a>
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              家族で共有する
+            </a>
+          </div>
+          <div className="py-1" role="none">
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              このアプリの使い方
+            </a>
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+              ヘルプ
+            </a>
+          </div>
+          <div className="py-1" role="none">
+            <a
+              href="#"
+              className="block px-4 py-2 text-sm text-gray-700"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                handleLogout();
+                closeMenu();
+              }}
+            >
+              サインアウト
             </a>
           </div>
         </div>

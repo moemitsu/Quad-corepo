@@ -52,3 +52,7 @@ def getRecordsAnalysis(db: Session, stakeholder_id: int, child_name: str):
       models.TimeShareRecords.child_name == child_name
     )
   ).all()
+
+# 確認用　TimeShareRecordsのデータをすべて取得する関数
+def getAllRecords(db: Session):
+    return db.query(models.TimeShareRecords).all()
