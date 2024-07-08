@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase'; // Firebaseの初期化ファイルをインポート
-import MenuIcon from 'feather-icons-react';
 import ButtonHeader from './ButtonHeader';
 import Image from 'next/image';
 
@@ -50,7 +49,7 @@ const Header: React.FC = () => {
             ) : (
               <>
               <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">
-                  このアプリの使い方
+                  アプリの使い方
                 </a>
                 <a
                   className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500"
