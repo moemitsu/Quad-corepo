@@ -16,9 +16,11 @@ const LoginForm: React.FC = () => {
     setError('');
 
     try {
+
       await login(email, password);
       // ログイン成功後にリダイレクト
       router.push('/monthly-analysis');
+
     } catch (err: any) {
       console.error('エラーコード:', err.code);
       console.error('エラーメッセージ:', err.message);
