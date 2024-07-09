@@ -15,7 +15,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # データベースセッションを取得する関数
-def getDB():
+def get_dB():
     db = SessionLocal()
     try:
         yield db

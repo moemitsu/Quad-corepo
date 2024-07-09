@@ -1,7 +1,7 @@
 #! usr/bin/bash
 set -e  # エラーが発生した場合にスクリプトを終了する
 # server立ち上げ
-poetry run uvicorn api.main:app --host 0.0.0.0 --reload --log-config logging.yaml
+poetry run uvicorn api.main:app --host 0.0.0.0 --reload --log-config logging.yaml # NOTE ここにコメントアウトがないとコンテナでサーバー立ち上げの際にエラーが出ます。
 # 初期マイグレーションの作成
 poetry run alembic revision --autogenerate -m "Initial migration"
 if grep -q "done"
