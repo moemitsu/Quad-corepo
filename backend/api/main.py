@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from api.database.db import SessionLocal
 from typing import List
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
-from routers import router as app_router
+from api.routers.routers import router as app_router
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)
@@ -77,6 +77,7 @@ async def protected_route(request: Request):
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(get_db)):
+    logger.info("all data")
     records = crud.get_all_records(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")

@@ -14,7 +14,7 @@ import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
-from services.stripe import router as stripe_router
+from api.services.stripe import router as stripe_router
 
 models.Base.metadata.create_all(bind=engine)
 
