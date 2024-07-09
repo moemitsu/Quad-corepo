@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base # type: ignore
 DATABASE_URL = "postgresql://postgres:password@db:5432/sectionfdb"
 
 # データベースエンジンを作成
-engine = create_engine(DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 
 # セッションファクトリを作成
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
