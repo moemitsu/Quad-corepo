@@ -9,7 +9,7 @@ class Error(BaseModel):
 
 # 新規登録のためのリクエストとレスポンスモデル
 class SignUpReq(BaseModel):
-  stakeholder_name: UUID
+  stakeholder_name: str
   firebase_id: str
 class SignUpRes(BaseModel):
   message: str
