@@ -10,7 +10,7 @@ def seed_data(db: Session):
 	stakeholder1_id = uuid4()
 	stakeholder2_id = uuid4()
 
-	# Define possible values
+	# シード用のデータ
 	surnames = ['佐藤', '鈴木', '高橋', '田中', '伊藤', '山本', '中村', '小林', '加藤', '吉田']
 	members = ['父', '母', '祖父', '祖母', '保育士']
 	children = ['はなこ', 'たろう', 'いちろう', 'ふたば']

@@ -9,6 +9,13 @@ from api.routers import routers
 from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
 
+# YAMLファイルを読み込み、ログ設定を適用
+# with open("logging.yaml", "r") as file:
+#     config = yaml.safe_load(file)
+#     logging.config.dictConfig(config)
+
+# logger = logging.getLogger(__name__)
+
 
 # FastAPIをインスタンス化する
 app = FastAPI()
@@ -46,8 +53,8 @@ async def protected_route(request: Request):
   return {"message": f"Hello, {user['name']}"}
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(getDB)):
-    records = crud.getAllRecords(db)
+def get_all_time_share_records(db: Session = Depends(get_db)):
+    records = crud.get_all_records(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records

@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 from api.schemas import (
     LoginReq, LoginRes, Error, StakeHolderReq, StakeholderRes, 
-    UserReq, UserRes, PostChildReq, PostChildRes, RecordReq, 
+    UserReq, UserRes, RecordReq, 
     RecordRes, LLMReq, LLMRes
 )
 import datetime
@@ -39,15 +39,6 @@ def test_user_res():
     user_res = UserRes(message="登録完了！", user_id=1)
     assert user_res.message == "登録完了！"
     assert user_res.user_id == 1
-
-def test_post_child_req():
-    post_child_req = PostChildReq(stakeholder_id=1, child_name="Doe")
-    assert post_child_req.stakeholder_id == 1
-    assert post_child_req.child_name == "Doe"
-
-def test_post_child_res():
-    post_child_res = PostChildRes(message="成功")
-    assert post_child_res.message == "成功"
 
 def test_record_req():
     share_start_at = datetime.datetime(2023, 7, 1, 0, 0, 0)

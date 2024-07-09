@@ -1,7 +1,7 @@
 import React from 'react';
 import PaymentForm from '../../_components/forms/PaymentForm';
-import Header from "../../_components/layout/header";
-import Footer from "../../_components/layout/footer";
+import Header from "../../_components/layout/Header";
+import Footer from "../../_components/layout/Footer";
 
 const PaymentPage: React.FC = () => {
   return (
