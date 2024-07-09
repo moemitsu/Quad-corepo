@@ -15,7 +15,7 @@
 | 記録の更新 | PUT | `/api/v1/records/{record_id}` | 特定の記録の更新 |
 -->
 
-# ログイン認証関連エンドポイント
+# サインイン認証関連エンドポイント
 ## 新規登録 [POST /auth/register]
 新しいユーザーを登録するためのエンドポイント：Stakeholderテーブル
 リクエストボディの、"stakeholder_name"はStakeholderテーブルに、"adult_name"と"child_name"はUserテーブルにポストされる。
