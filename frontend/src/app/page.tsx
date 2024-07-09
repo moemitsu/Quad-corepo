@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Header from "../_components/layout/header";
-import Footer from "../_components/layout/Footer";
+import Footer from "../_components/layout/footer";
 import { useRouter } from 'next/navigation';
 
 

@@ -16,11 +16,17 @@ const LoginForm: React.FC = () => {
     setError('');
 
     try {
+      const { userCredential, idToken } = await login(email, password);
+      if (userCredential && userCredential.user) {
+        console.log('IDトークン:', idToken); // トークンをコンソールに出力
+        console.log('UID:', userCredential.user.uid); // UIDをコンソールに出力
+        
 
-      await login(email, password);
-      // ログイン成功後にリダイレクト
-      router.push('/monthly-analysis');
-
+        // ログイン成功後にリダイレクト
+        router.push('/monthly-analysis');
+      } else {
+        setError('ログインに失敗しました。もう一度お試しください。');
+      }
     } catch (err: any) {
       console.error('エラーコード:', err.code);
       console.error('エラーメッセージ:', err.message);

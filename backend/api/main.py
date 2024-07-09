@@ -1,10 +1,9 @@
-import logging
-import logging.config
-import yaml
-from fastapi import FastAPI, HTTPException, Request, Depends, Response
+
+from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
+import openai 
 from api.lib.auth import get_current_user
 from api.routers import routers
 from api.database.db import SessionLocal, engine
@@ -22,7 +21,7 @@ import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.d
 app = FastAPI()
 app.include_router(routers.router)
 
-def get_db():
+def getDB():
   db = SessionLocal()
   try:
     yield db
@@ -46,7 +45,6 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
-  logger.info("Root endpoint called")
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")

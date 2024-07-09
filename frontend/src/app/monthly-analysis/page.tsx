@@ -5,7 +5,7 @@ import BarChart from "../../_components/analysis/BarChart";
 import PieChart from "../../_components/analysis/PieChart";
 import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
 import Header from "../../_components/layout/header";
-import Footer from "../../_components/layout/Footer";
+import Footer from "../../_components/layout/footer";
 import { barData, pieData, colors } from "../../data";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebaseのauthモジュールから必要な関数をインポート
