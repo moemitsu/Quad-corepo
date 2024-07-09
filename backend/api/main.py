@@ -7,6 +7,8 @@ from api.database.db import SessionLocal
 from typing import List
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
 from api.routers.routers import router as app_router
+from api.routers.stripe import router as stripe_router
+
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)
@@ -63,17 +65,18 @@ app.add_middleware(
 )
 # ルーターの登録
 app.include_router(app_router)
+app.include_router(stripe_router)
 
-@app.get("/")
-async def read_root():
-  logger.info("Root endpoint called")
-  print("------------------Root endpoint called")
-  return {"message": "Welcome to the FastAPI application"}
+# @app.get("/")
+# async def read_root():
+#   logger.info("Root endpoint called")
+#   print("------------------Root endpoint called")
+#   return {"message": "Welcome to the FastAPI application"}
 
-@app.get("/protected-route")
-async def protected_route(request: Request):
-  user = request.state.user
-  return {"message": f"Hello, {user['name']}"}
+# @app.get("/protected-route")
+# async def protected_route(request: Request):
+#   user = request.state.user
+#   return {"message": f"Hello, {user['name']}"}
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(get_db)):

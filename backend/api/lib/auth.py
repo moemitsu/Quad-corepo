@@ -15,12 +15,13 @@ print('-------------------firebase2.5')
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
   print('-------------------firebase3')
   token = credentials.credentials
-  print('-------------------firebase4')
+  print(token,'-------------------firebase4')
   try:
     decoded_token = auth.verify_id_token(token)
-    print('-------------------firebase5')
+    print(decoded_token)
     return decoded_token
   except Exception as e:
+    print(f"Token verification failed: {e}")
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
       detail="Invalid authentication credentials",

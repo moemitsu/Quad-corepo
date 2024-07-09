@@ -1,9 +1,9 @@
 from logging import config, getLogger
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
+from uuid import UUID
 import datetime
 import calendar
-import uuid
 
 from api.database import models
 from api.schemas import schemas
@@ -30,7 +30,7 @@ def get_records_by_month(db: Session, child_name: str, year: int, month: int):
     ).all()
 
 # 棒グラフ用データ取得＆計算
-def get_bar_graph_by_month(db: Session, stakeholder_id: uuid.UUID, child_name: str, year: int, month: int):
+def get_bar_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, year: int, month: int):
     start_date = datetime.datetime(year, month, 1)
     last_day = calendar.monthrange(year, month)[1]
     end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
@@ -54,7 +54,7 @@ def get_bar_graph_by_month(db: Session, stakeholder_id: uuid.UUID, child_name: s
     return records
 
 # 円グラフ用データの取得&計算
-def get_pie_graph_by_month(db: Session, stakeholder_id: uuid.UUID, child_name: str, year: int, month: int):
+def get_pie_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, year: int, month: int):
 
     start_date = datetime.datetime(year, month, 1)
     last_day = calendar.monthrange(year, month)[1]
@@ -92,7 +92,7 @@ def get_pie_graph_by_month(db: Session, stakeholder_id: uuid.UUID, child_name: s
 
 
 # 記録の追加
-def create_record(db: Session, stakeholder_id: uuid.UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
+def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
     new_record = models.TimeShareRecords(
         stakeholder_id=stakeholder_id,
@@ -104,13 +104,14 @@ def create_record(db: Session, stakeholder_id: uuid.UUID, with_member: str, chil
         share_start_at=share_start_at,
         share_end_at=share_end_at
     )
+    logger.info(new_record)
     db.add(new_record)
     db.commit()
     db.refresh(new_record)
     return new_record
 
 # LLMに分析してもらうためのデータを取得
-def get_records_analysis(db: Session, stakeholder_id: uuid, child_name: str):
+def get_records_analysis(db: Session, stakeholder_id: UUID, child_name: str):
     logger.info(f"Fetching Records for Analysis: Child={child_name}")
     return db.query(models.TimeShareRecords).filter(
         and_(
