@@ -12,11 +12,11 @@ from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
 
 # YAMLファイルを読み込み、ログ設定を適用
-with open("logging.yaml", "r") as file:
-    config = yaml.safe_load(file)
-    logging.config.dictConfig(config)
+# with open("logging.yaml", "r") as file:
+#     config = yaml.safe_load(file)
+#     logging.config.dictConfig(config)
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 # FastAPIをインスタンス化する
