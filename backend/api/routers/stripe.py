@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
-from services.stripe import create_checkout_session, handle_stripe_webhook
+from api.services.stripe import create_checkout_session, handle_stripe_webhook
 import stripe
 import os
 from dotenv import load_dotenv
