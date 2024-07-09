@@ -8,6 +8,7 @@ import os
 import json
 import api.database.models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
+from services.stripe import router as stripe_router
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -226,3 +227,5 @@ def get_all_time_share_records(db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="記録が見つかりません")
   return records
 
+# Stripe用のルーターを登録
+router.include_router(stripe_router, prefix="/stripe", tags=["stripe"])

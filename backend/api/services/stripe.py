@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 import stripe
 import os
@@ -6,51 +6,46 @@ from dotenv import load_dotenv
 
 load_dotenv()  # 環境変数を読み込む
 
-# Stripeのシークレットキーを設定
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+YOUR_DOMAIN = 'http://localhost:3000/'
 
+router = APIRouter()
+
+@router.post("/create-checkout-session")
 def create_checkout_session():
     try:
-        # チェックアウトセッションを作成
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': 'T-shirt',
-                    },
-                    'unit_amount': 2000,  # 20.00 USD
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    'price': 'price_1PaV7S2KB7MtryeCquCTBTn0',
+                    'quantity': 1,
                 },
-                'quantity': 1,
-            }],
-            mode='payment',
-            success_url='https://your-frontend-url.com/success',
-            cancel_url='https://your-frontend-url.com/cancel',
+            ],
+            mode='subscription',
+            success_url=YOUR_DOMAIN + '?success=true',
+            cancel_url=YOUR_DOMAIN + '?canceled=true',
         )
-        return session.id
+        return {"url": checkout_session.url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-def handle_stripe_webhook(payload, sig_header):
+@router.post("/webhook")
+async def handle_stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get('Stripe-Signature')
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
+        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
     except ValueError as e:
-        # Invalid payload
         raise HTTPException(status_code=400, detail=str(e))
     except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Handle the event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         handle_checkout_session(session)
     
-    return {"message": "success"}
+    return JSONResponse(status_code=200, content={"message": "success"})
 
 def handle_checkout_session(session):
     print("Payment was successful.")
