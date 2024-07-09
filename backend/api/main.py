@@ -1,20 +1,15 @@
 from logging import config, basicConfig, getLogger, DEBUG
 import yaml
-from fastapi import FastAPI, HTTPException, Request, Depends, Response
+from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
-# from api.lib.auth import get_current_user
+import openai 
+from api.lib.auth import verify_token, get_current_user
 from api.routers import routers
 from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
-
-from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
-import api.database.models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
-from api.lib.auth import verify_token, get_current_user
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)
@@ -49,7 +44,6 @@ if __name__ == "__main__":
 # FastAPIをインスタンス化する
 app = FastAPI()
 app.include_router(routers.router)
-
 
 def get_db():
   db = SessionLocal()

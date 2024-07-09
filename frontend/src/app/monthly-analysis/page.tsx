@@ -1,16 +1,16 @@
-// src/_components/MonthlyAnalysis.tsx
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // useRouterをインポート
 import BarChart from "../../_components/analysis/BarChart";
 import PieChart from "../../_components/analysis/PieChart";
 import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
-import Header from "../../_components/layout/Header";
-import Footer from "../../_components/layout/Footer";
+import Header from "../../_components/layout/header";
+import Footer from "../../_components/layout/footer";
 import { barData, pieData, colors } from "../../data";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebaseのauthモジュールから必要な関数をインポート
 import RecordList from "../../_components/analysis/RecordList"; // RecordListをインポート
+
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
   const [pieChartData, setPieChartData] = useState<any>({});
@@ -23,18 +23,16 @@ const MonthlyAnalysis: React.FC = () => {
 
   const router = useRouter();
 
-  useEffect(() => {
-    fetchChildren();
-  }, []);
-
   // FirebaseのAuthインスタンスを取得する
   const auth = getAuth();
 
-  // ユーザーの認証状態が変更されたら、子供データを取得する
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    // ユーザーの認証状態が変更されたら、トークンを取得してコンソールに表示
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        fetchChildren();
+        const token = await getAuthToken();
+        console.log("TokenID:", token);
+        fetchChildren(token);
       }
     });
 
@@ -42,15 +40,14 @@ const MonthlyAnalysis: React.FC = () => {
   }, [auth]);
 
   // 子供データの取得
-  const fetchChildren = async () => {
+  const fetchChildren = async (token: string) => {
     try {
-      const bearerToken = await getAuthToken();
-      const response = await axios.get('http://localhost:8000/api/v1/user/{user_id}/child_name', {
+      const response = await axios.get('http://localhost:8000/api/v1/names', {
         headers: {
-          Authorization: `Bearer ${bearerToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      setChildren(response.data.children);
+      setChildren(response.data.名前);
     } catch (error) {
       console.error('Error fetching children:', error);
     }
@@ -112,14 +109,13 @@ const MonthlyAnalysis: React.FC = () => {
     } catch (error) {
       console.error("エラー:", error);
     }
-  },[selectedMonth, selectedChild]);
+  }, [selectedMonth, selectedChild]);
 
   useEffect(() => {
     if (selectedChild) {
       fetchData();
     }
-
-  }, [selectedYear, selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChild, fetchData]);
 
   // 認証トークンを取得する関数
   const getAuthToken = async () => {
@@ -139,13 +135,11 @@ const MonthlyAnalysis: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="p-6  min-h-screen flex flex-col">
+      <div className="p-6 min-h-screen flex flex-col">
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-        分析条件を選択してください
+          分析条件を選択してください
           <div className="flex items-center justify-between mt-6">
-          
             <div className="relative flex items-center space-x-4">
-              
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedYear}
@@ -215,10 +209,10 @@ const MonthlyAnalysis: React.FC = () => {
               <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
               <BarChart data={barChartData} />
             </div>
-          </div> 
+          </div>
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-        <RecordList /> {/* ここにRecordListコンポーネントを追加 */}
+          <RecordList /> {/* ここにRecordListコンポーネントを追加 */}
         </div>
       </div>
       <Footer />

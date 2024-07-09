@@ -5,7 +5,6 @@ import axios from 'axios';
 import Header from'../../_components/layout/Header';
 import Footer from '../../_components/layout/Footer';
 
-
 const Hello: React.FC = () => {
   const [data, setData] = useState<{ message: string } | null>(null);
 
