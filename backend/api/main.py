@@ -1,15 +1,12 @@
-from logging import config, basicConfig, getLogger, DEBUG
+from logging import config, getLogger
 import yaml
-from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
-import openai 
-from api.lib.auth import verify_token, get_current_user
-from api.routers import routers
-from api.database.db import SessionLocal, engine
+from api.database.db import SessionLocal
+from typing import List
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
+from routers import router as app_router
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)
@@ -43,7 +40,6 @@ if __name__ == "__main__":
 
 # FastAPIをインスタンス化する
 app = FastAPI()
-app.include_router(routers.router)
 
 def get_db():
   db = SessionLocal()
@@ -65,7 +61,8 @@ app.add_middleware(
   allow_headers=["*"]# OPTIONSを追加
   # allow_headers=["Authorization", "Content-Type"]
 )
-
+# ルーターの登録
+app.include_router(app_router)
 
 @app.get("/")
 async def read_root():
