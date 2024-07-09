@@ -1,4 +1,4 @@
-import logging
+from logging import config, getLogger
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
 import datetime
@@ -7,7 +7,11 @@ import calendar
 from api.database import models
 from api.schemas import schemas
 
-logger = logging.getLogger(f'custom.{__name__}')
+#TODO:不要であれば削除
+#logger = logging.getLogger(f'custom.{__name__}')
+
+logger = getLogger(__name__)
+
 
 # クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得
 def get_records_by_month(db: Session, child_name: str, year: int, month: int):
@@ -50,6 +54,7 @@ def get_bar_graph_by_month(db: Session, stakeholder_id: int, child_name: str, ye
 
 # 円グラフ用データの取得&計算
 def get_pie_graph_by_month(db: Session, stakeholder_id: int, child_name: str, year: int, month: int):
+
     start_date = datetime.datetime(year, month, 1)
     last_day = calendar.monthrange(year, month)[1]
     end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
@@ -83,6 +88,7 @@ def get_pie_graph_by_month(db: Session, stakeholder_id: int, child_name: str, ye
         return [(record.with_member, 0) for record in records]
     
     return [(record.with_member, (record.total_hours / total_time) * 100) for record in records]
+
 
 # 記録の追加
 def create_record(db: Session, stakeholder_id: int, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):

@@ -1,15 +1,20 @@
-# firebaseのトークン検証
+# # firebaseのトークン検証
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin import credentials, auth
-from api.lib.firebase import cred
+import firebase_admin
+from logging import config, getLogger
+
+logger = getLogger(__name__)
 
 # FastAPIの認証スキーマ
 security = HTTPBearer()
 
 # トークンを検証し、ユーザー情報を取得する関数
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+  print('-------------------1')
   token = credentials.credentials
+  print('hoghoghogohogho')
   try:
     decoded_token = auth.verify_id_token(token)
     return decoded_token

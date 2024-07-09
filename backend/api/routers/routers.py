@@ -1,3 +1,4 @@
+from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
@@ -15,6 +16,9 @@ import api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
 
 models.Base.metadata.create_all(bind=engine)
+
+# Initialize the logger
+logger = getLogger(__name__)
 
 app = FastAPI()
 router = APIRouter()
@@ -169,13 +173,18 @@ def get_pie_data(
     db: Session = Depends(get_db)
   ):
   firebase_id = token['uid']
+  logger.info(f'Firebase ID: {firebase_id}')
   stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+  logger.info(f'Stakeholder: {stakeholder}')
   if not stakeholder:
+    logger.info('User not found')
     raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
   share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
   if not share_time_percentages:
+    logger.info('Records not found')
     raise HTTPException(status_code=404, detail='記録が見つかりません')
   result = {record[0]: record[1] for record in share_time_percentages}
+  logger.info(f'Result: {result}')
   return result
 
 # 各月画面用の情報の取得　トークン認証込みで書き直し済み　TODO 動作確認
@@ -207,3 +216,23 @@ def get_bar_data(
         result[with_member][str(date)] = total_hours
 
     return result
+
+# LLM分析　 TODO トークン認証込みで書き直す
+@router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
+def get_analysis(request: schemas.LLMReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+  records = timeShareRecordsCrud.get_records_analysis(db, request.user_id, request.child_name)
+  if not records:
+    raise HTTPException(status_code=404, detail='記録が見つかりません')
+  # 取得したデータをテキストに変換
+  formatted_records = format_records(records)
+  #OpenAI API を使用して分析
+  analysisResult = analyze_openai(formatted_records)
+  return schemas.LLMRes(summary=analysisResult, sentiment='N/A')
+
+# 確認用　FIXME あとで消す
+@router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
+def get_all_time_share_records(db: Session = Depends(get_db)):
+  records = timeShareRecordsCrud.get_all_records(db)
+  if not records:
+    raise HTTPException(status_code=404, detail="記録が見つかりません")
+  return records
