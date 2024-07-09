@@ -1,10 +1,15 @@
-import logging
+from logging import config, getLogger
 from sqlalchemy.orm import Session
 import api.database.models as models, api.schemas.schemas as schemas
 from uuid import uuid4
 
+logger = getLogger(__name__)
+
 # stakeholderテーブルのidを取得
+
 def get_stakeholder_id(db: Session, id: int):
+  logger.info('stakeholder_id get')
+  print('stakeholder_id get')
   return db.query(models.Stakeholder).filter(models.Stakeholder.id == id).first()
 
 # フロントエンドから来たトークンを保存する
@@ -19,6 +24,7 @@ def create_stakeholder(db: Session, stakeholder:schemas.StakeHolderReq):
   return db_stakeholder
 
 # stakeholderテーブルのfirebase_idを取得
+
 def get_firebase_id(db:Session, firebase_id: str):
   return db.query(models.Stakeholder).filter(models.Stakeholder.firebase_id == firebase_id).first()
 

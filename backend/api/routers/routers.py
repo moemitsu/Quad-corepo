@@ -1,3 +1,4 @@
+from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
@@ -9,6 +10,9 @@ import api.database.models as models, api.schemas.schemas as schemas, api.cruds.
 from api.lib.auth import verify_token, get_current_user
 
 models.Base.metadata.create_all(bind=engine)
+
+# Initialize the logger
+logger = getLogger(__name__)
 
 app = FastAPI()
 router = APIRouter()
@@ -188,13 +192,18 @@ def get_pie_data(
   db: Session = Depends(get_db)
 ):
   firebase_id = token['uid']
+  logger.info(f'Firebase ID: {firebase_id}')
   stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+  logger.info(f'Stakeholder: {stakeholder}')
   if not stakeholder:
+    logger.info('User not found')
     raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
   share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
   if not share_time_percentages:
+    logger.info('Records not found')
     raise HTTPException(status_code=404, detail='記録が見つかりません')
   result = {record[0]: record[1] for record in share_time_percentages}
+  logger.info(f'Result: {result}')
   return result
 
 # LLM分析　 TODO トークン認証込みで書き直す
@@ -216,3 +225,4 @@ def get_all_time_share_records(db: Session = Depends(get_db)):
   if not records:
     raise HTTPException(status_code=404, detail="記録が見つかりません")
   return records
+

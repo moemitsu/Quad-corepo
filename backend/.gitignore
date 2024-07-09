@@ -47,4 +47,6 @@ uvicorn.log
 custom.log
 uvicorn.log.*
 custom.log.*
+backend.log
+backend.log.*
 

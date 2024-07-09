@@ -1,27 +1,51 @@
-
-from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response
+from logging import config, basicConfig, getLogger, DEBUG
+import yaml
+from fastapi import FastAPI, HTTPException, Depends, Path, Query, Body, Request, Response, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 import openai 
-from api.lib.auth import get_current_user
+from api.lib.auth import verify_token, get_current_user
 from api.routers import routers
 from api.database.db import SessionLocal, engine
 import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.database as database
 
-# YAMLファイルを読み込み、ログ設定を適用
-# with open("logging.yaml", "r") as file:
-#     config = yaml.safe_load(file)
-#     logging.config.dictConfig(config)
+# log出力に関するrootでの設定
+logger = getLogger(__name__)
+def main():
+    """エントリーポイント
+    """
+    logger.debug(f"DEBUG")
+    logger.info(f"INFO")
+    logger.warning(f"WARNING")
+    logger.error(f"ERROR")
 
-# logger = logging.getLogger(__name__)
-
+if __name__ == "__main__":
+    try:
+        # ロガーの設定読み込み
+        config.dictConfig(
+            yaml.load(open("./logging.yaml", encoding="utf-8").read(), Loader=yaml.SafeLoader))
+        # メイン処理開始
+        main()
+    except KeyboardInterrupt:
+        # [Ctrl-C]が押されたときの終了捕捉
+        print("SIGINT - Exit")
+    except SystemExit:
+        # sys.exit関数による終了捕捉
+        print("SystemExit - Exit")
+    except:
+        # 例外発生時にメッセージ
+        import traceback
+        traceback.print_exc()
+    finally:
+        pass
 
 # FastAPIをインスタンス化する
 app = FastAPI()
 app.include_router(routers.router)
 
-def getDB():
+def get_db():
   db = SessionLocal()
   try:
     yield db
@@ -45,6 +69,8 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
+  logger.info("Root endpoint called")
+  print("------------------Root endpoint called")
   return {"message": "Welcome to the FastAPI application"}
 
 @app.get("/protected-route")

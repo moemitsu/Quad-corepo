@@ -16,6 +16,7 @@ sqlalchemy = "^2.0.31"
 psycopg2 = "^2.9.9"
 alembic = "^1.13.2"
 openai = "^1.35.10"
+stripe = "^10.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
