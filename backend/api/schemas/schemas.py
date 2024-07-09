@@ -20,16 +20,14 @@ class StakeholderRes(BaseModel):
   message: str
   stakeholder_id: UUID
 
-
 class UserReq(BaseModel):
   stakeholder_id: UUID
-  adult_name: str
-  child_name: str
+  adult_name: List[str]
+  child_name: List[str]
 
 class UserRes(BaseModel):
   message: str
   user_id: int
-
 
 class PostChildReq(BaseModel):
   stakeholder_id: UUID
@@ -37,7 +35,6 @@ class PostChildReq(BaseModel):
 
 class PostChildRes(BaseModel):
   message: str
-
 
 class NamesRes(BaseModel):
   names: List[Dict[str, str]]
@@ -62,7 +59,6 @@ class RecordRes(BaseModel):
   class Config:
     from_attributes: True
 
-
 class LLMReq(BaseModel):
   text: str
   stakeholder_id: UUID
@@ -73,7 +69,6 @@ class LLMReq(BaseModel):
 class LLMRes(BaseModel):
   summary: str
   sentiment: str
-
 
 # とりあえずの確認用
 class TimeShareRecordResponse(BaseModel):
@@ -92,7 +87,7 @@ class TimeShareRecordResponse(BaseModel):
 
 # 新規登録のためのリクエストとレスポンスモデル
 class SignUpReq(BaseModel):
-  stakeholder_name: UUID
+  stakeholder_name: str
   firebase_id: str
 
 class SignUpRes(BaseModel):

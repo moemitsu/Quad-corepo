@@ -48,14 +48,19 @@ const FamilyRegistrationForm: React.FC = () => {
       // Firebaseにユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // IDトークンを取得
+      // UIDとIDトークンを取得
+      const uid = userCredential.user.uid;
       const idToken = await userCredential.user.getIdToken();
 
-      // トークンをコンソールに表示
+      // UIDとトークンをコンソールに表示
+      console.log('UID:', uid);
       console.log('ID Token:', idToken);
 
+      // デバッグメッセージ: データベースに家族情報を送信
+      console.log('Sending family data to backend...');
+
       // データベースに家族情報を送信
-      await axios.post('http://localhost:8000/api/v1/user', 
+      const response = await axios.post('http://localhost:8000/api/v1/user', 
         { 
           stakeholder_name: stakeholderName,
           adult_name: adultNames,
@@ -68,6 +73,9 @@ const FamilyRegistrationForm: React.FC = () => {
         }
       );
 
+      // デバッグメッセージ: レスポンスのステータス
+      console.log('Response status:', response.status);
+
       alert('家族情報が登録されました！');
       setStakeholderName('');
       setAdultNames(['']);
@@ -76,7 +84,16 @@ const FamilyRegistrationForm: React.FC = () => {
       setPassword('');
       router.push('/monthly-analysis'); // 登録後にリダイレクト
     } catch (error: any) {
-      console.error('Error adding family: ', error);
+      console.error('Error adding family: ', error.response ? error.response.data : error.message);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
       setError('エラーが発生しました。もう一度試してください。');
     }
   };
