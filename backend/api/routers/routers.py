@@ -1,3 +1,4 @@
+from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
@@ -10,6 +11,9 @@ from api.lib.auth import verify_token, get_current_user
 
 
 models.Base.metadata.create_all(bind=engine)
+
+# Initialize the logger
+logger = getLogger(__name__)
 
 app = FastAPI()
 router = APIRouter()
@@ -173,26 +177,34 @@ def get_bar_data(
     return result
   
 # 円グラフ用GET　トークン認証込みで書き直し済み　TODO　動作チェック
-@router.get('/api/v1/pie-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
-def get_share_time_percentage(
-  token: str = Depends(verify_token),
-  child_name: str = Query(...),
-  year: int = Query(...),
-  month: int = Query(...),
-  db: Session = Depends(get_db)
-):
-  firebase_id = token['uid']
-  stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
-  if not stakeholder:
-    raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
+# @router.get('/api/v1/pie-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
+# def get_share_time_percentage(
+#   token: str = Depends(verify_token),
+#   child_name: str = Query(...),
+#   year: int = Query(...),
+#   month: int = Query(...),
+#   db: Session = Depends(get_db)
+# ):
+#   firebase_id = token['uid']
+#   logger.info(f'Firebase ID: {firebase_id}')
+#   print('Firebase ID: {firebase_id}')
+#   stakeholder = stakeholderCrud.getFirebaseId(db, firebase_id)
+#   logger.info(f'Stakeholder: {stakeholder}')
+#   print('Stakeholder: {stakeholder}')
+#   if not stakeholder:
+#     logger.info('User not found')
+#     raise HTTPException(status_code=400, detail="ユーザーが見つかりません")
 
-  share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
-  if not share_time_percentages:
-    raise HTTPException(status_code=404, detail='記録が見つかりません')
+#   share_time_percentages = timeShareRecordsCrud.get_pie_graph_by_month(db, stakeholder.id, child_name, year, month)
+#   logger.info(f'Share time percentages: {share_time_percentages}')
+#   if not share_time_percentages:
+#     logger.info('Records not found')
+#     raise HTTPException(status_code=404, detail='記録が見つかりません')
 
-  result = {record[0]: record[1] for record in share_time_percentages}
+#   result = {record[0]: record[1] for record in share_time_percentages}
+#   logger.info(f'Result: {result}')
 
-  return result
+#   return result
 
 
 # LLM分析　 TODO トークン認証込みで書き直す
@@ -208,9 +220,10 @@ def getAnalysis(request: schemas.LLMReq, token: str = Depends(verify_token), db:
   return schemas.LLMRes(summary=analysisResult, sentiment='N/A')
 
 # 確認用　FIXME あとで消す
-@router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(get_db)):
-  records = timeShareRecordsCrud.getAllRecords(db)
-  if not records:
-    raise HTTPException(status_code=404, detail="記録が見つかりません")
-  return records
+# @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
+# def get_all_time_share_records(db: Session = Depends(get_db)):
+#   records = timeShareRecordsCrud.getAllRecords(db)
+#   logger.info('get records')
+#   if not records:
+#     raise HTTPException(status_code=404, detail="記録が見つかりません")
+#   return records
