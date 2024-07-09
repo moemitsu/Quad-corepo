@@ -5,7 +5,6 @@ from fastapi import FastAPI, HTTPException, Request, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
-import openai 
 from api.lib.auth import get_current_user
 from api.routers import routers
 from api.database.db import SessionLocal, engine
@@ -57,7 +56,7 @@ async def protected_route(request: Request):
 
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(get_db)):
-    records = crud.getAllRecords(db)
+    records = crud.get_all_records(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
