@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Header from'../../_components/layout/header';
-import Footer from '../../_components/layout/footer';
+import Header from'../../_components/layout/Header';
+import Footer from '../../_components/layout/Footer';
 
 
 const Hello: React.FC = () => {

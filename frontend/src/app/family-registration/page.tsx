@@ -2,8 +2,8 @@
 
 import React from "react";
 import FamilyRegistrationForm from "../../_components/forms/FamilyRegistrationForm";
-import Header from "../../_components/layout/header";
-import Footer from "../../_components/layout/footer";
+import Header from "../../_components/layout/Header";
+import Footer from "../../_components/layout/Footer";
 
 const FamilyRegistrationPage: React.FC = () => {
   return (
