@@ -84,20 +84,9 @@ async def protected_route(request: Request):
   user = request.state.user
   return {"message": f"Hello, {user['name']}"}
 
-# @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-# def get_all_time_share_records(db: Session = Depends(get_db)):
-#     records = crud.getAllRecords(db)
-#     if not records:
-#         raise HTTPException(status_code=404, detail="記録が見つかりません")
-#     return records
-
-
-
-
 @app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(token: str = Depends(verify_token), db: Session = Depends(get_db)):
-    print('hogehogheohogehogheo')
-    records = crud.getAllRecords(db)
+def get_all_time_share_records(db: Session = Depends(get_db)):
+    records = crud.get_all_records(db)
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
