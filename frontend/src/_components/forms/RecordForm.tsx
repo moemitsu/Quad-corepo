@@ -45,7 +45,7 @@ const RecordForm: React.FC = () => {
 
         setChildren(response.data.child_names || []);
         setAdultNames(response.data.adult_names || []);
-      } catch (error) {
+      } catch (error:any) {
         console.error('データ取得エラー: ', error);
         if (error.response) {
           console.error('エラーレスポンス:', error.response.data);
@@ -89,7 +89,7 @@ const RecordForm: React.FC = () => {
 
       alert('活動が記録されました！');
       console.log('Response:', response.data);
-    } catch (error) {
+    } catch (error:any) {
       console.error('ドキュメント追加エラー: ', error);
       if (error.response) {
         console.error('エラーレスポンス:', error.response.data);
