@@ -1,18 +1,37 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from "next/image";
+import axios from 'axios';
 
 const PaymentRedirect: React.FC = () => {
+  const [message, setMessage] = useState("");
+
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://js.stripe.com/v3/buy-button.js';
-    script.async = true;
-    document.body.appendChild(script);
-    
-    return () => {
-      document.body.removeChild(script);
-    };
+    // Check to see if this is a redirect back from Checkout
+    const query = new URLSearchParams(window.location.search);
+
+    if (query.get("success")) {
+      setMessage("Order placed! You will receive an email confirmation.");
+    }
+
+    if (query.get("canceled")) {
+      setMessage("Order canceled -- continue to shop around and checkout when you're ready.");
+    }
   }, []);
+
+  const handlePayment = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:8000/create-checkout-session', {
+        price_id: 'price_1PaTu62KB7MtryeCVN2wPmNq',  // ここに実際のPrice IDを入力
+        quantity: 1,
+      });
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
+  };
 
   return (
     <div className="p-6 min-h-screen flex flex-col justify-center items-center">

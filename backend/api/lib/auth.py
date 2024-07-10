@@ -4,21 +4,24 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin import credentials, auth
 import firebase_admin
 from logging import config, getLogger
+from api.lib.firebase import cred
 
 logger = getLogger(__name__)
 
 # FastAPIの認証スキーマ
 security = HTTPBearer()
-
+print('-------------------firebase2.5')
 # トークンを検証し、ユーザー情報を取得する関数
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-  print('-------------------1')
+  print('-------------------firebase3')
   token = credentials.credentials
-  print('hoghoghogohogho')
+  print(token,'-------------------firebase4')
   try:
     decoded_token = auth.verify_id_token(token)
+    print(decoded_token)
     return decoded_token
   except Exception as e:
+    print(f"Token verification failed: {e}")
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
       detail="Invalid authentication credentials",

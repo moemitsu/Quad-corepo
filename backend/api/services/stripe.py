@@ -10,30 +10,32 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
 YOUR_DOMAIN = 'http://localhost:3000/'
 
-router = APIRouter()
 
-@router.post("/create-checkout-session")
 def create_checkout_session():
     try:
         checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price': 'price_1PaV7S2KB7MtryeCquCTBTn0',
-                    'quantity': 1,
+            line_items=[{
+                "price_data": {
+                    "currency": "jpy",
+                    "product_data": {
+                        "name": "LLM分析",
+                    },
+                    "unit_amount": 80000,
+                    "recurring": {  # 追加: 定期購入の詳細
+                        "interval": "month"
+                    }
                 },
-            ],
+                "quantity": 1,
+            }],
             mode='subscription',
             success_url=YOUR_DOMAIN + '?success=true',
             cancel_url=YOUR_DOMAIN + '?canceled=true',
         )
-        return {"url": checkout_session.url}
+        return checkout_session.id
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/webhook")
-async def handle_stripe_webhook(request: Request):
-    payload = await request.body()
-    sig_header = request.headers.get('Stripe-Signature')
+def handle_stripe_webhook(payload, sig_header):
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
     except ValueError as e:
@@ -45,7 +47,8 @@ async def handle_stripe_webhook(request: Request):
         session = event['data']['object']
         handle_checkout_session(session)
     
-    return JSONResponse(status_code=200, content={"message": "success"})
+    return {"message": "success"}
+
 
 def handle_checkout_session(session):
     print("Payment was successful.")
