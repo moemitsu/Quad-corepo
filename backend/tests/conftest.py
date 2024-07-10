@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from api.database.db import Base, getDB
+from api.database.db import Base, get_db
 from api.routers import app
 
 # PostgreSQLの接続URL
@@ -21,7 +21,7 @@ def client():
         finally:
             db.close()
 
-    app.dependency_overrides[getDB] = override_get_db
+    app.dependency_overrides[get_db] = override_get_db
     client = TestClient(app)
     yield client
 
