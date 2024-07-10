@@ -45,15 +45,16 @@ const FamilyRegistrationForm: React.FC = () => {
     }
 
     try {
+      // エラーメッセージをクリア
+      setError('');
+
       // Firebaseにユーザーを作成
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // UIDとIDトークンを取得
-      const uid = userCredential.user.uid;
+      // IDトークンを取得
       const idToken = await userCredential.user.getIdToken();
 
-      // UIDとトークンをコンソールに表示
-      console.log('UID:', uid);
+      // トークンをコンソールに表示
       console.log('ID Token:', idToken);
 
       // デバッグメッセージ: データベースに家族情報を送信
@@ -63,8 +64,8 @@ const FamilyRegistrationForm: React.FC = () => {
       const response = await axios.post('http://localhost:8000/api/v1/user', 
         { 
           stakeholder_name: stakeholderName,
-          adult_name: adultNames,
-          child_name: childNames
+          adult_names: adultNames,
+          child_names: childNames
         },
         {
           headers: {
@@ -97,6 +98,7 @@ const FamilyRegistrationForm: React.FC = () => {
       setError('エラーが発生しました。もう一度試してください。');
     }
   };
+
 
   return (
     <div className="p-6 min-h-screen flex flex-col justify-center items-center">

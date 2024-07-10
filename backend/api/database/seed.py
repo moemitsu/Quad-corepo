@@ -43,6 +43,7 @@ def seed_data(db: Session):
     db.bulk_save_objects(initial_data)
     db.commit()
 
+
     # Userテーブルのデータを取得
     users = db.query(User).all()
     
@@ -59,7 +60,7 @@ def seed_data(db: Session):
         time_share_records.append(
             TimeShareRecords(
                 stakeholder_id=user.stakeholder_id,
-                with_member=random.choice(members),
+                with_member=user.adult_name if user.adult_name else random.choice(members),
                 child_name=user.child_name if user.child_name else random.choice(children),
                 events=random.choice(events),
                 child_condition=random.choice(conditions),
