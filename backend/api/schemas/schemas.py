@@ -47,7 +47,7 @@ class NamesRes(BaseModel):
 
 # 記録を追加するためのリクエスト
 class RecordReq(BaseModel):
-  stakeholder_id: UUID
+  # stakeholder_id: UUID
   with_member: str
   child_name: str
   events: str
@@ -61,6 +61,9 @@ class RecordRes(BaseModel):
   record_id: int
   class Config:
     orm_mode = True
+    
+class Error(BaseModel):
+  detail: str
 
 # LLM用のリクエスト
 class LLMReq(BaseModel):
