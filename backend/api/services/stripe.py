@@ -21,6 +21,9 @@ def create_checkout_session():
                         "name": "LLM分析",
                     },
                     "unit_amount": 80000,
+                    "recurring": {  # 追加: 定期購入の詳細
+                        "interval": "month"
+                    }
                 },
                 "quantity": 1,
             }],
