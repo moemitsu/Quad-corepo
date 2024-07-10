@@ -16,8 +16,8 @@ Base = declarative_base()
 
 # データベースセッションを取得する関数
 def get_dB():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()

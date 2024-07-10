@@ -55,7 +55,6 @@ def get_bar_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, y
 
 # 円グラフ用データの取得&計算
 def get_pie_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, year: int, month: int):
-
     start_date = datetime.datetime(year, month, 1)
     last_day = calendar.monthrange(year, month)[1]
     end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
@@ -90,7 +89,6 @@ def get_pie_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, y
     
     return [(record.with_member, (record.total_hours / total_time) * 100) for record in records]
 
-
 # 記録の追加
 def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
@@ -111,14 +109,17 @@ def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_nam
     return new_record
 
 # LLMに分析してもらうためのデータを取得
-def get_records_analysis(db: Session, stakeholder_id: UUID, child_name: str):
-    logger.info(f"Fetching Records for Analysis: Child={child_name}")
-    return db.query(models.TimeShareRecords).filter(
-        and_(
-            models.TimeShareRecords.stakeholder_id == stakeholder_id,
-            models.TimeShareRecords.child_name == child_name
-        )
-    ).all()
+
+def get_all_data_for_analysis(db: Session):
+  return db.query(
+    models.TimeShareRecords.with_member,
+    models.TimeShareRecords.child_name,
+    models.TimeShareRecords.events,
+    models.TimeShareRecords.child_condition,
+    models.TimeShareRecords.place,
+    models.TimeShareRecords.share_start_at,
+    models.TimeShareRecords.share_end_at
+  ).all()
 
 # 確認用　TimeShareRecordsのデータをすべて取得する関数
 def get_all_records(db: Session):

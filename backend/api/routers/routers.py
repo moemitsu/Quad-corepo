@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from api.database.db import SessionLocal, engine
+from dotenv import load_dotenv
+from openai import OpenAI
 import openai
 import os
 import json
@@ -14,6 +16,8 @@ import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
+import logging
+from starlette.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,7 +28,10 @@ logger = getLogger(__name__)
 app = FastAPI()
 router = APIRouter()
 
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = api_key
+
+logger = logging.getLogger(__name__)
 
 def get_db():
     db = SessionLocal()
@@ -33,28 +40,7 @@ def get_db():
     finally:
         db.close()
 
-# OpenAIを呼び出す関数
-def analyze_openai(text: str):
-    res = openai.Completion.create(
-        model='text-davinci-003',
-        prompt=text,
-        max_tokens=2000,
-        n=1,
-        stop=None,
-        temperature=0.5
-    )
-    return res.choices[0].text.strip()
-
-# LLM分析の@router.post内でデータをjson形式へフォーマットする関数
-def format_records(records):
-    formatted_records = [record.__dict__ for record in records]
-    for record in formatted_records:
-        record.pop('_sa_instance_state', None)
-    return json.dumps(formatted_records, indent=2)
-
 # 以下メソッド
-# メモ：記録を追加する（POST）、登録情報の編集（PUT）、LLMに情報渡して値貰う(POST)
-
 # 新規登録（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
 @router.post('/api/v1/signup', response_model=schemas.SignUpRes, responses={400: {'model': schemas.Error}})
 def signup(token: str = Depends(verify_token), db: Session = Depends(get_db)):
@@ -198,7 +184,6 @@ def get_pie_data(
   logger.info(f'Result: {result}')
   return result
 
-# 各月画面用の情報の取得　トークン認証込みで書き直し済み　TODO 動作確認
 # 棒グラフ用GET
 @router.get('/api/v1/bar-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
 def get_bar_data(
@@ -228,24 +213,72 @@ def get_bar_data(
 
     return result
 
-# LLM分析　 TODO トークン認証込みで書き直す
-@router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
-def get_analysis(request: schemas.LLMReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
-  records = timeShareRecordsCrud.get_records_analysis(db, request.user_id, request.child_name)
-  if not records:
-    raise HTTPException(status_code=404, detail='記録が見つかりません')
-  # 取得したデータをテキストに変換
-  formatted_records = format_records(records)
-  #OpenAI API を使用して分析
-  analysisResult = analyze_openai(formatted_records)
-  return schemas.LLMRes(summary=analysisResult, sentiment='N/A')
+# LLM分析 TODO 書き直し
+# LLM TEST
+@router.get('/api/v1/llm-test', response_model=schemas.AdviceResponse)
+async def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_db)):
+  logger.info("llm-test endpoint called")
+  try:
+    # データベースからデータを取得
+    records = timeShareRecordsCrud.get_all_data_for_analysis(db)
+    logger.debug(f"Records fetched: {records}")
+    # NOTE データを整形
+    data = {
+      'with_member': [],
+      'child_name': [],
+      'events': [],
+      'child_condition': [],
+      'place': [],
+      'share_start_at': [],
+      'share_end_at': []
+    }
+    for record in records:
+      data['with_member'].append(record.with_member)
+      data['child_name'].append(record.child_name)
+      data['events'].append(record.events)
+      data['child_condition'].append(record.child_condition)
+      data['place'].append(record.place)
+      data['share_start_at'].append(record.share_start_at)
+      data['share_end_at'].append(record.share_end_at)
+      
+      # NOTE 分析結果の要約を作成
+      summary = f"""
+      子どもと関わる人たち: {data['with_member']}
+      子どもの名前: {data['child_name']}
+      イベント: {data['events']}
+      子どもの機嫌: {data['child_condition']}
+      場所: {data['place']}
+      共有開始時刻: {data['share_start_at']}
+      共有終了時刻: {data['share_end_at']}
+      """
 
-# 確認用　FIXME あとで消す
+      logger.debug(f"Summary: {summary}")
+      
+      # NOTE アドバイスを生成
+      response = await run_in_threadpool(
+        openai.chat.completions.create,
+        model="gpt-3.5-turbo",
+        messages=[
+          {"role": "system", "content": "あなたは優れた分析家であり親切なアドバイザーです。"},
+          {"role": "user", "content": f"以下のデータを基に、家族がより良い時間を過ごすためのアドバイスをください。\n\n{summary}\n\nアドバイス:"}
+        ],
+        max_tokens=2000
+      )
+    logger.debug(f"OpenAI Response: {response}")
+    advice = response.choices[0].message['content'].strip()
+    logger.debug(f"Advice: {advice}")
+    
+    return schemas.AdviceResponse(advice=advice)
+  
+  except Exception as e:
+    logger.error(f"Error occurred: {e}")
+    raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+# 確認用　TODO あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
 def get_all_time_share_records(db: Session = Depends(get_db)):
   records = timeShareRecordsCrud.get_all_records(db)
   if not records:
     raise HTTPException(status_code=404, detail="記録が見つかりません")
   return records
-
-
