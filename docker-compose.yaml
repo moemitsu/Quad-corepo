@@ -40,7 +40,8 @@ services:
       - ./backend/logs:/src/logs
       - ./backend/.env:/src/.env
       - ./backend/entrypoint.sh:/src/entrypoint.sh
-      
+    env_file:
+      - ./backend/.env
     tty: true
     ports:
       - 8000:8000  # ホストマシンのポート8000を、docker内のポート8000に接続する
