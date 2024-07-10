@@ -207,6 +207,25 @@ def get_bar_data(
 
   return result
 
+# 家族データ一覧の取得
+@router.get("/api/v1/family-records", response_model=List[schemas.DetailListRes])
+def get_each_detail_lists(
+  token: str = Depends(verify_token),
+  child_name: str = Query(...),
+  year: int = Query(...),
+  month: int = Query(...),
+  db: Session = Depends(get_db)
+):
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+  if not stakeholder:
+      raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+  records = timeShareRecordsCrud.get_each_detail_lists_by_month(db, stakeholder.id, child_name, year, month)
+  if not records:
+    raise HTTPException(status_code=404, detail="記録が見つかりません")
+  return records
+
+
 # LLM分析 TODO 書き直し
 # LLM TEST
 @router.get('/api/v1/llm-test', response_model=schemas.AdviceResponse)
@@ -266,6 +285,7 @@ async def analysis(child_name: str, year: int, month: int, db: Session = Depends
   except Exception as e:
     logger.error(f"Error occurred: {e}")
     raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 
 # 確認用　TODO あとで消す

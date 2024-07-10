@@ -21,6 +21,7 @@ const MonthlyAnalysis: React.FC = () => {
   const [children, setChildren] = useState<string[]>([]);
   const [selectedChild, setSelectedChild] = useState<string>("");
   const [error, setError] = useState<string | null>(null); // State for error handling
+  const [authToken, setAuthToken] = useState<string>("");
   const router = useRouter();
   const auth = getAuth();
 
@@ -28,6 +29,7 @@ const MonthlyAnalysis: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await getAuthToken();
+        setAuthToken(token);
         fetchChildren(token);
       }
     });
@@ -49,7 +51,7 @@ const MonthlyAnalysis: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const childNames = response.data.names.map((item: { child_name: string }) => item.child_name).filter((name: string) => name !== '');
+      const childNames = response.data.child_names;
       console.log(childNames);
       setChildren(childNames);
       setError(null); // 成功した場合はエラーをクリア
@@ -201,7 +203,11 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <RecordList />
+          <RecordList 
+          selectedYear={selectedYear} 
+          selectedMonth={selectedMonth} 
+          selectedChild={selectedChild}
+          bearerToken={authToken} />
         </div>
       </div>
       <Footer />
