@@ -51,7 +51,7 @@ const MonthlyAnalysis: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const childNames = response.data.child_names.map((item: { child_name: string }) => item.child_name).filter((name: string) => name !== '');
+      const childNames = response.data.child_names;
       console.log(childNames);
       setChildren(childNames);
       setError(null); // 成功した場合はエラーをクリア
