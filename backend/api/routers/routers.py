@@ -195,9 +195,12 @@ def get_pie_data(
 
 # LLM分析 TODO 書き直し
 # LLM TEST
-@router.get('api/v1/llm-test')
+@router.get('api/v1/llm-test', response_model=schemas.AdviceResponse)
 def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_db)):
+  logger.info("llm-test endpoint called")
   records = timeShareRecordsCrud.get_all_data_for_analysis(db)
+  logger.debug(f"Records fetched: {records}")
+
   # NOTE データを整形
   data = {
     'with_member': [],
@@ -226,6 +229,9 @@ def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_d
     共有開始時刻: {data['share_start_at']}
     共有終了時刻: {data['share_end_at']}
     """
+
+    logger.debug(f"Summary: {summary}")
+    
     # NOTE アドバイスを生成
     response = openai.Completion.create(
       engine='text-davinci-003',
@@ -234,7 +240,6 @@ def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_d
     )
     advice = response.choices[0].text.strip()
     return schemas.AdviceResponse(advice=advice)
-
 
 # 確認用　TODO あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
