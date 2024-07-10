@@ -3,8 +3,8 @@
 | 機能         | メソッド | パス          | 説明                       |
 |--------------|---------|--------------|----------------------------|
 | 新規登録 | POST | `/api/v1/signup` | firebaseの新規登録をする |
-| ログイン | POST | `/api/v1/login` | 登録済ユーザーのログイン |
-| ユーザー情報登録 | POST | `/api/v1/user` | 新規登録後にUser情報を登録 |
+<!-- | ログイン | POST | `/api/v1/login` | 登録済ユーザーのログイン | ログイン時は認証をフロントで行うので、不要-->
+| ユーザー情報登録 | POST | `/api/v1/user` | 新規登録時にUser情報を登録 |
 | ユーザー情報編集 | PUT | `/api/v1/user/{user_id}` | ユーザー情報の更新 |
 | 利用者と子供の名前の取得 | GET | `/api/v1/names` | 利用者と子どもの名前を取得（記録の追加用） |
 | 記録の追加 | POST | `/api/v1/time-share-records` | 子どもとの時間の記録を登録 |
@@ -55,26 +55,23 @@
   + Body
     ```
     {
-      "stakeholder_id": stakeholder_id,
-      "adult_name": "母",
-    }
-    {
-      "stakeholder_id": stakeholder_id,
-      "child_name": "えり"
+    "stakeholder_name": "家族の名前",
+    "adult_names": ["成人1", "成人2"],
+    "child_names": ["子供1", "子供2"]
     }
     ```
 + Response 201 Created
   + Body
     ```
     {
-      "message": "User registered successfully",
+      "message": "ユーザー情報を登録しました",
     }
     ```
-+ Response 400 Bad Request
++ Response 500 Bad Request
   + Body
     ```
     {
-      "error": "不正なリクエストです。"
+      "error": "ユーザー情報の登録に失敗しました{エラー内容}"
     }
     ```
 ## ユーザー情報の編集 [PUT /api/v1/user/{user_id}]
@@ -101,8 +98,63 @@
       "user_id": "12345"
     }
     ```
+## 利用者と子供の名前の取得 [GET /api/v1/user]
+利用者と子どもの名前を取得（記録の追加用）
++ Request
+  + Header
+    ```
+    {
+      "Authorization": "Bearer ${idToken}"
+    }
+    ```
++ Response 201 Created
+  + Body
+    ```
+    {
+    "adult_names": ["成人1", "成人2"],
+    "child_names": ["子供1", "子供2"]
+    }
+    ```
 
 # 記録管理エンドポイント
+## 新しい記録の追加 [POST /api/v1/record]
+子どもとの時間の記録を追加するためのエンドポイント
++ Request
+  + Header
+    ```
+    {
+      "Authorization": "Bearer ${idToken}"
+    }
+    ```
+  + Body
+    ```
+    {
+      "stakeholder_id": stakeholder_id,
+      "with_member": "祖母",
+      "child_name": "はなこ",
+      "events": "遊び",
+      "child_condition": "☀️☀️",
+      "place": "公園",
+      "share_start_at": "2024-06-01T10:00:00",
+      "share_end_at": "2024-06-01T11:00:00"
+    }
+    ```
++ Response 201 Created
+  + Body
+    ```
+    {
+      "message": "記録を追加しました。",
+      "record_id": "67890"
+    }
+    ```
++ Response 400 Bad Request
+  + Body
+    ```
+    {
+      "error": "記録の作成中にエラーが発生しました"
+    }
+    ```
+
 ## 棒グラフ用データ取得 [GET /api/v1/bar-graph]
   + year（必須）: `2024`
   + month（必須）: `6`
@@ -162,43 +214,7 @@
     }
     ```
 
-## 新しい記録の追加 [POST /api/v1/time-share-records]
-子どもとの時間の記録を追加するためのエンドポイント
-+ Request
-  + Header
-    ```
-    {
-      "Authorization": "Bearer ${idToken}"
-    }
-    ```
-  + Body
-    ```
-    {
-      "stakeholder_id": stakeholder_id,
-      "with_member": "祖母",
-      "child_name": "はなこ",
-      "events": "遊び",
-      "child_condition": "☀️☀️",
-      "place": "公園",
-      "share_start_at": "2024-06-01T10:00:00",
-      "share_end_at": "2024-06-01T11:00:00"
-    }
-    ```
-+ Response 201 Created
-  + Body
-    ```
-    {
-      "message": "記録を追加しました。",
-      "record_id": "67890"
-    }
-    ```
-+ Response 400 Bad Request
-  + Body
-    ```
-    {
-      "error": "不正なリクエストです。"
-    }
-    ```
+
 <!-- 第2段階で実装
 ## 記録の更新 [POST /api/v1/records/{record_id}]
 特定の記録を更新するためのエンドポイント

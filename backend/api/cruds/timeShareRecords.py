@@ -92,7 +92,8 @@ def get_pie_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, y
 # 記録の追加
 def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
-    new_record = models.TimeShareRecords(
+    try:
+      new_record = models.TimeShareRecords(
         stakeholder_id=stakeholder_id,
         with_member=with_member,
         child_name=child_name,
@@ -101,12 +102,15 @@ def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_nam
         place=place,
         share_start_at=share_start_at,
         share_end_at=share_end_at
-    )
-    logger.info(new_record)
-    db.add(new_record)
-    db.commit()
-    db.refresh(new_record)
-    return new_record
+      )
+      logger.info(new_record)
+      db.add(new_record)
+      db.commit()
+      db.refresh(new_record)
+      return new_record
+    except Exception as e:
+      logger.error(f"Error creating record: {e}")
+      raise
 
 # LLMに分析してもらうためのデータを取得
 
