@@ -87,3 +87,7 @@ class TimeShareRecordResponse(BaseModel):
   share_end_at: datetime
   class Config:
     from_attributes = True
+
+# LLM動作確認用
+class AdviceResponse(BaseModel):
+  advice: str
