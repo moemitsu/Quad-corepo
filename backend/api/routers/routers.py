@@ -14,7 +14,6 @@ import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
-from api.services.stripe import router as stripe_router
 from fastapi.responses import JSONResponse
 
 models.Base.metadata.create_all(bind=engine)
@@ -249,6 +248,4 @@ def get_all_time_share_records(db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="記録が見つかりません")
   return records
 
-# Stripe用のルーターを登録
-router.include_router(stripe_router, prefix="/stripe", tags=["stripe"])
 

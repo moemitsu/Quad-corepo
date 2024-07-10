@@ -65,7 +65,7 @@ app.add_middleware(
 )
 # ルーターの登録
 app.include_router(app_router)
-app.include_router(stripe_router)
+app.include_router(stripe_router, prefix="/stripe", tags=["stripe"])
 
 # @app.get("/")
 # async def read_root():
