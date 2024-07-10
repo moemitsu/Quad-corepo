@@ -83,21 +83,27 @@ def post_user(
 ):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    
+    # ユーザーが存在しない場合、新規作成
     if not stakeholder:
-        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+        try:
+            stakeholder = stakeholderCrud.create_new_stakeholder(db, firebase_id)
+            stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='新しいユーザーの作成に失敗しました: {}'.format(str(e)))
+    
     # stakeholder_nameの更新
     try:
         updated_stakeholder_name = stakeholderCrud.update_stakeholder_name(db, stakeholder.id, stakeholder_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail='家族名の更新に失敗しました：{}'.format(str(e)))
-    # userテーブルのadult_names,child_namesの登録
+
+    # userテーブルのadult_names, child_namesの登録
     try:
         user_ids = []
-        # adult_names リストの各名前で User レコードを作成
         for adult_name in adult_names:
             new_adult_user = userCrud.create_user(db, stakeholder.id, adult_name=adult_name, child_name=None)
             user_ids.append(new_adult_user.id)
-        # child_names リストの各名前で User レコードを作成
         for child_name in child_names:
             new_child_user = userCrud.create_user(db, stakeholder.id, adult_name=None, child_name=child_name)
             user_ids.append(new_child_user.id)

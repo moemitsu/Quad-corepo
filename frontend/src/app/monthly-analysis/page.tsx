@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import BarChart from "../../_components/analysis/BarChart";
@@ -29,6 +29,8 @@ const MonthlyAnalysis: React.FC = () => {
       if (user) {
         const token = await getAuthToken();
         fetchChildren(token);
+      } else {
+        setError("ユーザーが認証されていません。");
       }
     });
 
@@ -45,12 +47,12 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchChildren = async (token: string) => {
     try {
       const response = await axios.get('http://localhost:8000/api/v1/user', { 
-      headers: {
+        headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const childNames = response.data.names.map((item: { child_name: string }) => item.child_name).filter((name: string) => name !== '');
-      console.log(childNames);
+      const childNames = response.data.child_names;
+      console.log("取得した子供の名前:", childNames); // コンソールログで確認
       setChildren(childNames);
       setError(null); // 成功した場合はエラーをクリア
     } catch (error) {
@@ -73,11 +75,13 @@ const MonthlyAnalysis: React.FC = () => {
         },
       });
       const data = response.data;
+      console.log("取得した棒グラフデータ:", data); // コンソールログで確認
       setBarChartData(data);
       setLlmSummary(data.summary);
       setLlmSentiment(data.sentiment);
     } catch (error) {
       console.error("Error:", error);
+      setError("データの取得に失敗しました。");
     }
   }, [selectedYear, selectedMonth, selectedChild]);
 
@@ -95,9 +99,11 @@ const MonthlyAnalysis: React.FC = () => {
         },
       });
       const data = response.data;
+      console.log("取得した円グラフデータ:", data); // コンソールログで確認
       setPieChartData(data);
     } catch (error) {
       console.error("Error:", error);
+      setError("データの取得に失敗しました。");
     }
   }, [selectedYear, selectedMonth, selectedChild]);
 
@@ -114,7 +120,6 @@ const MonthlyAnalysis: React.FC = () => {
       throw error;
     }
   };
-
   return (
     <div>
       <Header />
