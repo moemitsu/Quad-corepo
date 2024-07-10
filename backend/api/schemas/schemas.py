@@ -33,16 +33,17 @@ class StakeholderRes(BaseModel):
 # userテーブルへのリクエストボディ
 class UserReq(BaseModel):
   stakeholder_id: UUID
-  adult_name: str
-  child_name: str
+  adult_names: List[str]  # 複数の成人名
+  child_names: List[str]  # 複数の子供名
 # レスポンス
 class UserRes(BaseModel):
   message: str
-  user_id: int
+  user_id: List[int]
 
 # adult_nameとchild_nameの取得
 class NamesRes(BaseModel):
-  names: List[Dict[str, str]]
+  adult_names: List[str]  # 複数の成人名
+  child_names: List[str]  # 複数の子供名
 
 # 記録を追加するためのリクエスト
 class RecordReq(BaseModel):
@@ -59,7 +60,7 @@ class RecordRes(BaseModel):
   message: str
   record_id: int
   class Config:
-    from_attributes: True
+    orm_mode = True
 
 # LLM用のリクエスト
 class LLMReq(BaseModel):

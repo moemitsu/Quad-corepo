@@ -1,4 +1,4 @@
-from sqlalchemy import String, Column, ForeignKey, TIMESTAMP, Integer, DateTime # type: ignore
+from sqlalchemy import CheckConstraint, String, Column, ForeignKey, Integer, DateTime # type: ignore
 from sqlalchemy.dialects.postgresql import UUID # type: ignore
 from sqlalchemy.ext.declarative import declarative_base # type: ignore
 from sqlalchemy.orm import relationship # type: ignore
@@ -17,8 +17,15 @@ class User(Base):
   __tablename__ = 'User'
   id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
   stakeholder_id = Column(ForeignKey('Stakeholder.id'), nullable=False)
-  adult_name = Column(String())
-  child_name = Column(String())
+  adult_name = Column(String(), nullable=True)
+  child_name = Column(String(), nullable=True)
+# CheckConstraintを追加して、adult_nameまたはchild_nameのいずれかが必ず入力されるようにする
+  __table_args__ = (
+      CheckConstraint(
+          'adult_name IS NOT NULL OR child_name IS NOT NULL',
+          name='check_adult_or_child_name'
+      ),
+  )
 
 class Payments(Base):
   __tablename__ = 'Payments'

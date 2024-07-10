@@ -69,29 +69,30 @@ def signup(token: str = Depends(verify_token), db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
 
 # ログイン（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
-@router.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
-def login(token: str = Depends(verify_token), db: Session = Depends(get_db)):
-    firebase_id = token['uid']
-    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
-    if stakeholder:
-        return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
-    else:
-        # ユーザーが存在しない場合、新しいユーザーを作成するかエラーを返す
-        stakeholder_name = "default_name"  # 必要に応じてフロントエンドから受け取るか、適切なデフォルト値を設定
-        new_stakeholder = schemas.StakeHolderReq(stakeholder_name=stakeholder_name, firebase_id=firebase_id)
-        try:
-            created_stakeholder = stakeholderCrud.create_stakeholder(db, new_stakeholder)
-            return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
+# ログイン時は認証をフロントで行うので不要
+# @router.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
+# def login(token: str = Depends(verify_token), db: Session = Depends(get_db)):
+#     firebase_id = token['uid']
+#     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+#     if stakeholder:
+#         return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
+#     else:
+#         # ユーザーが存在しない場合、新しいユーザーを作成するかエラーを返す
+#         stakeholder_name = "default_name"  # 必要に応じてフロントエンドから受け取るか、適切なデフォルト値を設定
+#         new_stakeholder = schemas.StakeHolderReq(stakeholder_name=stakeholder_name, firebase_id=firebase_id)
+#         try:
+#             created_stakeholder = stakeholderCrud.create_stakeholder(db, new_stakeholder)
+#             return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
+#         except Exception as e:
+#             raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
 
 # ユーザー情報登録（登録画面⓷）トークン認証込みで書き直し済み TODO 要動作確認
 @router.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def post_user(
     token: str = Depends(verify_token),
     stakeholder_name: str = Body(...),
-    adult_name: str = Body(...),
-    child_name: str = Body(...),
+    adult_names: List[str] = Body(...),
+    child_names: List[str] = Body(...),
     db: Session = Depends(get_db)
 ):
     firebase_id = token['uid']
@@ -103,10 +104,18 @@ def post_user(
         updated_stakeholder_name = stakeholderCrud.update_stakeholder_name(db, stakeholder.id, stakeholder_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail='家族名の更新に失敗しました：{}'.format(str(e)))
-    # userテーブルのadult_name,child_nameの登録
+    # userテーブルのadult_names,child_namesの登録
     try:
-        new_user = userCrud.create_user(db, stakeholder.id, adult_name, child_name)
-        return schemas.UserRes(message='ユーザー情報を登録しました', user_id=new_user.id)
+        user_ids = []
+        # adult_names リストの各名前で User レコードを作成
+        for adult_name in adult_names:
+            new_adult_user = userCrud.create_user(db, stakeholder.id, adult_name=adult_name, child_name=None)
+            user_ids.append(new_adult_user.id)
+        # child_names リストの各名前で User レコードを作成
+        for child_name in child_names:
+            new_child_user = userCrud.create_user(db, stakeholder.id, adult_name=None, child_name=child_name)
+            user_ids.append(new_child_user.id)
+        return schemas.UserRes(message='ユーザー情報を登録しました', user_id=user_ids)
     except Exception as e:
         raise HTTPException(status_code=500, detail='ユーザー情報の登録に失敗しました：{}'.format(str(e)))
 
@@ -127,7 +136,7 @@ def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db))
     if not stakeholder:
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     names = userCrud.get_names(db, stakeholder.id)
-    return schemas.NamesRes(names=names)
+    return schemas.NamesRes(adult_names=names['adult_names'], child_names=names['child_names'])
 
 # 記録追加（記録画面⓶）
 @router.post('/api/v1/record', response_model=schemas.RecordRes, responses={400: {'model': schemas.Error}})
@@ -158,21 +167,6 @@ def create_record(
     except Exception as e:
         logger.error(f"Error creating record: {e}")
         return JSONResponse(status_code=400, content={"detail": "記録の作成中にエラーが発生しました"})
-
-# LLMに情報を渡して値を取得（解析画面⓺）
-@router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
-def get_analysis(request: schemas.LLMReq, db: Session = Depends(get_db)):
-    records = timeShareRecordsCrud.get_records(
-        db=db,
-        stakeholder_id=request.stakeholder_id,
-        child_name=request.child_name,
-        year=request.year,
-        month=request.month
-    )
-    formatted_records = format_records(records)
-    openai_text = f"以下はある家族の記録です。\n{formatted_records}\nこれを基にその月の家族の活動についての要約を作成し、感情分析を行ってください。"
-    analysis_result = analyze_openai(openai_text)
-    return schemas.LLMRes(summary=analysis_result, sentiment="感情分析結果")
 
 # 円グラフ用GET　トークン認証込みで書き直し済み　TODO　動作チェック
 @router.get('/api/v1/pie-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})
@@ -227,6 +221,21 @@ def get_bar_data(
         result[with_member][str(date)] = total_hours
 
     return result
+
+# LLMに情報を渡して値を取得（解析画面⓺）
+@router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
+def get_analysis(request: schemas.LLMReq, db: Session = Depends(get_db)):
+    records = timeShareRecordsCrud.get_records(
+        db=db,
+        stakeholder_id=request.stakeholder_id,
+        child_name=request.child_name,
+        year=request.year,
+        month=request.month
+    )
+    formatted_records = format_records(records)
+    openai_text = f"以下はある家族の記録です。\n{formatted_records}\nこれを基にその月の家族の活動についての要約を作成し、感情分析を行ってください。"
+    analysis_result = analyze_openai(openai_text)
+    return schemas.LLMRes(summary=analysis_result, sentiment="感情分析結果")
 
 # LLM分析　 TODO トークン認証込みで書き直す
 @router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
