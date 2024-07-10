@@ -135,24 +135,24 @@ def create_record(
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
     if not stakeholder:
-      logger.error("Stakeholder not found")
-      raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+        logger.error("Stakeholder not found")
+        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     try:
-      record = timeShareRecordsCrud.create_record(
-          db=db,
-          stakeholder_id=stakeholder.id,
-          with_member=request.with_member,
-          child_name=request.child_name,
-          events=request.events,
-          child_condition=request.child_condition,
-          place=request.place,
-          share_start_at=request.share_start_at,
-          share_end_at=request.share_end_at
-      )
-      return schemas.RecordRes(message='記録を追加しました', record_id=record.id)
+        record = timeShareRecordsCrud.create_record(
+            db=db,
+            stakeholder_id=stakeholder.id,
+            with_member=request.with_member,
+            child_name=request.child_name,
+            events=request.events,
+            child_condition=request.child_condition,
+            place=request.place,
+            share_start_at=request.share_start_at,
+            share_end_at=request.share_end_at
+        )
+        return schemas.RecordRes(message='記録を追加しました', record_id=record.id)
     except Exception as e:
-      logger.error(f"Error creating record: {e}")
-      return JSONResponse(status_code=400, content={"detail": "記録の作成中にエラーが発生しました"})
+        logger.error(f"Error creating record: {e}")
+        return JSONResponse(status_code=400, content={"detail": "記録の作成中にエラーが発生しました"})
 
 # 円グラフ用GET　トークン認証込みで書き直し済み　TODO　動作チェック
 @router.get('/api/v1/pie-graph', responses={200: {'model': Dict[str, Any]}, 400: {'model': schemas.Error}})

@@ -60,6 +60,9 @@ class RecordRes(BaseModel):
   record_id: int
   class Config:
     orm_mode = True
+    
+class Error(BaseModel):
+  detail: str
 
 # 各月各子詳細データ取得用
 class DetailListRes(BaseModel):
