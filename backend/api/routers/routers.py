@@ -14,7 +14,7 @@ import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
-from services.stripe import router as stripe_router
+from fastapi.responses import JSONResponse
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -131,23 +131,33 @@ def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db))
 
 # 記録追加（記録画面⓶）
 @router.post('/api/v1/record', response_model=schemas.RecordRes, responses={400: {'model': schemas.Error}})
-def create_record(request: schemas.RecordReq, token: str = Depends(verify_token), db: Session = Depends(get_db)):
+def create_record(
+        request: schemas.RecordReq,
+        token: str = Depends(verify_token),
+        db: Session = Depends(get_db)
+    ):
+    logger.info('------------------create record1')
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
     if not stakeholder:
+        logger.error("Stakeholder not found")
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
-    record = timeShareRecordsCrud.create_record(
-        db=db,
-        stakeholder_id=stakeholder.id,
-        with_member=request.with_member,
-        child_name=request.child_name,
-        events=request.events,
-        child_condition=request.child_condition,
-        place=request.place,
-        share_start_at=request.share_start_at,
-        share_end_at=request.share_end_at
-    )
-    return schemas.RecordRes(message='記録を追加しました', record_id=record.id)
+    try:
+        record = timeShareRecordsCrud.create_record(
+            db=db,
+            stakeholder_id=request.stakeholder_id,
+            with_member=request.with_member,
+            child_name=request.child_name,
+            events=request.events,
+            child_condition=request.child_condition,
+            place=request.place,
+            share_start_at=request.share_start_at,
+            share_end_at=request.share_end_at
+        )
+        return schemas.RecordRes(message='記録を追加しました', record_id=record.id)
+    except Exception as e:
+        logger.error(f"Error creating record: {e}")
+        return JSONResponse(status_code=400, content={"detail": "記録の作成中にエラーが発生しました"})
 
 # LLMに情報を渡して値を取得（解析画面⓺）
 @router.post('/api/v1/analysis', response_model=schemas.LLMRes, responses={400: {'model': schemas.Error}})
@@ -238,6 +248,4 @@ def get_all_time_share_records(db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="記録が見つかりません")
   return records
 
-# Stripe用のルーターを登録
-router.include_router(stripe_router, prefix="/stripe", tags=["stripe"])
 

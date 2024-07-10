@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
-from services.stripe import create_checkout_session, handle_stripe_webhook
+from api.services.stripe import create_checkout_session, handle_stripe_webhook
 import stripe
 import os
 from dotenv import load_dotenv
@@ -8,27 +8,26 @@ from dotenv import load_dotenv
 load_dotenv()  # 環境変数を読み込む
 router = APIRouter()
 
-app_secret = os.getenv('APP_SECRET')
+# app_secret = os.getenv('APP_SECRET')
 
-@router.post("/do_more_secret_stuff")
-async def do_more_secret_stuff(request: Request):
-    payload = await request.body()
-    sig_header = request.headers.get('stripe-signature')
-
-    try:
-        # リクエストボディとヘッダーを使って署名を検証
-        stripe.Webhook.construct_event(
-            payload, sig_header, app_secret
-        )
-    except ValueError as e:
-        # 無効なペイロード
-        raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError as e:
-        # 無効な署名
-        raise HTTPException(status_code=400, detail="Invalid signature")
+# @router.post("/do_more_secret_stuff")
+# async def do_more_secret_stuff(request: Request):
+#     payload = await request.body()
+#     sig_header = request.headers.get('stripe-signature')
     
-    # リクエストを処理してイベントの受領を確認するレスポンスを返す
-    return JSONResponse(status_code=200, content={"success": True})
+#     try:
+#         # リクエストボディとヘッダーを使って署名を検証
+#         stripe.Webhook.construct_event(
+#             payload, sig_header, app_secret
+#         )
+#     except ValueError as e:
+#         # 無効なペイロード
+#         raise HTTPException(status_code=400, detail="Invalid payload")
+#     except stripe.error.SignatureVerificationError as e:
+#         # 無効な署名
+#         raise HTTPException(status_code=400, detail="Invalid signature")
+#     # リクエストを処理してイベントの受領を確認するレスポンスを返す
+#     return JSONResponse(status_code=200, content={"success": True})
 
 @router.post("/create-checkout-session")
 def create_checkout_session_endpoint():
