@@ -227,8 +227,8 @@ def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_d
     共有終了時刻: {data['share_end_at']}
     """
     # NOTE アドバイスを生成
-    response = openai.completions.create(
-      engine='gpt-3.5-turbo-0125',
+    response = openai.Completion.create(
+      engine='text-davinci-003',
       prompt=f"以下のデータをもとに、家族がより良い時間を過ごすためのアドバイスをください。\n\n{summary}\n\nアドバイス:",
       max_tokens=2000
     )
