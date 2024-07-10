@@ -47,7 +47,6 @@ class NamesRes(BaseModel):
 
 # 記録を追加するためのリクエスト
 class RecordReq(BaseModel):
-  stakeholder_id: UUID
   with_member: str
   child_name: str
   events: str
