@@ -1,37 +1,33 @@
-"use client";
+'use client'
 import React, { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation"; // useRouterをインポート
+import { useRouter } from "next/navigation";
 import BarChart from "../../_components/analysis/BarChart";
 import PieChart from "../../_components/analysis/PieChart";
 import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
-import Header from "../../_components/layout/header";
-import Footer from "../../_components/layout/footer";
-import { barData, pieData, colors } from "../../data";
+import Header from "../../_components/layout/Header";
+import Footer from "../../_components/layout/Footer";
+import RecordList from "../../_components/analysis/RecordList";
 import axios from "axios";
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // Firebaseのauthモジュールから必要な関数をインポート
-import RecordList from "../../_components/analysis/RecordList"; // RecordListをインポート
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { PieChartData } from "../../types"; // Assuming you have a PieChartData type defined
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<any>({});
-  const [pieChartData, setPieChartData] = useState<any>({});
-  const [selectedYear, setSelectedYear] = useState<number>(2024); // 初期選択: 2024年
-  const [selectedMonth, setSelectedMonth] = useState<number>(6); // 初期選択: 6月
-  const [llmSummary, setLlmSummary] = useState<string>(""); // LLMの要約結果
-  const [llmSentiment, setLlmSentiment] = useState<string>(""); // LLMのセンチメント
-  const [children, setChildren] = useState<string[]>([]); // 子供のリスト
-  const [selectedChild, setSelectedChild] = useState<string>(""); // 選択された子供
-
+  const [pieChartData, setPieChartData] = useState<PieChartData[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(2024);
+  const [selectedMonth, setSelectedMonth] = useState<number>(6);
+  const [llmSummary, setLlmSummary] = useState<string>("");
+  const [llmSentiment, setLlmSentiment] = useState<string>("");
+  const [children, setChildren] = useState<string[]>([]);
+  const [selectedChild, setSelectedChild] = useState<string>("");
+  const [error, setError] = useState<string | null>(null); // State for error handling
   const router = useRouter();
-
-  // FirebaseのAuthインスタンスを取得する
   const auth = getAuth();
 
   useEffect(() => {
-    // ユーザーの認証状態が変更されたら、トークンを取得してコンソールに表示
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await getAuthToken();
-        console.log("TokenID:", token);
         fetchChildren(token);
       }
     });
@@ -39,25 +35,34 @@ const MonthlyAnalysis: React.FC = () => {
     return () => unsubscribe();
   }, [auth]);
 
-  // 子供データの取得
+  useEffect(() => {
+    if (selectedChild) {
+      fetchData();
+      fetchPieData();
+    }
+  }, [selectedYear, selectedMonth, selectedChild]);
+
   const fetchChildren = async (token: string) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/v1/names', {
-        headers: {
+      const response = await axios.get('http://localhost:8000/api/v1/user', { 
+      headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setChildren(response.data.名前);
+      const childNames = response.data.names.map((item: { child_name: string }) => item.child_name).filter((name: string) => name !== '');
+      console.log(childNames);
+      setChildren(childNames);
+      setError(null); // 成功した場合はエラーをクリア
     } catch (error) {
       console.error('Error fetching children:', error);
+      setError('お子様の名前を取得できませんでした。');
     }
   };
 
-  // 月別の子供ごとのデータを取得する
   const fetchData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get('http://localhost:8000/api/v1/main', {
+      const response = await axios.get('http://localhost:8000/api/v1/bar-graph', {
         params: {
           year: selectedYear,
           month: selectedMonth,
@@ -68,56 +73,34 @@ const MonthlyAnalysis: React.FC = () => {
         },
       });
       const data = response.data;
-      const { summary, analysis } = data;
-
-      // グラフデータに色を追加する関数
-      const addColors = (data: any, isPieChart = false) => {
-        const newData = { ...data };
-        newData.datasets = newData.datasets.map(
-          (dataset: any, index: number) => {
-            if (isPieChart) {
-              const backgroundColor = dataset.data.map(
-                (_: any, i: number) => colors[i % colors.length]
-              );
-              const borderColor = backgroundColor.map((color: string) =>
-                color.replace("0.7", "1")
-              );
-              return {
-                ...dataset,
-                backgroundColor,
-                borderColor,
-                borderWidth: 2,
-              };
-            } else {
-              const color = colors[index % colors.length];
-              return {
-                ...dataset,
-                backgroundColor: color,
-                borderColor: color.replace("0.7", "1"),
-                borderWidth: 1,
-              };
-            }
-          }
-        );
-        return newData;
-      };
-
-      setBarChartData(addColors(barData));
-      setPieChartData(addColors(pieData, true));
-      setLlmSummary(analysis.llm_summary);
-      setLlmSentiment(analysis.llm_sentiment);
+      setBarChartData(data);
+      setLlmSummary(data.summary);
+      setLlmSentiment(data.sentiment);
     } catch (error) {
-      console.error("エラー:", error);
+      console.error("Error:", error);
     }
-  }, [selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChild]);
 
-  useEffect(() => {
-    if (selectedChild) {
-      fetchData();
+  const fetchPieData = useCallback(async () => {
+    try {
+      const bearerToken = await getAuthToken();
+      const response = await axios.get('http://localhost:8000/api/v1/pie-graph', {
+        params: {
+          year: selectedYear,
+          month: selectedMonth,
+          child_name: selectedChild,
+        },
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      const data = response.data;
+      setPieChartData(data);
+    } catch (error) {
+      console.error("Error:", error);
     }
-  }, [selectedYear, selectedMonth, selectedChild, fetchData]);
+  }, [selectedYear, selectedMonth, selectedChild]);
 
-  // 認証トークンを取得する関数
   const getAuthToken = async () => {
     try {
       const user = auth.currentUser;
@@ -185,6 +168,12 @@ const MonthlyAnalysis: React.FC = () => {
             </div>
           </div>
         </div>
+        {error && (
+          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">エラー:</strong>
+            <span className="block sm:inline"> {error}</span>
+          </div>
+        )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
           <OpenaiAnalysis month={selectedMonth} />
         </div>
@@ -212,7 +201,7 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <RecordList /> {/* ここにRecordListコンポーネントを追加 */}
+          <RecordList />
         </div>
       </div>
       <Footer />
