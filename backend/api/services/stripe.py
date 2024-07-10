@@ -14,26 +14,26 @@ YOUR_DOMAIN = 'http://localhost:3000/'
 def create_checkout_session():
     try:
         checkout_session = stripe.checkout.Session.create(
-            line_items=[{
-                "price_data": {
-                    "currency": "jpy",
-                    "product_data": {
-                        "name": "LLM分析",
-                    },
-                    "unit_amount": 80000,
-                    "recurring": {  # 追加: 定期購入の詳細
-                        "interval": "month"
-                    }
+            line_items=[
+                {
+                'price': 'price_1PapiD2KB7MtryeCx2PkDaEY',
+                'quantity': 1,
                 },
-                "quantity": 1,
-            }],
+            ],
             mode='subscription',
             success_url=YOUR_DOMAIN + '?success=true',
             cancel_url=YOUR_DOMAIN + '?canceled=true',
         )
-        return checkout_session.id
+        return checkout_session.client_secret
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise e
+
+def get_session_status(session_id):
+    session = stripe.checkout.Session.retrieve(session_id)
+    return {
+        "status": session.status,
+        "customer_email": session.customer_details.email
+    }
 
 def handle_stripe_webhook(payload, sig_header):
     try:

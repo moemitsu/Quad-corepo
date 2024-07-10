@@ -1,33 +1,93 @@
-'use client';
+import React, { useCallback, useState, useEffect } from "react";
+import {loadStripe} from '@stripe/stripe-js';
+import {
+  EmbeddedCheckoutProvider,
+  EmbeddedCheckout
+} from '@stripe/react-stripe-js';
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate
+} from "react-router-dom";
+import {stripePromise} from '../../lib/stripe';
+// Make sure to call `loadStripe` outside of a component’s render to avoid
+// recreating the `Stripe` object on every render.
+// This is your test secret API key.
 
-import React, { useEffect } from 'react';
-
-const PaymentRedirect: React.FC = () => {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://js.stripe.com/v3/buy-button.js';
-    script.async = true;
-    document.body.appendChild(script);
-    
-    return () => {
-      document.body.removeChild(script);
-    };
+const CheckoutForm = () => {
+  const fetchClientSecret = useCallback(() => {
+    // Create a Checkout Session
+    return fetch("/create-checkout-session", {
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .then((data) => data.clientSecret);
   }, []);
 
-  return (
-    <div className="p-6 min-h-screen flex flex-col justify-center items-center">
-      <div className="p-6 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-4xl font-bold mb-6 text-center">支払いを行う</h2>
-        <div dangerouslySetInnerHTML={{__html: `
-          <stripe-buy-button
-            buy-button-id="buy_btn_1PaprZ2KB7MtryeCrlpCXjHw"
-            publishable-key="pk_test_51PZ1U92KB7MtryeC0GeQiocQwDstKH0qQdktlzLQWy107zqfdADAPoP7exKtQnBurFspFDRdIHAj08Vx86z0D0RL00zWPiol3J"
-          >
-          </stripe-buy-button>
-        `}} />
-      </div>
-    </div>
-  );
-};
+  const options = {fetchClientSecret};
 
-export default PaymentRedirect;
+  return (
+    <div id="checkout">
+      <EmbeddedCheckoutProvider
+        stripe={stripePromise}
+        options={options}
+      >
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    </div>
+  )
+}
+
+const Return = () => {
+  const [status, setStatus] = useState(null);
+  const [customerEmail, setCustomerEmail] = useState('');
+
+  useEffect(() => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const sessionId = urlParams.get('session_id');
+
+    fetch(`/session-status?session_id=${sessionId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setStatus(data.status);
+        setCustomerEmail(data.customer_email);
+      });
+  }, []);
+
+  if (status === 'open') {
+    return (
+      <Navigate to="/checkout" />
+    )
+  }
+
+  if (status === 'complete') {
+    return (
+      <section id="success">
+        <p>
+          We appreciate your business! A confirmation email will be sent to {customerEmail}.
+
+          If you have any questions, please email <a href="mailto:orders@example.com">orders@example.com</a>.
+        </p>
+      </section>
+    )
+  }
+
+  return null;
+}
+
+const App = () => {
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/checkout" element={<CheckoutForm />} />
+          <Route path="/return" element={<Return />} />
+        </Routes>
+      </Router>
+    </div>
+  )
+}
+
+export default App;
