@@ -10,10 +10,10 @@ import os
 import json
 import api.database.models as models, api.schemas.schemas as schemas, api.cruds.timeShareRecords as timeShareRecordsCrud, api.cruds.payments as paymentsCrud, api.cruds.stakeholder as stakeholderCrud, api.cruds.user as userCrud
 from api.lib.auth import verify_token, get_current_user
+import logging
+from starlette.concurrency import run_in_threadpool
 
 models.Base.metadata.create_all(bind=engine)
-
-load_dotenv()
 
 # Initialize the logger
 logger = getLogger(__name__)
@@ -22,10 +22,9 @@ app = FastAPI()
 router = APIRouter()
 
 api_key = os.getenv('OPENAI_API_KEY')
-if not api_key:
-    raise ValueError("APIキーがセットされていません。")
+openai.api_key = api_key
 
-client = openai.OpenAI(api_key=api_key)
+logger = logging.getLogger(__name__)
 
 def get_db():
   db = SessionLocal()
@@ -195,51 +194,65 @@ def get_pie_data(
 
 # LLM分析 TODO 書き直し
 # LLM TEST
-@router.get('api/v1/llm-test', response_model=schemas.AdviceResponse)
-def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_db)):
+@router.get('/api/v1/llm-test', response_model=schemas.AdviceResponse)
+async def analysis(child_name: str, year: int, month: int, db: Session = Depends(get_db)):
   logger.info("llm-test endpoint called")
-  records = timeShareRecordsCrud.get_all_data_for_analysis(db)
-  logger.debug(f"Records fetched: {records}")
+  try:
+    # データベースからデータを取得
+    records = timeShareRecordsCrud.get_all_data_for_analysis(db)
+    logger.debug(f"Records fetched: {records}")
+    # NOTE データを整形
+    data = {
+      'with_member': [],
+      'child_name': [],
+      'events': [],
+      'child_condition': [],
+      'place': [],
+      'share_start_at': [],
+      'share_end_at': []
+    }
+    for record in records:
+      data['with_member'].append(record.with_member)
+      data['child_name'].append(record.child_name)
+      data['events'].append(record.events)
+      data['child_condition'].append(record.child_condition)
+      data['place'].append(record.place)
+      data['share_start_at'].append(record.share_start_at)
+      data['share_end_at'].append(record.share_end_at)
+      
+      # NOTE 分析結果の要約を作成
+      summary = f"""
+      子どもと関わる人たち: {data['with_member']}
+      子どもの名前: {data['child_name']}
+      イベント: {data['events']}
+      子どもの機嫌: {data['child_condition']}
+      場所: {data['place']}
+      共有開始時刻: {data['share_start_at']}
+      共有終了時刻: {data['share_end_at']}
+      """
 
-  # NOTE データを整形
-  data = {
-    'with_member': [],
-    'child_name': [],
-    'events': [],
-    'child_condition': [],
-    'place': [],
-    'share_start_at': [],
-    'share_end_at': []
-  }
-  for record in records:
-    data['with_member'].append(record.with_member)
-    data['child_name'].append(record.child_name)
-    data['events'].append(record.events)
-    data['child_condition'].append(record.child_condition)
-    data['place'].append(record.place)
-    data['share_start_at'].append(record.share_start_at)
-    data['share_end_at'].append(record.share_end_at)
-    # NOTE 分析結果の要約を作成
-    summary = f"""
-    子どもと関わる人たち: {data['with_member']}
-    子どもの名前: {data['child_name']}
-    イベント: {data['events']}
-    子どもの機嫌: {data['child_condition']}
-    場所: {data['place']}
-    共有開始時刻: {data['share_start_at']}
-    共有終了時刻: {data['share_end_at']}
-    """
+      logger.debug(f"Summary: {summary}")
+      
+      # NOTE アドバイスを生成
+      response = await run_in_threadpool(
+        openai.chat.completions.create,
+        model="gpt-3.5-turbo",
+        messages=[
+          {"role": "system", "content": "あなたは優れた分析家であり親切なアドバイザーです。"},
+          {"role": "user", "content": f"以下のデータを基に、家族がより良い時間を過ごすためのアドバイスをください。\n\n{summary}\n\nアドバイス:"}
+        ],
+        max_tokens=2000
+      )
+    logger.debug(f"OpenAI Response: {response}")
+    advice = response.choices[0].message['content'].strip()
+    logger.debug(f"Advice: {advice}")
 
-    logger.debug(f"Summary: {summary}")
-    
-    # NOTE アドバイスを生成
-    response = openai.Completion.create(
-      engine='text-davinci-003',
-      prompt=f"以下のデータをもとに、家族がより良い時間を過ごすためのアドバイスをください。\n\n{summary}\n\nアドバイス:",
-      max_tokens=2000
-    )
-    advice = response.choices[0].text.strip()
     return schemas.AdviceResponse(advice=advice)
+  
+  except Exception as e:
+    logger.error(f"Error occurred: {e}")
+    raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 # 確認用　TODO あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
