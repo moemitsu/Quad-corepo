@@ -62,6 +62,18 @@ class RecordRes(BaseModel):
   class Config:
     orm_mode = True
 
+# 各月各子詳細データ取得用
+class DetailListRes(BaseModel):
+  with_member: str
+  events: str
+  child_condition: str
+  place: str
+  share_start_at: datetime
+  share_end_at: datetime
+
+
+
+
 # LLM用のリクエスト
 class LLMReq(BaseModel):
   text: str
@@ -74,7 +86,7 @@ class LLMRes(BaseModel):
   summary: str
   sentiment: str
 
-# とりあえずの確認用　FIXME 後で消す
+# 確認用　FIXME 後で消す
 class TimeShareRecordResponse(BaseModel):
   id: int
   stakeholder_id: UUID

@@ -50,8 +50,11 @@ def seed_data(db: Session):
 		User(stakeholder_id=stakeholder1_id, adult_name='母', child_name=''),
 		User(stakeholder_id=stakeholder1_id, adult_name='父', child_name=''),
 		User(stakeholder_id=stakeholder2_id, adult_name='祖母', child_name=''),
+		User(stakeholder_id=stakeholder2_id, adult_name='父', child_name=''),
 		User(stakeholder_id=stakeholder2_id, adult_name='', child_name='はなこ'),
+		User(stakeholder_id=stakeholder2_id, adult_name='', child_name='いちろう'),
 		User(stakeholder_id=stakeholder1_id, adult_name='', child_name='たろう'),
+		User(stakeholder_id=stakeholder1_id, adult_name='', child_name='ふたば'),
 		Payments(user_id=1, stakeholder_id=stakeholder1_id),  # user_idはオートインクリメントの最初のUserのID
 		Payments(user_id=3, stakeholder_id=stakeholder2_id),  # user_idはオートインクリメントの次のUserのID
 	] + time_share_records

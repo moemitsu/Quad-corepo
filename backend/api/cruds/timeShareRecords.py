@@ -4,6 +4,7 @@ from sqlalchemy import and_, func
 from uuid import UUID
 import datetime
 import calendar
+from fastapi import HTTPException
 
 from api.database import models
 from api.schemas import schemas
@@ -89,6 +90,24 @@ def get_pie_graph_by_month(db: Session, stakeholder_id: UUID, child_name: str, y
     
     return [(record.with_member, (record.total_hours / total_time) * 100) for record in records]
 
+# 詳細一覧の取得　グラフに合わせて、各月各子の一覧とする
+def get_each_detail_lists_by_month(db: Session, stakeholder_id: UUID, child_name: str, year: int, month: int):
+    try:
+        start_date = datetime.datetime(year, month, 1)
+        last_day = calendar.monthrange(year, month)[1]
+        end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
+        records = db.query(models.TimeShareRecords).filter(
+            models.TimeShareRecords.stakeholder_id == stakeholder_id,
+            models.TimeShareRecords.child_name == child_name,
+            models.TimeShareRecords.share_start_at >= start_date,
+            models.TimeShareRecords.share_end_at <= end_date
+        ).order_by(models.TimeShareRecords.share_start_at).all()
+
+        return records
+    except Exception as e:
+        logger.error(f"Error fetching records: {e}")
+        raise HTTPException(status_code=500, detail="記録の取得中にエラーが発生しました")
+
 # 記録の追加
 def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
@@ -112,8 +131,8 @@ def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_nam
       logger.error(f"Error creating record: {e}")
       raise
 
-# LLMに分析してもらうためのデータを取得
 
+# LLMに分析してもらうためのデータを取得
 def get_all_data_for_analysis(db: Session):
   return db.query(
     models.TimeShareRecords.with_member,
