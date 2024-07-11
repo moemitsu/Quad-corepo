@@ -11,6 +11,7 @@ export default function Home() {
   const router = useRouter();
   return (
     <div>
+      <title>corepo -これぽ- </title>
       <Header />
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <Image
