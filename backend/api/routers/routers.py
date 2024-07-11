@@ -203,7 +203,7 @@ def get_each_detail_lists(
 # LLM分析
 @router.get('/api/v1/analysis', response_model=schemas.Completion)
 def analysis(
-    # token: str = Depends(verify_token),
+    token: str = Depends(verify_token),
     child_name: str = Query(...),
     year: int = Query(...),
     month: int = Query(...),
@@ -270,11 +270,11 @@ def analysis(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an excellent analyst and a kind advisor."},
-                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese.\n\n{summary}\n\n"}
+                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese, use a friendly tone, address the father, mother, and children with 'さん', and provide detailed analysis and specific recommendations for places to visit.\n\n{summary}\n\n"}
                 ],
                 max_tokens=2000,
                 n=1,
-                temperature=0.4
+                temperature=0.7
             )
             advice = response.choices[0].message.content.strip()
         except Exception as e:
