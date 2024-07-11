@@ -112,7 +112,6 @@ def create_record(
             logger.error("Stakeholder not found")
             raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
         try:
-            print('------------------create record2')
             record = timeShareRecordsCrud.create_record(
                 db=db,
                 stakeholder_id=stakeholder.id,

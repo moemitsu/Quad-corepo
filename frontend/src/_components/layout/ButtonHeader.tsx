@@ -61,7 +61,7 @@ const ButtonHeader: React.FC = () => {
         >
           <div className="py-1" role="none">
           <a href="monthly-analysis" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
-              分析結果を見る
+              記録を見る
             </a>
           </div>
           <div className="py-1" role="none">
