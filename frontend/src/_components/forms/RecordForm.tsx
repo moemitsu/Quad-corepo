@@ -45,7 +45,7 @@ const RecordForm: React.FC = () => {
 
         setChildren(response.data.child_names || []);
         setAdultNames(response.data.adult_names || []);
-      } catch (error) {
+      } catch (error:any) {
         console.error('データ取得エラー: ', error);
         if (axios.isAxiosError(error)) {
           console.error('エラーレスポンス:', error.response?.data);
@@ -103,6 +103,7 @@ const RecordForm: React.FC = () => {
       setEndDate('');
       setEndTime('');
     } catch (error: any) {
+
       console.error('ドキュメント追加エラー: ', error);
       if (error.response) {
         console.error('エラーレスポンス:', error.response.data);
