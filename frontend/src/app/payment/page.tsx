@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import PaymentForm from '../../_components/forms/PaymentForm';
 import Header from "../../_components/layout/Header";

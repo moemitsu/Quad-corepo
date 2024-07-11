@@ -104,11 +104,15 @@ const RecordForm: React.FC = () => {
       setStartTime('');
       setEndDate('');
       setEndTime('');
+
     } catch (error: any) {
+
       console.error('ドキュメント追加エラー: ', error);
-      if (error.response) {
-        console.error('エラーレスポンス:', error.response.data);
+
+      if (axios.isAxiosError(error)) {
+        console.error('エラーレスポンス:', error.response?.data);
       }
+
       alert('エラーが発生しました。もう一度試してください。');
     }
   };

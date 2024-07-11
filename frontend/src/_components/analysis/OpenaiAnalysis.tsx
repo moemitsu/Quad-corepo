@@ -31,6 +31,10 @@ interface AnalysisData {
 }
 
 const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
+  const [selectedYear, setSelectedYear] = useState<number>(2024);
+  const [selectedMonth, setSelectedMonth] = useState<number>(6);
+  const [selectedChild, setSelectedChild] = useState<string>("");
+
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [viewCount, setViewCount] = useState<number>(0);
@@ -44,8 +48,9 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           const token = await user.getIdToken(); // Firebaseトークンを取得
           const response = await axios.get('http://localhost:8000/api/v1/analysis', {
             params: {
-              // 年も追加する
-              month: `2024-${month.toString().padStart(2, '0')}`,
+              year: selectedYear,
+              month: selectedMonth,
+              child_name: selectedChild,
             },
             headers: {
               Authorization: `Bearer ${token}`, // Bearerトークンをヘッダーに追加
@@ -60,7 +65,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
       };
       fetchData();
     }
-  }, [user, month]);
+  }, [user, selectedYear, selectedMonth, selectedChild]);
 
   const handleViewClick = () => {
     setViewCount(viewCount + 1);
@@ -110,14 +115,14 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           border-l-8 border-l-custom-light-blue"></div>
       </div>
       <div className="ml-4">
-          <video
-            src="/LLMicon1.mp4"
-            loop
-            muted
-            autoPlay
-            className="w-26 h-40"
-          />
-        </div>
+        <video
+          src="/LLMicon1.mp4"
+          loop
+          muted
+          autoPlay
+          className="w-26 h-40"
+        />
+      </div>
     </div>
   );
 };

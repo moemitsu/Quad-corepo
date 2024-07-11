@@ -1,3 +1,4 @@
+'use client'
 import React, { useCallback, useState, useEffect } from "react";
 import {loadStripe} from '@stripe/stripe-js';
 import {
@@ -44,6 +45,7 @@ const Return = () => {
   const [customerEmail, setCustomerEmail] = useState('');
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined'){
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const sessionId = urlParams.get('session_id');
@@ -54,6 +56,7 @@ const Return = () => {
         setStatus(data.status);
         setCustomerEmail(data.customer_email);
       });
+    }
   }, []);
 
   if (status === 'open') {
@@ -78,6 +81,9 @@ const Return = () => {
 }
 
 const App = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
   return (
     <div className="App">
       <Router>

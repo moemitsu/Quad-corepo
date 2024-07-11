@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import Image from "next/image";
 import Header from "../_components/layout/Header";
 import Footer from "../_components/layout/Footer";
@@ -15,7 +15,7 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/index.jpg"
+          src="/index1.jpg"
           alt="Index Logo"
           width={1200}
           height={160}
