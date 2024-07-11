@@ -9,6 +9,8 @@ import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.d
 from api.routers.routers import router as app_router
 from api.routers.stripe import router as stripe_router
 
+# schemas.py からインポート
+from api.schemas.schemas import RecordReq, RecordRes, Error
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)

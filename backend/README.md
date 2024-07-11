@@ -10,6 +10,7 @@
 | 記録の追加 | POST | `/api/v1/time-share-records` | 子どもとの時間の記録を登録 |
 | 棒グラフ表示用データを取得 | GET | `/api/v1/bar-graph` | 各月画面に表示されるすべてのデータを取得 |
 | 円グラフ表示用データを取得 | GET | `/api/v1/pie-graph` | 各月画面に表示されるすべてのデータを取得 |
+| 家族データ一覧の取得 | GET | c` | 各月画面の表示に使用されたデータの詳細を取得 |
 | LLM分析 | POST | `/api/v1/analysis` | LLMにデータとテキストを送信して分析結果を取得する |
 <!--第2段階で実装
 | 記録の更新 | PUT | `/api/v1/records/{record_id}` | 特定の記録の更新 |
@@ -156,16 +157,19 @@
     ```
 
 ## 棒グラフ用データ取得 [GET /api/v1/bar-graph]
-  + year（必須）: `2024`
-  + month（必須）: `6`
-  + child_name（必須）: `たろう`
-+ Response 200 OK
+各月画面に表示されるすべてのデータを取得
++ Request
+  + Query Parameter
+    + year（必須）: `2024`
+    + month（必須）: `6`
+    + child_name（必須）: `たろう`
   + Header
     ```
     {
       "Authorization": "Bearer ${idToken}"
     }
     ```
++ Response 200 OK
   + Body
     ```
     {
@@ -188,17 +192,18 @@
     ```
 
 ## 円グラフ用データ取得 [GET /api/v1/pie-graph]
-+ クエリパラメーター
-  + year（必須）: `2024`
-  + month（必須）: `6`
-  + child_name（必須）: `たろう`
-+ Response 200 OK
++ Request
+  + Query Parameter
+    + year（必須）: `2024`
+    + month（必須）: `6`
+    + child_name（必須）: `たろう`
   + Header
     ```
     {
       "Authorization": "Bearer ${idToken}"
     }
     ```
++ Response 200 OK
   + Body
     ```
     {
@@ -214,6 +219,32 @@
     }
     ```
 
+## 家族データ一覧の取得 [GET /api/v1/family-records]
+各月画面の表示に使用されたデータの詳細を取得
++ Request
+  + Query Parameter
+    + year（必須）: `2024`
+    + month（必須）: `6`
+    + child_name（必須）: `たろう`
+  + Header
+    ```
+    {
+      "Authorization": "Bearer ${idToken}"
+    }
+    ```
++ Response 200 OK
+  + Body
+    ```
+    {
+      "id":"id"
+      "with_member": "祖母",
+      "events": "遊び",
+      "child_condition": "☀️☀️",
+      "place": "公園",
+      "share_start_at": "2024-06-01T10:00:00",
+      "share_end_at": "2024-06-01T11:00:00"
+    }
+    ```
 
 <!-- 第2段階で実装
 ## 記録の更新 [POST /api/v1/records/{record_id}]

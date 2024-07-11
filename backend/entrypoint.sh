@@ -7,7 +7,7 @@ poetry run alembic revision --autogenerate -m "Initial migration"
 if grep -q "done"
   echo "Initial migration generated successfully."
 else
-  echo "Failed to generate initial migration." >&2
+  echo "Failed to generate initial migration."
   exit 1
 fi
 # マイグレーションの適用
@@ -15,7 +15,7 @@ poetry run alembic upgrade head
 if grep -q "Initial migration"
   echo "Migration applied successfully."
 else
-  echo "Failed to apply migration." >&2
+  echo "Failed to apply migration."
   exit 1
 fi
 # データベースのシード

@@ -15,6 +15,9 @@ RUN npm install
 # ポート 3000 を公開
 EXPOSE 3000
 
+# uuidモジュールとその型定義をインストール
+RUN npm install uuid @types/uuid
+
 # アプリケーションのソースコードをコピー
 COPY . .
 

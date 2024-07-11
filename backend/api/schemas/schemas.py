@@ -48,7 +48,6 @@ class NamesRes(BaseModel):
 
 # 記録を追加するためのリクエスト
 class RecordReq(BaseModel):
-  stakeholder_id: UUID
   with_member: str
   child_name: str
   events: str
@@ -63,6 +62,15 @@ class RecordRes(BaseModel):
   class Config:
     from_attributes = True
 
+# 各月各子詳細データ取得用
+class DetailListRes(BaseModel):
+  with_member: str
+  events: str
+  child_condition: str
+  place: str
+  share_start_at: datetime
+  share_end_at: datetime
+
 # LLM用のリクエスト
 class LLMReq(BaseModel):
   text: str
@@ -75,7 +83,7 @@ class LLMRes(BaseModel):
   summary: str
   sentiment: str
 
-# とりあえずの確認用　FIXME 後で消す
+# 確認用　FIXME 後で消す
 class TimeShareRecordResponse(BaseModel):
   id: int
   stakeholder_id: UUID
@@ -89,8 +97,8 @@ class TimeShareRecordResponse(BaseModel):
   class Config:
     from_attributes = True
 
-# LLM動作確認用
 
+# LLM動作確認用
 class Logprobs(BaseModel):
     text_offset: Optional[List[int]] = None
     token_logprobs: Optional[List[float]] = None

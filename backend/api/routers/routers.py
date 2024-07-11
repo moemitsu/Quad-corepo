@@ -85,21 +85,27 @@ def post_user(
 ):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    
+    # ユーザーが存在しない場合、新規作成
     if not stakeholder:
-        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+        try:
+            stakeholder = stakeholderCrud.create_new_stakeholder(db, firebase_id)
+            stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail='新しいユーザーの作成に失敗しました: {}'.format(str(e)))
+    
     # stakeholder_nameの更新
     try:
         updated_stakeholder_name = stakeholderCrud.update_stakeholder_name(db, stakeholder.id, stakeholder_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail='家族名の更新に失敗しました：{}'.format(str(e)))
-    # userテーブルのadult_names,child_namesの登録
+
+    # userテーブルのadult_names, child_namesの登録
     try:
         user_ids = []
-        # adult_names リストの各名前で User レコードを作成
         for adult_name in adult_names:
             new_adult_user = userCrud.create_user(db, stakeholder.id, adult_name=adult_name, child_name=None)
             user_ids.append(new_adult_user.id)
-        # child_names リストの各名前で User レコードを作成
         for child_name in child_names:
             new_child_user = userCrud.create_user(db, stakeholder.id, adult_name=None, child_name=child_name)
             user_ids.append(new_child_user.id)
@@ -209,6 +215,25 @@ def get_bar_data(
 
     return result
 
+# 家族データ一覧の取得
+@router.get("/api/v1/family-records", response_model=List[schemas.DetailListRes])
+def get_each_detail_lists(
+  token: str = Depends(verify_token),
+  child_name: str = Query(...),
+  year: int = Query(...),
+  month: int = Query(...),
+  db: Session = Depends(get_db)
+):
+  firebase_id = token['uid']
+  stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+  if not stakeholder:
+      raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+  records = timeShareRecordsCrud.get_each_detail_lists_by_month(db, stakeholder.id, child_name, year, month)
+  if not records:
+    raise HTTPException(status_code=404, detail="記録が見つかりません")
+  return records
+
+
 # LLM分析 TODO 書き直し
 # LLM TEST
 @router.get('/api/v1/llm-test', response_model=schemas.Completion)
@@ -292,6 +317,7 @@ def analysis(child_name: str = Query(...), year: int = Query(...), month: int = 
 #     ]
 # )
 # print(completion.choices[0].message)
+
 
 # 確認用　TODO あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])

@@ -6,11 +6,11 @@ import { useAuth } from '../../hooks/useAuth';
 
 const RecordForm: React.FC = () => {
   const { user } = useAuth();
-  const events = ['遊び', '生活（食事・お風呂・寝かしつけ、など）', '見守り（勉強・習い事、など）'];
-  const places = ['家', '屋内', '戸外', '保育園・幼稚園', 'その他'];
+  const events = ['遊び', '食事', '睡眠', '勉強', '習い事'];
+  const places = ['家', '公園', '保育園・幼稚園', 'その他'];
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
-  const [selectedWithMember, setSelectedWithMember] = useState<string>('');
+  const [selectedAdultName, setSelectedAdultName] = useState<string>('');
   const [selectedChild, setSelectedChild] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [childCondition, setChildCondition] = useState<string>('');
@@ -20,36 +20,40 @@ const RecordForm: React.FC = () => {
   const [endDate, setEndDate] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
   const [children, setChildren] = useState<string[]>([]);
-  const [withMembers, setWithMembers] = useState<string[]>([]);
+  const [adultNames, setAdultNames] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchChildrenAndWithMembers = async () => {
+    const fetchChildrenAndAdults = async () => {
       try {
         if (!user) {
           throw new Error('ユーザーが認証されていません。');
         }
 
         const token = await user.getIdToken();
+        console.log('取得したトークン:', token);
 
-        const childrenResponse = await axios.get('http://localhost:8000/api/v1/user/{user_id}/child_name', {
+        const response = await axios.get('http://localhost:8000/api/v1/user', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: {
+            token: token
+          }
         });
-        setChildren(childrenResponse.data.children);
 
-        const withMembersResponse = await axios.get('http://localhost:8000/api/v1/stakeholders/{stakeholder_id}/adult_name', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setWithMembers(withMembersResponse.data.with_members);
-      } catch (error) {
+        console.log('APIからの応答:', response.data);
+
+        setChildren(response.data.child_names || []);
+        setAdultNames(response.data.adult_names || []);
+      } catch (error:any) {
         console.error('データ取得エラー: ', error);
+        if (error.response) {
+          console.error('エラーレスポンス:', error.response.data);
+        }
       }
     };
 
-    fetchChildrenAndWithMembers();
+    fetchChildrenAndAdults();
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,17 +66,22 @@ const RecordForm: React.FC = () => {
 
       const token = await user.getIdToken();
 
-      const response = await axios.post('http://localhost:8000/api/v1/records', {
-        with_member: selectedWithMember,
-        child: selectedChild,
+      const shareStartAt = new Date(`${startDate}T${startTime}:00.000Z`).toISOString();
+      const shareEndAt = new Date(`${endDate}T${endTime}:00.000Z`).toISOString();
+
+      const requestBody = {
+        with_member: selectedAdultName,
+        child_name: selectedChild,
         events: selectedEvent,
         child_condition: childCondition,
         place: selectedPlace,
-        startDate,
-        startTime,
-        endDate,
-        endTime,
-      }, {
+        share_start_at: shareStartAt,
+        share_end_at: shareEndAt,
+      };
+
+      console.log('送信するリクエストボディ:', JSON.stringify(requestBody, null, 2));
+
+      const response = await axios.post('http://localhost:8000/api/v1/record', requestBody, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,11 +89,16 @@ const RecordForm: React.FC = () => {
 
       alert('活動が記録されました！');
       console.log('Response:', response.data);
-    } catch (error) {
+    } catch (error:any) {
       console.error('ドキュメント追加エラー: ', error);
+      if (error.response) {
+        console.error('エラーレスポンス:', error.response.data);
+      }
       alert('エラーが発生しました。もう一度試してください。');
     }
   };
+
+
 
   return (
     <div className="p-6 min-h-screen flex flex-col justify-center items-center">
@@ -92,19 +106,19 @@ const RecordForm: React.FC = () => {
         <h2 className="text-4xl font-bold mb-6 text-center">活動の記録</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="with_member" className="block text-lg font-semibold mb-2">保護者の名前</label>
+            <label htmlFor="adult_name" className="block text-lg font-semibold mb-2">保護者の名前</label>
             <div className="flex space-x-4">
-              {withMembers.map((member, index) => (
+              {adultNames.map((adultName, index) => (
                 <label key={index} className="inline-flex items-center">
                   <input
                     type="radio"
-                    name="with_member"
-                    value={member}
-                    checked={selectedWithMember === member}
-                    onChange={(e) => setSelectedWithMember(e.target.value)}
+                    name="adult_name"
+                    value={adultName}
+                    checked={selectedAdultName === adultName}
+                    onChange={(e) => setSelectedAdultName(e.target.value)}
                     className="form-radio"
                   />
-                  <span className="ml-2">{member}</span>
+                  <span className="ml-2">{adultName}</span>
                 </label>
               ))}
             </div>
