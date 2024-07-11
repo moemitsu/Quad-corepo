@@ -12,9 +12,9 @@ load_dotenv()  # 環境変数を読み込む
 # Initialize the logger
 logger = getLogger(__name__)
 
-stripe.api_key = os.getenv('STRIPE_PUBLIC_KEY')
-endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-print(os.getenv('STRIPE_PUBLIC_KEY'))
+# stripe.api_key = os.getenv('STRIPE_MY_SECRET_KEY')
+# endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+# print(os.getenv('STRIPE_SECRET_KEY'))
 
 def create_checkout_session():
     try:
@@ -41,18 +41,5 @@ def get_session_status(session_id):
         "status": session.status,
         "customer_email": session.customer_details.email
     }
-
-def handle_stripe_webhook(payload, sig_header):
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except stripe.error.SignatureVerificationError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-    
-    return {"message": "success"}
 
 
