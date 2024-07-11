@@ -42,8 +42,9 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
       const fetchData = async () => {
         try {
           const token = await user.getIdToken(); // Firebaseトークンを取得
-          const response = await axios.get('http://localhost:8000/api/v1/main', {
+          const response = await axios.get('http://localhost:8000/api/v1/analysis', {
             params: {
+              // 年も追加する
               month: `2024-${month.toString().padStart(2, '0')}`,
             },
             headers: {

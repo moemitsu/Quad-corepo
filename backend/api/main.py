@@ -46,24 +46,24 @@ if __name__ == "__main__":
 app = FastAPI()
 
 def get_db():
-  db = SessionLocal()
-  try:
-    yield db
-  finally:
-    db.close()
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # CORS設定
 origins = [
-  "http://localhost:3000",
-  "https://localhost:3000"
+    "http://localhost:3000",
+    "https://localhost:3000"
 ]
 app.add_middleware(
-  CORSMiddleware,
-  allow_origins=origins,
-  allow_credentials=True,
-  allow_methods=["*"],
-  allow_headers=["*"]# OPTIONSを追加
-  # allow_headers=["Authorization", "Content-Type"]
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]# OPTIONSを追加
+    # allow_headers=["Authorization", "Content-Type"]
 )
 # ルーターの登録
 app.include_router(app_router)

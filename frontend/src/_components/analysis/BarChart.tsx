@@ -1,13 +1,14 @@
-// src/_components/BarChart.tsx
-'use client'
+// BarChart.tsx
+
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { BarChartData, BarDataset } from '../../types';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface BarChartProps {
-  data: any;
+  data: BarChartData;
   options?: any;
 }
 
@@ -17,7 +18,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   const chartOptions = {
     ...options,
     responsive: true,
-    maintainAspectRatio: false, // 縦横比を維持しない
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: true,
@@ -60,7 +61,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>
       <div style={{ width: `${data.labels.length * 100}px` }}>
-        <Bar data={data} options={chartOptions} />
+        <Bar data={{ ...data }} options={chartOptions} />
       </div>
     </div>
   );
