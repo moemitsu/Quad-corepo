@@ -32,7 +32,7 @@ const RecordForm: React.FC = () => {
         const token = await user.getIdToken();
         console.log('取得したトークン:', token);
 
-        const response = await axios.get('http://localhost:8000/api/v1/user', {
+        const response = await axios.get('http://localhost:8000/api/v1/names', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
