@@ -51,7 +51,7 @@ const MonthlyAnalysis: React.FC = () => {
   // 子供の名前取得
   const fetchChildren = async (token: string) => {
     try {
-      const response = await axios.get("http://localhost:8000/api/v1/user", {
+      const response = await axios.get("http://localhost:8000/api/v1/names", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
