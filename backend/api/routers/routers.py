@@ -148,7 +148,7 @@ def create_record(
         try:
             record = timeShareRecordsCrud.create_record(
                 db=db,
-                stakeholder_id=request.stakeholder_id,
+                stakeholder_id=stakeholder.id,
                 with_member=request.with_member,
                 child_name=request.child_name,
                 events=request.events,
