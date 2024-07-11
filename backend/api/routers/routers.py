@@ -200,10 +200,10 @@ def get_each_detail_lists(
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
 
-
 # LLM分析
 @router.get('/api/v1/analysis', response_model=schemas.Completion)
 def analysis(
+    # token: str = Depends(verify_token),
     child_name: str = Query(...),
     year: int = Query(...),
     month: int = Query(...),
