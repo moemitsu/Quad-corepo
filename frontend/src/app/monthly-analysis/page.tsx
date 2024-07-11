@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import BarChart from "../../_components/analysis/BarChart";
@@ -22,6 +22,7 @@ const MonthlyAnalysis: React.FC = () => {
   const [children, setChildren] = useState<string[]>([]);
   const [selectedChild, setSelectedChild] = useState<string>("");
   const [error, setError] = useState<string | null>(null); // State for error handling
+  const [authToken, setAuthToken] = useState<string>("");
   const router = useRouter();
   const auth = getAuth();
 
@@ -29,8 +30,12 @@ const MonthlyAnalysis: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await getAuthToken();
+
         console.log("tokenid", token);
+        setAuthToken(token);
         fetchChildren(token);
+      } else {
+        setError("ユーザーが認証されていません。");
       }
     });
 
@@ -47,7 +52,7 @@ const MonthlyAnalysis: React.FC = () => {
   // 子供の名前取得
   const fetchChildren = async (token: string) => {
     try {
-      const response = await axios.get('http://localhost:8000/api/v1/user', {
+      const response = await axios.get('http://localhost:8000/api/v1/user', { 
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,6 +61,7 @@ const MonthlyAnalysis: React.FC = () => {
       // JSON response から子供の名前を取得
       const childNames = response.data.child_names.filter((name: string) => name !== '');
       console.log(childNames);
+
       setChildren(childNames);
       setError(null); // 成功した場合はエラーをクリア
     } catch (error) {
@@ -101,12 +107,12 @@ const MonthlyAnalysis: React.FC = () => {
         datasets: datasets,
         summary: data.summary,
       };
-
-      // エラーログを確認
+       console.log("取得した棒グラフデータ:", data); // コンソールログで確認
       setBarChartData(barChartData);
       setLlmSummary(data.summary);
     } catch (error) {
       console.error("Error:", error);
+      setError("データの取得に失敗しました。");
     }
   }, [selectedYear, selectedMonth, selectedChild]);
 
@@ -145,10 +151,11 @@ const MonthlyAnalysis: React.FC = () => {
         ],
       };
       setPieChartData(pieChartData);
-      console.log(pieChartData);
+      console.log("取得した円グラフデータ:",pieChartData);
     } catch (error) {
       console.error("Error:", error);
       setError('データの取得に失敗しました。');
+
     }
   }, [selectedYear, selectedMonth, selectedChild]);
 
@@ -169,7 +176,6 @@ const MonthlyAnalysis: React.FC = () => {
       throw error;
     }
   };
-
   return (
     <div>
       <Header />
@@ -262,7 +268,11 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <RecordList />
+          <RecordList 
+          selectedYear={selectedYear} 
+          selectedMonth={selectedMonth} 
+          selectedChild={selectedChild}
+          bearerToken={authToken} />
         </div>
       </div>
       <Footer />

@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
-from typing import List, Dict, Any
+from typing_extensions import Literal
+from typing import List, Dict, Any, Optional
 
 # エラー用 
 class Error(BaseModel):
@@ -47,7 +48,6 @@ class NamesRes(BaseModel):
 
 # 記録を追加するためのリクエスト
 class RecordReq(BaseModel):
-  stakeholder_id: UUID
   with_member: str
   child_name: str
   events: str
@@ -60,7 +60,16 @@ class RecordRes(BaseModel):
   message: str
   record_id: int
   class Config:
-    orm_mode = True
+    from_attributes = True
+
+# 各月各子詳細データ取得用
+class DetailListRes(BaseModel):
+  with_member: str
+  events: str
+  child_condition: str
+  place: str
+  share_start_at: datetime
+  share_end_at: datetime
 
 # LLM用のリクエスト
 class LLMReq(BaseModel):
@@ -74,7 +83,7 @@ class LLMRes(BaseModel):
   summary: str
   sentiment: str
 
-# とりあえずの確認用　FIXME 後で消す
+# 確認用　FIXME 後で消す
 class TimeShareRecordResponse(BaseModel):
   id: int
   stakeholder_id: UUID
@@ -88,6 +97,30 @@ class TimeShareRecordResponse(BaseModel):
   class Config:
     from_attributes = True
 
+
 # LLM動作確認用
-class AdviceResponse(BaseModel):
-  advice: str
+class Logprobs(BaseModel):
+    text_offset: Optional[List[int]] = None
+    token_logprobs: Optional[List[float]] = None
+    tokens: Optional[List[str]] = None
+    top_logprobs: Optional[List[Dict[str, float]]] = None
+
+class CompletionChoice(BaseModel):
+    finish_reason: Literal["stop", "length", "content_filter"]
+    index: int
+    logprobs: Optional[Logprobs] = None
+    text: str
+
+class CompletionUsage(BaseModel):
+    completion_tokens: int
+    prompt_tokens: int
+    total_tokens: int
+
+class Completion(BaseModel):
+    id: str
+    choices: List[CompletionChoice]
+    created: int
+    model: str
+    object: Literal["text_completion"]
+    system_fingerprint: Optional[str] = None
+    usage: Optional[CompletionUsage] = None

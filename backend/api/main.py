@@ -9,6 +9,8 @@ import api.schemas.schemas as schemas, api.cruds.timeShareRecords as crud, api.d
 from api.routers.routers import router as app_router
 from api.routers.stripe import router as stripe_router
 
+# schemas.py からインポート
+from api.schemas.schemas import RecordReq, RecordRes, Error
 
 # log出力に関するrootでの設定
 logger = getLogger(__name__)
@@ -44,24 +46,24 @@ if __name__ == "__main__":
 app = FastAPI()
 
 def get_db():
-  db = SessionLocal()
-  try:
-    yield db
-  finally:
-    db.close()
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # CORS設定
 origins = [
-  "http://localhost:3000",
-  "https://localhost:3000"
+    "http://localhost:3000",
+    "https://localhost:3000"
 ]
 app.add_middleware(
-  CORSMiddleware,
-  allow_origins=origins,
-  allow_credentials=True,
-  allow_methods=["*"],
-  allow_headers=["*"]# OPTIONSを追加
-  # allow_headers=["Authorization", "Content-Type"]
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]# OPTIONSを追加
+    # allow_headers=["Authorization", "Content-Type"]
 )
 # ルーターの登録
 app.include_router(app_router)
