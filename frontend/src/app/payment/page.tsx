@@ -1,9 +1,10 @@
 'use client'
 import React from 'react';
-import PaymentForm from '../../_components/forms/PaymentForm';
+import dynamic from 'next/dynamic';
 import Header from "../../_components/layout/Header";
 import Footer from "../../_components/layout/Footer";
 
+const PaymentForm = dynamic(() => import('../../_components/forms/PaymentForm'), { ssr: false });
 const PaymentPage: React.FC = () => {
   return (
     <div>

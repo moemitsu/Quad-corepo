@@ -1,6 +1,5 @@
 'use client'
-import React, { useCallback, useState, useEffect } from "react";
-import {loadStripe} from '@stripe/stripe-js';
+import React, {  useState, useEffect } from "react";
 import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout
@@ -13,52 +12,55 @@ import {stripePromise} from '../../lib/stripe';
 // This is your test secret API key.
 
 const CheckoutForm = () => {
-  const fetchClientSecret = useCallback(() => {
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  useEffect(() => {
     // Create a Checkout Session
-    return axios.post('http://localhost:8000/create-checkout-session')
-      .then((res) => res.data.clientSecret);
+    axios.post('http://localhost:8000/stripe/create-checkout-session')
+      .then((res) => setClientSecret(res.data.clientSecret))
+      .catch((error) => console.error('Error creating checkout session:', error));
   }, []);
 
-  const options = {fetchClientSecret};
+  const options = { clientSecret };
 
   return (
     <div id="checkout">
-      <EmbeddedCheckoutProvider
-        stripe={stripePromise}
-        options={options}
-      >
+      {clientSecret && (
+        <EmbeddedCheckoutProvider
+          stripe={stripePromise}
+          options={options}
+        >
         <EmbeddedCheckout />
-      </EmbeddedCheckoutProvider>
+        </EmbeddedCheckoutProvider>
+      )}
     </div>
-  )
+  );
 }
 
 const Return = () => {
   const router = useRouter();
-  const [status, setStatus] = useState(null);
-  const [customerEmail, setCustomerEmail] = useState('');
+  const [status, setStatus] = useState<string | null>(null);
+  const [customerEmail, setCustomerEmail] = useState<string>('');
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined'){
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const sessionId = urlParams.get('session_id');
+    if (typeof window !== 'undefined') {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const sessionId = urlParams.get('session_id');
 
-      axios.get(`http://localhost:8000/session-status`, {params:{ session_id:sessionId}})
-        .then((res) => {
-          setStatus(res.data.status);
-          setCustomerEmail(res.data.customer_email);
-        })
-        .catch((error) => {
-          console.error('Error fetching session status:', error);
-        }
-      );
+      if (sessionId){
+        axios.get(`http://localhost:8000/stripe/session-status`, {params:{ session_id:sessionId } })
+          .then((res) => {
+            setStatus(res.data.status);
+            setCustomerEmail(res.data.customer_email);
+          })
+          .catch((error) => console.error('Error fetching session status:', error));
+      }
     }
   }, []);
 
   useEffect(() => {
     if (status === 'open') {
-      router.push('/checkout');
+      router.push('/payment/checkout');
     }
   },[status, router]);
 
@@ -74,8 +76,12 @@ const Return = () => {
     )
   }
 
-  return null;
-}
+  return (
+    <div>
+      <p>Checking payment status...</p>
+    </div>
+  );
+};
 
 const App = () => {
   if (typeof window === 'undefined') {
