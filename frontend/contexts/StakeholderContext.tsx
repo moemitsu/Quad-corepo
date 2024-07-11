@@ -1,3 +1,4 @@
+'use client'
 // contexts/StakeholderContext.tsx
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 

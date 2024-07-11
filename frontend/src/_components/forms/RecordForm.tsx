@@ -32,7 +32,7 @@ const RecordForm: React.FC = () => {
         const token = await user.getIdToken();
         console.log('取得したトークン:', token);
 
-        const response = await axios.get('http://localhost:8000/api/v1/user', {
+        const response = await axios.get('http://localhost:8000/api/v1/names', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -47,8 +47,10 @@ const RecordForm: React.FC = () => {
         setAdultNames(response.data.adult_names || []);
       } catch (error:any) {
         console.error('データ取得エラー: ', error);
-        if (error.response) {
-          console.error('エラーレスポンス:', error.response.data);
+        if (axios.isAxiosError(error)) {
+          console.error('エラーレスポンス:', error.response?.data);
+        } else {
+          console.error('予期しないエラー:', error);
         }
       }
     };
@@ -100,7 +102,8 @@ const RecordForm: React.FC = () => {
       setStartTime('');
       setEndDate('');
       setEndTime('');
-    } catch (error:any) {
+    } catch (error: any) {
+
       console.error('ドキュメント追加エラー: ', error);
       if (error.response) {
         console.error('エラーレスポンス:', error.response.data);

@@ -1,13 +1,14 @@
 from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
-from typing import Optional, List, Dict, Any
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from api.database.db import SessionLocal, engine
-from dotenv import load_dotenv
-import openai
-from openai.types import Completion, CompletionChoice, CompletionUsage
+import logging
 import os
-import json
+from dotenv import load_dotenv
+from openai import OpenAI
+import pandas as pd
+from typing import Optional, List, Dict, Any
+from api.database.db import SessionLocal, engine
 import api.database.models as models
 import api.schemas.schemas as schemas
 # from ..database import get_db  #追加
@@ -15,10 +16,7 @@ import api.cruds.timeShareRecords as timeShareRecordsCrud
 import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
-from api.lib.auth import verify_token, get_current_user
-import logging
-from fastapi.responses import JSONResponse
-import pandas as pd
+from api.lib.auth import verify_token
 
 models.Base.metadata.create_all(bind=engine)
 load_dotenv()
@@ -28,10 +26,9 @@ logger = getLogger(__name__)
 
 app = FastAPI()
 router = APIRouter()
-
-api_key = os.getenv('OPENAI_API_KEY')
-print('api_key', api_key)
-openai.api_key = api_key
+client = OpenAI(
+    api_key = os.getenv('OPENAI_API_KEY')
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,37 +40,6 @@ def get_db():
         db.close()
 
 # 以下メソッド
-# 新規登録（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
-@router.post('/api/v1/signup', response_model=schemas.SignUpRes, responses={400: {'model': schemas.Error}})
-def signup(token: str = Depends(verify_token), db: Session = Depends(get_db)):
-    firebase_id = token['uid']
-    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
-    if stakeholder:
-        raise HTTPException(status_code=400, detail="ユーザーは既に存在します")
-    try:
-        created_stakeholder = stakeholderCrud.create_new_stakeholder(db, firebase_id)
-        return schemas.SignUpRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
-
-# ログイン（index⓹）トークン認証込みで書き直し済み　TODO 要動作確認
-# ログイン時は認証をフロントで行うので不要
-# @router.post('/api/v1/login', response_model=schemas.StakeholderRes, responses={400: {'model': schemas.Error}})
-# def login(token: str = Depends(verify_token), db: Session = Depends(get_db)):
-#     firebase_id = token['uid']
-#     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
-#     if stakeholder:
-#         return schemas.StakeholderRes(message="ログイン成功", stakeholder_id=stakeholder.id)
-#     else:
-#         # ユーザーが存在しない場合、新しいユーザーを作成するかエラーを返す
-#         stakeholder_name = "default_name"  # 必要に応じてフロントエンドから受け取るか、適切なデフォルト値を設定
-#         new_stakeholder = schemas.StakeHolderReq(stakeholder_name=stakeholder_name, firebase_id=firebase_id)
-#         try:
-#             created_stakeholder = stakeholderCrud.create_stakeholder(db, new_stakeholder)
-#             return schemas.StakeholderRes(message="新しいユーザーを作成しました", stakeholder_id=created_stakeholder.id)
-#         except Exception as e:
-#             raise HTTPException(status_code=500, detail="ユーザーの作成に失敗しました: {}".format(str(e)))
-
 # ユーザー情報登録（登録画面⓷）トークン認証込みで書き直し済み TODO 要動作確認
 @router.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def post_user(
@@ -123,7 +89,7 @@ def update_user(user_id: int, request: schemas.UserReq, token: str = Depends(ver
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
 
 # adult_nameとchild_nameの取得（記録画面⓶）
-@router.get('/api/v1/user', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
+@router.get('/api/v1/names', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
 def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db)):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
@@ -219,28 +185,31 @@ def get_bar_data(
 # 家族データ一覧の取得
 @router.get("/api/v1/family-records", response_model=List[schemas.DetailListRes])
 def get_each_detail_lists(
-  token: str = Depends(verify_token),
-  child_name: str = Query(...),
-  year: int = Query(...),
-  month: int = Query(...),
-  db: Session = Depends(get_db)
+    token: str = Depends(verify_token),
+    child_name: str = Query(...),
+    year: int = Query(...),
+    month: int = Query(...),
+    db: Session = Depends(get_db)
+    ):
+    firebase_id = token['uid']
+    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    if not stakeholder:
+        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+    records = timeShareRecordsCrud.get_each_detail_lists_by_month(db, stakeholder.id, child_name, year, month)
+    if not records:
+        raise HTTPException(status_code=404, detail="記録が見つかりません")
+    return records
+
+
+# LLM分析
+@router.get('/api/v1/analysis', response_model=schemas.Completion)
+def analysis(
+    child_name: str = Query(...),
+    year: int = Query(...),
+    month: int = Query(...),
+    db: Session = Depends(get_db)
 ):
-  firebase_id = token['uid']
-  stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
-  if not stakeholder:
-      raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
-  records = timeShareRecordsCrud.get_each_detail_lists_by_month(db, stakeholder.id, child_name, year, month)
-  if not records:
-    raise HTTPException(status_code=404, detail="記録が見つかりません")
-  return records
-
-
-# LLM分析 TODO 書き直し
-# LLM TEST
-@router.get('/api/v1/llm-test', response_model=schemas.Completion)
-def analysis(child_name: str = Query(...), year: int = Query(...), month: int = Query(...), db: Session = Depends(get_db)):
-    logger.info("llm-test endpoint called")
-    print('キー',api_key)
+    logger.info("analysis endpoint called")
     # データベースからデータを取得
     records = timeShareRecordsCrud.get_records_by_month(db, child_name, year, month)
     print(f'データ:', records)
@@ -297,27 +266,22 @@ def analysis(child_name: str = Query(...), year: int = Query(...), month: int = 
         print('condition_analysis', condition_analysis)
         print('time_pattern', time_pattern)
         try:
-            response = Completion(
-                engine="text-davinci-003",
-                prompt=f"あなたは優秀な分析家であり親切なアドバイザーです。以下のデータを分析し、家族がより良い時間を過ごすためのアドバイスをください。返答は日本語で行ってください。\n\n{summary}\n\nアドバイス:",
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are an excellent analyst and a kind advisor."},
+                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese.\n\n{summary}\n\n"}
+                ],
                 max_tokens=2000,
                 n=1,
                 temperature=0.4
             )
-            completion_response = schemas.Completion(**response)
+            advice = response.choices[0].message.content.strip()
         except Exception as e:
             raise HTTPException(status_code=500, detail=f'OpenAI API Error:{str(e)}')
-        print(completion_response)
-        return completion_response
-
-# completion = client.chat.completions.create(
-#     model='gpt-3.5-turbo',
-#     messages=[
-#         {"role": "system", "content": "あなたは優秀な数学者です。"},
-#         {"role": "user", "content": "1+1は？"}
-#     ]
-# )
-# print(completion.choices[0].message)
+        logger.info("Generated advice: " + advice)
+        print(advice)
+        return schemas.Completion(advice=advice)
 
 
 # 確認用　TODO あとで消す
