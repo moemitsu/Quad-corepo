@@ -204,6 +204,7 @@ def get_each_detail_lists(
 # LLM分析
 @router.get('/api/v1/analysis', response_model=schemas.Completion)
 def analysis(
+    token: str = Depends(verify_token),
     child_name: str = Query(...),
     year: int = Query(...),
     month: int = Query(...),
@@ -274,7 +275,7 @@ def analysis(
                 ],
                 max_tokens=2000,
                 n=1,
-                temperature=0.4
+                temperature=0.5
             )
             advice = response.choices[0].message.content.strip()
         except Exception as e:
