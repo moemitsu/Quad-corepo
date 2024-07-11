@@ -11,25 +11,25 @@ const SuccessPage = () => {
   const router = useRouter();
   useEffect(() => {
     const postPayment = async () => {
-    if (router.query.success === 'true'&& user) {
-      try {
-        // IDトークンを取得
-        const token = await user.getIdToken();
-        await axios.post('http://localhost:8000/api/v1/payments', null, {
-            headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTimeout(() => {
-          router.push('/monthly-analysis');
-        }, 5000);
-      } catch (error) {
-        console.error('Payment post error:', error);
+      if (user){
+        try {
+          // IDトークンを取得
+          const token = await user.getIdToken();
+          await axios.post('http://localhost:8000/stripe/api/v1/payments', null, {
+              headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setTimeout(() => {
+            router.push('/monthly-analysis');
+          }, 5000);
+        } catch (error) {
+          console.error('Payment post error:', error);
+        }
       }
-    }
     };
     postPayment();
-  }, [router]);
+  }, [user, router]);
 
   return (
     <div>
