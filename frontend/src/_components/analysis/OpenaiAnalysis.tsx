@@ -1,4 +1,3 @@
-// src/_components/analysis/OpenaiAnalysis.tsx
 'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -7,30 +6,14 @@ import { auth } from '../../lib/firebase';
 
 interface OpenaiAnalysisProps {
   month: number;
+  selectedChildName: string;
 }
 
 interface AnalysisData {
-  summary: {
-    dates: {
-      date: string;
-      activities: {
-        user_name: string;
-        activity: string;
-        start_time: string;
-        end_time: string;
-      }[];
-    }[];
-    ratios: {
-      [key: string]: number;
-    };
-  };
-  analysis: {
-    llm_summary: string;
-    llm_sentiment: string;
-  };
+  advice: string;
 }
 
-const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
+const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month, selectedChildName }) => {
   const [selectedYear, setSelectedYear] = useState<number>(2024);
   const [selectedMonth, setSelectedMonth] = useState<number>(6);
   const [selectedChild, setSelectedChild] = useState<string>("");
@@ -38,33 +21,34 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [viewCount, setViewCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true); // データ読み込み中の状態
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // LLMの分析結果を取得
   useEffect(() => {
-    if (user) {
-      const fetchData = async () => {
+    const fetchData = async () => {
+      if (user) {
         try {
-          const token = await user.getIdToken(); // Firebaseトークンを取得
+          const token = await user.getIdToken();
           const response = await axios.get('http://localhost:8000/api/v1/analysis', {
             params: {
               year: selectedYear,
               month: selectedMonth,
-              child_name: selectedChild,
+              child_name: selectedChildName,
             },
             headers: {
-              Authorization: `Bearer ${token}`, // Bearerトークンをヘッダーに追加
+              Authorization: `Bearer ${token}`,
             },
           });
           setData(response.data);
         } catch (error) {
           console.error('データ取得に失敗しました', error);
+          setError('データの取得に失敗しました');
         } finally {
-          setLoading(false); // 読み込み完了
+          setLoading(false);
         }
-      };
-      fetchData();
-    }
+      }
+    };
+    fetchData();
   }, [user, selectedYear, selectedMonth, selectedChild]);
 
   const handleViewClick = () => {
@@ -79,6 +63,10 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
     return <p>データを読み込んでいます...</p>;
   }
 
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   if (!data) {
     return <p>データを取得できませんでした。</p>;
   }
@@ -91,8 +79,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           <p>{month}月のLLMでの分析結果がここに入ります</p>
           {viewCount < 3 ? (
             <>
-              <p>{data.analysis.llm_summary}</p>
-              <p>{data.analysis.llm_sentiment}</p>
+              <p>{data.advice}</p>
               <button onClick={handleViewClick} className="p-2 mt-4 bg-custom-blue text-white rounded">
                 分析結果を表示
               </button>
@@ -100,8 +87,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           ) : (
             <>
               <div className="blur-sm">
-                <p>{data.analysis.llm_summary}</p>
-                <p>{data.analysis.llm_sentiment}</p>
+                <p>{data.advice}</p>
               </div>
               <p className="mt-4">続きを見たい場合は会員登録をしてください。</p>
               <button className="p-2 mt-2 bg-custom-blue text-white rounded">
@@ -120,7 +106,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           loop
           muted
           autoPlay
-          className="w-26 h-40"
+          className="w-32 h-40 object-cover"
         />
       </div>
     </div>

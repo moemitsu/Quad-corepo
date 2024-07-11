@@ -1,17 +1,33 @@
 'use client';
+import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../lib/firebase';
 import Image from "next/image";
 import Header from "../_components/layout/Header";
 import Footer from "../_components/layout/Footer";
-import { useRouter } from 'next/navigation';
-
-
-
+import Head from 'next/head';
 
 export default function Home() {
   const router = useRouter();
+  const [user, loading, error] = useAuthState(auth);
+
+  useEffect(() => {
+    if (loading) {
+      // ローディング中は何もしない
+      return;
+    }
+    if (user) {
+      // ユーザーが認証済みの場合は、グラフやLLM分析結果のページにリダイレクト
+      router.push('/monthly-analysis');
+    }
+  }, [user, loading, router]);
+
   return (
     <div>
-      <title>corepo -これぽ- </title>
+      <Head>
+        <title>corepo -これぽ-</title>
+      </Head>
       <Header />
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <Image

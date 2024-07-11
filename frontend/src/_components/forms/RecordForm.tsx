@@ -11,7 +11,7 @@ const RecordForm: React.FC = () => {
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
   const [selectedAdultName, setSelectedAdultName] = useState<string>('');
-  const [selectedChild, setSelectedChild] = useState<string>('');
+  const [selectedChildName, setSelectedChildName] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [childCondition, setChildCondition] = useState<string>('');
   const [selectedPlace, setSelectedPlace] = useState<string>('');
@@ -36,16 +36,13 @@ const RecordForm: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          params: {
-            token: token
-          }
         });
 
         console.log('APIからの応答:', response.data);
 
         setChildren(response.data.child_names || []);
         setAdultNames(response.data.adult_names || []);
-      } catch (error:any) {
+      } catch (error: any) {
         console.error('データ取得エラー: ', error);
         if (axios.isAxiosError(error)) {
           console.error('エラーレスポンス:', error.response?.data);
@@ -73,7 +70,7 @@ const RecordForm: React.FC = () => {
 
       const requestBody = {
         with_member: selectedAdultName,
-        child_name: selectedChild,
+        child_name: selectedChildName,
         events: selectedEvent,
         child_condition: childCondition,
         place: selectedPlace,
@@ -94,7 +91,7 @@ const RecordForm: React.FC = () => {
 
       // フォームのステートをリセット
       setSelectedAdultName('');
-      setSelectedChild('');
+      setSelectedChildName('');
       setSelectedEvent('');
       setChildCondition('');
       setSelectedPlace('');
@@ -104,7 +101,6 @@ const RecordForm: React.FC = () => {
       setEndTime('');
       
     } catch (error: any) {
-
       console.error('ドキュメント追加エラー: ', error);
 
       if (axios.isAxiosError(error)) {
@@ -120,139 +116,113 @@ const RecordForm: React.FC = () => {
       <div className="p-6 rounded-lg shadow-md w-full max-w-2xl bg-white">
         <h2 className="text-4xl font-bold mb-6 text-center">活動の記録</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="adult_name" className="block text-lg font-semibold mb-2">保護者の名前</label>
-            <div className="flex space-x-4">
-              {adultNames.map((adultName, index) => (
-                <label key={index} className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="adult_name"
-                    value={adultName}
-                    checked={selectedAdultName === adultName}
-                    onChange={(e) => setSelectedAdultName(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">{adultName}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="child" className="block text-lg font-semibold mb-2">子供の名前</label>
-            <div className="flex space-x-4">
-              {children.map((child, index) => (
-                <label key={index} className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="child"
-                    value={child}
-                    checked={selectedChild === child}
-                    onChange={(e) => setSelectedChild(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">{child}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="events" className="block text-lg font-semibold mb-2">どんなこと</label>
-            <div className="flex flex-wrap space-x-4">
-              {events.map((event, index) => (
-                <label key={index} className="inline-flex items-center mb-2">
-                  <input
-                    type="radio"
-                    name="event"
-                    value={event}
-                    checked={selectedEvent === event}
-                    onChange={(e) => setSelectedEvent(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">{event}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="place" className="block text-lg font-semibold mb-2">場所</label>
-            <div className="flex space-x-4">
-              {places.map((place, index) => (
-                <label key={index} className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="place"
-                    value={place}
-                    checked={selectedPlace === place}
-                    onChange={(e) => setSelectedPlace(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">{place}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="child_condition" className="block text-lg font-semibold mb-2">子供の気分</label>
-            <div className="flex space-x-4">
-              {child_conditions.map((condition, index) => (
-                <label key={index} className="inline-flex items-center">
-                  <input
-                    type="radio"
-                    name="child_condition"
-                    value={condition}
-                    checked={childCondition === condition}
-                    onChange={(e) => setChildCondition(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span className="ml-2">{condition}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="startDate" className="block text-lg font-semibold mb-2">開始日時</label>
-            <input
-              type="date"
-              id="startDate"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded mb-2"
-            />
-            <input
-              type="time"
-              id="startTime"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="endDate" className="block text-lg font-semibold mb-2">終了日時</label>
-            <input
-              type="date"
-              id="endDate"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded mb-2"
-            />
-            <input
-              type="time"
-              id="endTime"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
+          <RadioGroup
+            label="保護者の名前"
+            name="adult_name"
+            options={adultNames}
+            selectedOption={selectedAdultName}
+            onChange={setSelectedAdultName}
+          />
+          <RadioGroup
+            label="子供の名前"
+            name="child"
+            options={children}
+            selectedOption={selectedChildName}
+            onChange={setSelectedChildName}
+          />
+          <RadioGroup
+            label="どんなこと"
+            name="event"
+            options={events}
+            selectedOption={selectedEvent}
+            onChange={setSelectedEvent}
+          />
+          <RadioGroup
+            label="場所"
+            name="place"
+            options={places}
+            selectedOption={selectedPlace}
+            onChange={setSelectedPlace}
+          />
+          <RadioGroup
+            label="子供の気分"
+            name="child_condition"
+            options={child_conditions}
+            selectedOption={childCondition}
+            onChange={setChildCondition}
+          />
+          <DateTimeInput
+            label="開始日時"
+            date={startDate}
+            time={startTime}
+            onDateChange={setStartDate}
+            onTimeChange={setStartTime}
+          />
+          <DateTimeInput
+            label="終了日時"
+            date={endDate}
+            time={endTime}
+            onDateChange={setEndDate}
+            onTimeChange={setEndTime}
+          />
           <button type="submit" className="w-full p-2 bg-custom-teal text-white rounded">記録する</button>
         </form>
       </div>
     </div>
   );
 };
+
+const RadioGroup: React.FC<{
+  label: string;
+  name: string;
+  options: string[];
+  selectedOption: string;
+  onChange: (value: string) => void;
+}> = ({ label, name, options, selectedOption, onChange }) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-lg font-semibold mb-2">{label}</label>
+    <div className="flex space-x-4">
+      {options.map((option, index) => (
+        <label key={index} className="inline-flex items-center">
+          <input
+            type="radio"
+            name={name}
+            value={option}
+            checked={selectedOption === option}
+            onChange={(e) => onChange(e.target.value)}
+            className="form-radio"
+          />
+          <span className="ml-2">{option}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
+const DateTimeInput: React.FC<{
+  label: string;
+  date: string;
+  time: string;
+  onDateChange: (date: string) => void;
+  onTimeChange: (time: string) => void;
+}> = ({ label, date, time, onDateChange, onTimeChange }) => (
+  <div className="mb-4">
+    <label className="block text-lg font-semibold mb-2">{label}</label>
+    <input
+      type="date"
+      value={date}
+      onChange={(e) => onDateChange(e.target.value)}
+      required
+      className="w-full p-2 border border-gray-300 rounded mb-2"
+    />
+    <input
+      type="time"
+      value={time}
+      onChange={(e) => onTimeChange(e.target.value)}
+      required
+      className="w-full p-2 border border-gray-300 rounded"
+    />
+  </div>
+);
 
 export default RecordForm;

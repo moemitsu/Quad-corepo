@@ -91,11 +91,16 @@ def update_user(user_id: int, request: schemas.UserReq, token: str = Depends(ver
 # adult_nameとchild_nameの取得（記録画面⓶）
 @router.get('/api/v1/names', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
 def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    logger.info(f"Token received: {token}")
     firebase_id = token['uid']
+    logger.info(f"Firebase ID: {firebase_id}")
+    
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
     if not stakeholder:
+        logger.error('Stakeholder not found')
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     names = userCrud.get_names(db, stakeholder.id)
+    logger.info(f"Names fetched: {names}")
     return schemas.NamesRes(adult_names=names['adult_names'], child_names=names['child_names'])
 
 # 記録追加（記録画面⓶）
