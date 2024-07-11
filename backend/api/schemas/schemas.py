@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
-from typing import List, Dict, Any
+from typing_extensions import Literal
+from typing import List, Dict, Any, Optional
 
 # エラー用 
 class Error(BaseModel):
@@ -60,7 +61,7 @@ class RecordRes(BaseModel):
   message: str
   record_id: int
   class Config:
-    orm_mode = True
+    from_attributes = True
 
 # LLM用のリクエスト
 class LLMReq(BaseModel):
@@ -89,5 +90,29 @@ class TimeShareRecordResponse(BaseModel):
     from_attributes = True
 
 # LLM動作確認用
-class AdviceResponse(BaseModel):
-  advice: str
+
+class Logprobs(BaseModel):
+    text_offset: Optional[List[int]] = None
+    token_logprobs: Optional[List[float]] = None
+    tokens: Optional[List[str]] = None
+    top_logprobs: Optional[List[Dict[str, float]]] = None
+
+class CompletionChoice(BaseModel):
+    finish_reason: Literal["stop", "length", "content_filter"]
+    index: int
+    logprobs: Optional[Logprobs] = None
+    text: str
+
+class CompletionUsage(BaseModel):
+    completion_tokens: int
+    prompt_tokens: int
+    total_tokens: int
+
+class Completion(BaseModel):
+    id: str
+    choices: List[CompletionChoice]
+    created: int
+    model: str
+    object: Literal["text_completion"]
+    system_fingerprint: Optional[str] = None
+    usage: Optional[CompletionUsage] = None
