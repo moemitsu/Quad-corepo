@@ -1,3 +1,4 @@
+from logging import config, getLogger
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from uuid import UUID
@@ -8,14 +9,16 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()  # 環境変数を読み込む
+# Initialize the logger
+logger = getLogger(__name__)
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-YOUR_DOMAIN = 'http://localhost:3000/'
+print(os.getenv('STRIPE_SECRET_KEY'))
 
-
-def create_checkout_session(stakeholder_id: UUID, user_id: int):
+def create_checkout_session():
     try:
+        logger.info('------------------ create-checkout-session2')
         checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
@@ -24,12 +27,8 @@ def create_checkout_session(stakeholder_id: UUID, user_id: int):
                 },
             ],
             mode='subscription',
-            success_url=YOUR_DOMAIN + '?success=true',
-            cancel_url=YOUR_DOMAIN + '?canceled=true',
-            metadata={
-                'stakeholder_id': stakeholder_id,
-                'user_id': user_id
-            }
+            success_url='http://localhost:3000/payment/success',
+            cancel_url='http://localhost:3000/payment/cancel',
         )
         return checkout_session.client_secret
     except Exception as e:
@@ -37,6 +36,7 @@ def create_checkout_session(stakeholder_id: UUID, user_id: int):
 
 def get_session_status(session_id):
     session = stripe.checkout.Session.retrieve(session_id)
+    logger.info('------------------ create-checkout-session4')
     return {
         "status": session.status,
         "customer_email": session.customer_details.email
@@ -52,22 +52,7 @@ def handle_stripe_webhook(payload, sig_header):
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        handle_checkout_session(session)
     
     return {"message": "success"}
 
 
-def handle_checkout_session(session, db: Session):
-    print("Payment was successful.")
-    print(session)
-    
-    stakeholder_id = session['metadata']['stakeholder_id']
-    user_id = session['metadata']['user_id']
-    
-    payment = Payments(
-        stakeholder_id=stakeholder_id,
-        user_id=user_id
-    )
-    
-    db.add(payment)
-    db.commit()
