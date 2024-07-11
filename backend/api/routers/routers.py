@@ -123,7 +123,7 @@ def update_user(user_id: int, request: schemas.UserReq, token: str = Depends(ver
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
 
 # adult_nameとchild_nameの取得（記録画面⓶）
-@router.get('/api/v1/user', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
+@router.get('/api/v1/names', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
 def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db)):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
@@ -146,7 +146,6 @@ def create_record(
             logger.error("Stakeholder not found")
             raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
         try:
-            print('------------------create record2')
             record = timeShareRecordsCrud.create_record(
                 db=db,
                 stakeholder_id=stakeholder.id,
