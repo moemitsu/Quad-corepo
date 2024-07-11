@@ -5,12 +5,8 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout
 } from '@stripe/react-stripe-js';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate
-} from "react-router-dom";
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import {stripePromise} from '../../lib/stripe';
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -19,11 +15,8 @@ import {stripePromise} from '../../lib/stripe';
 const CheckoutForm = () => {
   const fetchClientSecret = useCallback(() => {
     // Create a Checkout Session
-    return fetch("/create-checkout-session", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => data.clientSecret);
+    return axios.post('http://localhost:8000/create-checkout-session')
+      .then((res) => res.data.clientSecret);
   }, []);
 
   const options = {fetchClientSecret};
@@ -41,6 +34,7 @@ const CheckoutForm = () => {
 }
 
 const Return = () => {
+  const router = useRouter();
   const [status, setStatus] = useState(null);
   const [customerEmail, setCustomerEmail] = useState('');
 
@@ -50,20 +44,23 @@ const Return = () => {
     const urlParams = new URLSearchParams(queryString);
     const sessionId = urlParams.get('session_id');
 
-    fetch(`/session-status?session_id=${sessionId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setStatus(data.status);
-        setCustomerEmail(data.customer_email);
-      });
+      axios.get(`http://localhost:8000/session-status`, {params:{ session_id:sessionId}})
+        .then((res) => {
+          setStatus(res.data.status);
+          setCustomerEmail(res.data.customer_email);
+        })
+        .catch((error) => {
+          console.error('Error fetching session status:', error);
+        }
+      );
     }
   }, []);
 
-  if (status === 'open') {
-    return (
-      <Navigate to="/checkout" />
-    )
-  }
+  useEffect(() => {
+    if (status === 'open') {
+      router.push('/checkout');
+    }
+  },[status, router]);
 
   if (status === 'complete') {
     return (
@@ -86,12 +83,8 @@ const App = () => {
   }
   return (
     <div className="App">
-      <Router>
-        <Routes>
-          <Route path="/checkout" element={<CheckoutForm />} />
-          <Route path="/return" element={<Return />} />
-        </Routes>
-      </Router>
+      <CheckoutForm />
+      <Return />
     </div>
   )
 }
