@@ -1,86 +1,58 @@
 // src/_components/analysis/OpenaiAnalysis.tsx
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
 
 interface OpenaiAnalysisProps {
-  month: number;
+  selectedYear: number;
+  selectedMonth: number;
+  selectedChild: string;
 }
 
 interface AnalysisData {
-  summary: {
-    dates: {
-      date: string;
-      activities: {
-        user_name: string;
-        activity: string;
-        start_time: string;
-        end_time: string;
-      }[];
-    }[];
-    ratios: {
-      [key: string]: number;
-    };
-  };
-  analysis: {
-    llm_summary: string;
-    llm_sentiment: string;
-  };
+  advice: string;
 }
 
-const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
-  const [selectedYear, setSelectedYear] = useState<number>(2024);
-  const [selectedMonth, setSelectedMonth] = useState<number>(6);
-  const [selectedChild, setSelectedChild] = useState<string>("");
-
+const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ selectedYear, selectedMonth, selectedChild }) => {
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [viewCount, setViewCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true); // データ読み込み中の状態
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // LLMの分析結果を取得
-  useEffect(() => {
+  const fetchData = async () => {
     if (user) {
-      const fetchData = async () => {
-        try {
-          const token = await user.getIdToken(); // Firebaseトークンを取得
-          const response = await axios.get('http://localhost:8000/api/v1/analysis', {
-            params: {
-              year: selectedYear,
-              month: selectedMonth,
-              child_name: selectedChild,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`, // Bearerトークンをヘッダーに追加
-            },
-          });
-          setData(response.data);
-        } catch (error) {
-          console.error('データ取得に失敗しました', error);
-        } finally {
-          setLoading(false); // 読み込み完了
-        }
-      };
-      fetchData();
+      try {
+        setLoading(true);
+        const token = await user.getIdToken();
+        const response = await axios.get('http://localhost:8000/api/v1/analysis', {
+          params: {
+            year: selectedYear,
+            month: selectedMonth,
+            child_name: selectedChild,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(data)
+        setData(response.data);
+      } catch (error) {
+        console.error('データ取得に失敗しました', error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [user, selectedYear, selectedMonth, selectedChild]);
+  };
 
   const handleViewClick = () => {
     setViewCount(viewCount + 1);
+    fetchData();
   };
 
   if (!user) {
     return <p>ログインしてください。</p>;
-  }
-
-  if (loading) {
-    return <p>データを読み込んでいます...</p>;
-  }
-
-  if (!data) {
-    return <p>データを取得できませんでした。</p>;
   }
 
   return (
@@ -88,20 +60,25 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
       <div className="relative bg-white p-6 rounded-lg shadow-md self-start flex items-center">
         <div>
           <h3 className="text-2xl font-semibold mb-2">LLMでの分析</h3>
-          <p>{month}月のLLMでの分析結果がここに入ります</p>
           {viewCount < 3 ? (
             <>
-              <p>{data.analysis.llm_summary}</p>
-              <p>{data.analysis.llm_sentiment}</p>
               <button onClick={handleViewClick} className="p-2 mt-4 bg-custom-blue text-white rounded">
                 分析結果を表示
               </button>
+              {loading ? (
+                <p>データを読み込んでいます...</p>
+              ) : (
+                data && (
+                  <div>
+                    <p>{data.advice}</p>
+                  </div>
+                )
+              )}
             </>
           ) : (
             <>
               <div className="blur-sm">
-                <p>{data.analysis.llm_summary}</p>
-                <p>{data.analysis.llm_sentiment}</p>
+                <p>{data ? data.advice : 'データを取得できませんでした。'}</p>
               </div>
               <p className="mt-4">続きを見たい場合は会員登録をしてください。</p>
               <button className="p-2 mt-2 bg-custom-blue text-white rounded">
@@ -120,7 +97,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ month }) => {
           loop
           muted
           autoPlay
-          className="w-26 h-40"
+          className="w-96 h-60"
         />
       </div>
     </div>
