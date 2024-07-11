@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
+from uuid import UUID
+from sqlalchemy.orm import Session
+from api.database.models import Payments
 import stripe
 import os
 from dotenv import load_dotenv
@@ -11,7 +14,7 @@ endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
 YOUR_DOMAIN = 'http://localhost:3000/'
 
 
-def create_checkout_session():
+def create_checkout_session(stakeholder_id: UUID, user_id: int):
     try:
         checkout_session = stripe.checkout.Session.create(
             line_items=[
@@ -23,6 +26,10 @@ def create_checkout_session():
             mode='subscription',
             success_url=YOUR_DOMAIN + '?success=true',
             cancel_url=YOUR_DOMAIN + '?canceled=true',
+            metadata={
+                'stakeholder_id': stakeholder_id,
+                'user_id': user_id
+            }
         )
         return checkout_session.client_secret
     except Exception as e:
@@ -50,6 +57,17 @@ def handle_stripe_webhook(payload, sig_header):
     return {"message": "success"}
 
 
-def handle_checkout_session(session):
+def handle_checkout_session(session, db: Session):
     print("Payment was successful.")
     print(session)
+    
+    stakeholder_id = session['metadata']['stakeholder_id']
+    user_id = session['metadata']['user_id']
+    
+    payment = Payments(
+        stakeholder_id=stakeholder_id,
+        user_id=user_id
+    )
+    
+    db.add(payment)
+    db.commit()

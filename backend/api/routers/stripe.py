@@ -1,12 +1,22 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import JSONResponse
 from api.services.stripe import create_checkout_session, handle_stripe_webhook, get_session_status
+import api.schemas.stripe as schemas
+from api.database.db import SessionLocal
+from sqlalchemy.orm import Session
 import stripe
 import os
 from dotenv import load_dotenv
 
 load_dotenv()  # 環境変数を読み込む
 router = APIRouter()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # app_secret = os.getenv('APP_SECRET')
 
@@ -30,7 +40,10 @@ router = APIRouter()
 #     return JSONResponse(status_code=200, content={"success": True})
 
 @router.post("/create-checkout-session")
-async def create_checkout_session_endpoint():
+async def create_checkout_session_endpoint(
+    stripe_req: schemas.StripeReq,
+    db: Session = Depends(get_db)
+):
     try:
         client_secret = create_checkout_session()
         return JSONResponse(content={"clientSecret": client_secret})
