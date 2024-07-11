@@ -6,8 +6,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 const RecordForm: React.FC = () => {
   const { user } = useAuth();
-  const events = ['遊び', '食事', '睡眠', '勉強', '習い事'];
-  const places = ['家', '公園', '保育園・幼稚園', 'その他'];
+  const events = ['遊び', '生活(食事、風呂、寝かしつけなど)', '見守り(習い事、勉強など)'];
+  const places = ['家', '屋内', '戸外',　'保育園・幼稚園', 'その他'];
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
   const [selectedAdultName, setSelectedAdultName] = useState<string>('');
@@ -89,6 +89,17 @@ const RecordForm: React.FC = () => {
 
       alert('活動が記録されました！');
       console.log('Response:', response.data);
+
+      // フォームのステートをリセット
+      setSelectedAdultName('');
+      setSelectedChild('');
+      setSelectedEvent('');
+      setChildCondition('');
+      setSelectedPlace('');
+      setStartDate('');
+      setStartTime('');
+      setEndDate('');
+      setEndTime('');
     } catch (error) {
       console.error('ドキュメント追加エラー: ', error);
       if (error.response) {
@@ -97,6 +108,7 @@ const RecordForm: React.FC = () => {
       alert('エラーが発生しました。もう一度試してください。');
     }
   };
+
 
 
 
