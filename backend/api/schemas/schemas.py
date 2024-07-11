@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from uuid import UUID
-from typing_extensions import Literal
-from typing import List, Dict, Any, Optional
+from typing import List
 
 # エラー用 
 class Error(BaseModel):
@@ -99,28 +98,5 @@ class TimeShareRecordResponse(BaseModel):
 
 
 # LLM動作確認用
-class Logprobs(BaseModel):
-    text_offset: Optional[List[int]] = None
-    token_logprobs: Optional[List[float]] = None
-    tokens: Optional[List[str]] = None
-    top_logprobs: Optional[List[Dict[str, float]]] = None
-
-class CompletionChoice(BaseModel):
-    finish_reason: Literal["stop", "length", "content_filter"]
-    index: int
-    logprobs: Optional[Logprobs] = None
-    text: str
-
-class CompletionUsage(BaseModel):
-    completion_tokens: int
-    prompt_tokens: int
-    total_tokens: int
-
 class Completion(BaseModel):
-    id: str
-    choices: List[CompletionChoice]
-    created: int
-    model: str
-    object: Literal["text_completion"]
-    system_fingerprint: Optional[str] = None
-    usage: Optional[CompletionUsage] = None
+    advice: str
