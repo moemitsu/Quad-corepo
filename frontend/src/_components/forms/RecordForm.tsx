@@ -45,10 +45,11 @@ const RecordForm: React.FC = () => {
 
         setChildren(response.data.child_names || []);
         setAdultNames(response.data.adult_names || []);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('データ取得エラー: ', error);
-        if (error.response) {
-          console.error('エラーレスポンス:', error.response.data);
+
+        if (axios.isAxiosError(error)) {
+          console.error('エラーレスポンス:', error.response?.data);
         }
       }
     };
@@ -100,15 +101,16 @@ const RecordForm: React.FC = () => {
       setStartTime('');
       setEndDate('');
       setEndTime('');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('ドキュメント追加エラー: ', error);
-      if (error.response) {
-        console.error('エラーレスポンス:', error.response.data);
+
+      if (axios.isAxiosError(error)) {
+        console.error('エラーレスポンス:', error.response?.data);
       }
+
       alert('エラーが発生しました。もう一度試してください。');
     }
   };
-
 
   return (
     <div className="p-6 min-h-screen flex flex-col justify-center items-center">
