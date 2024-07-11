@@ -12,9 +12,9 @@ load_dotenv()  # 環境変数を読み込む
 # Initialize the logger
 logger = getLogger(__name__)
 
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+stripe.api_key = os.getenv('STRIPE_PUBLIC_KEY')
 endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-print(os.getenv('STRIPE_SECRET_KEY'))
+print(os.getenv('STRIPE_PUBLIC_KEY'))
 
 def create_checkout_session():
     try:
