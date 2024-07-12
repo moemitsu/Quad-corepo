@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '../../lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
@@ -15,25 +15,25 @@ const FamilyRegistrationForm: React.FC = () => {
   const [error, setError] = useState<string>('');
   const router = useRouter();
 
-  const handleAddChild = () => {
+  const handleAddChild = useCallback(() => {
     setChildNames([...childNames, '']);
-  };
+  }, [childNames]);
 
-  const handleChildChange = (index: number, value: string) => {
+  const handleChildChange = useCallback((index: number, value: string) => {
     const newChildNames = [...childNames];
     newChildNames[index] = value;
     setChildNames(newChildNames);
-  };
+  }, [childNames]);
 
-  const handleAddAdult = () => {
+  const handleAddAdult = useCallback(() => {
     setAdultNames([...adultNames, '']);
-  };
+  }, [adultNames]);
 
-  const handleAdultChange = (index: number, value: string) => {
+  const handleAdultChange = useCallback((index: number, value: string) => {
     const newAdultNames = [...adultNames];
     newAdultNames[index] = value;
     setAdultNames(newAdultNames);
-  };
+  }, [adultNames]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +57,6 @@ const FamilyRegistrationForm: React.FC = () => {
       // トークンをコンソールに表示
       console.log('ID Token:', idToken);
 
-      // デバッグメッセージ: データベースに家族情報を送信
-      console.log('Sending family data to backend...');
-
       // データベースに家族情報を送信
       const response = await axios.post('http://localhost:8000/api/v1/user', 
         { 
@@ -73,9 +70,6 @@ const FamilyRegistrationForm: React.FC = () => {
           },
         }
       );
-
-      // デバッグメッセージ: レスポンスのステータス
-      console.log('Response status:', response.status);
 
       alert('家族情報が登録されました！');
       setStakeholderName('');

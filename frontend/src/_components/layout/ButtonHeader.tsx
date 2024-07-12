@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase'; // Firebaseの初期化ファイルをインポート
-import MenuIcon from 'feather-icons-react';
+import Link from 'next/link';
 
 const ButtonHeader: React.FC = () => {
   const router = useRouter();
@@ -57,39 +57,38 @@ const ButtonHeader: React.FC = () => {
           aria-orientation="vertical"
           aria-labelledby="menu-button"
           tabIndex={-1}
-          style={{ top: 'auto', left: 'auto' }} // 固定位置を設定
         >
           <div className="py-1" role="none">
-          <a href="monthly-analysis" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            <Link href="monthly-analysis" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               記録を見る
-            </a>
+            </Link>
           </div>
           <div className="py-1" role="none">
-            <a href="record-activity" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            <Link href="record-activity" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               記録を追加する
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            </Link>
+            <Link href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               記録を変更する
-            </a>
+            </Link>
           </div>
           <div className="py-1" role="none">
-            <a href="/family-registration" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            <Link href="/family-registration" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               登録情報の変更
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            </Link>
+            <Link href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               家族で共有する
-            </a>
+            </Link>
           </div>
           <div className="py-1" role="none">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            <Link href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               このアプリの使い方
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            </Link>
+            <Link href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               ヘルプ
-            </a>
+            </Link>
           </div>
           <div className="py-1" role="none">
-            <a
+            <Link
               href="#"
               className="block px-4 py-2 text-sm text-gray-700"
               role="menuitem"
@@ -100,7 +99,7 @@ const ButtonHeader: React.FC = () => {
               }}
             >
               サインアウト
-            </a>
+            </Link>
           </div>
         </div>
       )}

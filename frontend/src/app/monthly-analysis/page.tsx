@@ -1,3 +1,5 @@
+// MonthlyAnalysis.tsx
+
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -7,20 +9,19 @@ import OpenaiAnalysis from "../../_components/analysis/OpenaiAnalysis";
 import Header from "../../_components/layout/Header";
 import Footer from "../../_components/layout/Footer";
 import RecordList from "../../_components/analysis/RecordList";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { BarDataset, PieChartData, BarChartData,colors } from "../../types"; 
-
+import { BarDataset, PieChartData, BarChartData, colors } from "../../types";
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<BarChartData | null>(null);
   const [pieChartData, setPieChartData] = useState<PieChartData | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(2024);
   const [selectedMonth, setSelectedMonth] = useState<number>(6);
-  const [llmSummary, setLlmSummary] = useState<any>(null);
+  const [llmSummary, setLlmSummary] = useState<string | null>(null);
   const [children, setChildren] = useState<string[]>([]);
-  const [selectedChild, setSelectedChild] = useState<string>("");
-  const [error, setError] = useState<string | null>(null); // State for error handling
+  const [selectedChildName, setSelectedChildName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string>("");
   const router = useRouter();
   const auth = getAuth();
@@ -28,11 +29,15 @@ const MonthlyAnalysis: React.FC = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const token = await getAuthToken();
-
-        console.log("tokenid", token);
-        setAuthToken(token);
-        fetchChildren(token);
+        try {
+          const token = await getAuthToken();
+          console.log("tokenid", token);
+          setAuthToken(token);
+          fetchChildren(token);
+        } catch (err) {
+          console.error("Error fetching auth token:", err);
+          setError("ユーザーが認証されていません。");
+        }
       } else {
         setError("ユーザーが認証されていません。");
       }
@@ -42,173 +47,144 @@ const MonthlyAnalysis: React.FC = () => {
   }, [auth]);
 
   useEffect(() => {
-    if (selectedChild) {
+    if (selectedChildName) {
       fetchData();
       fetchPieData();
     }
-  }, [selectedYear, selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChildName]);
 
-  // 子供の名前取得
   const fetchChildren = async (token: string) => {
     try {
-      const response = await axios.get("http://localhost:8000/api/v1/names", {
+      const response = await axios.get<{ child_names: string[] }>("http://localhost:8000/api/v1/names", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // JSON response から子供の名前を取得
-      const childNames = response.data.child_names.filter(
-        (name: string) => name !== ""
-      );
+      const childNames = response.data.child_names.filter(name => name !== "");
       console.log("子供の名前", childNames);
-
       setChildren(childNames);
-      setError(null); // 成功した場合はエラーをクリア
-    } catch (error) {
+      setError(null);
+    } catch (error: AxiosError | any) {
       console.error("Error fetching children:", error);
       setError("お子様の名前を取得できませんでした。");
     }
   };
 
-  // 棒グラフ用データの取得
   const fetchData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/bar-graph",
-        {
-          params: {
-            year: selectedYear,
-            month: selectedMonth,
-            child_name: selectedChild,
-          },
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-          },
-        }
-      );
+      console.log("fetchData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
+      const response = await axios.get<any>("http://localhost:8000/api/v1/bar-graph", {
+        params: {
+          year: selectedYear,
+          month: selectedMonth,
+          child_name: selectedChildName,
+        },
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
 
-      const data: any = response.data;
+      const data = response.data;
       console.log("取得した生データ:", data);
 
-      // データを変換して BarChartData にする
-      const familyMembers = Object.keys(data).filter(
-        (key) => key !== "summary"
-      );
-
-      // 日付を取得するためのセットを作成
+      const familyMembers = Object.keys(data).filter(key => key !== "summary");
       const dates = new Set<string>();
-      familyMembers.forEach((member) => {
-        Object.keys(data[member]).forEach((date) => {
+      familyMembers.forEach(member => {
+        Object.keys(data[member]).forEach(date => {
           dates.add(date);
         });
       });
 
-      // 日付をソートする
       const sortedDates = Array.from(dates).sort();
-
-      // データセットの作成
-      const datasets: BarDataset[] = familyMembers.map(
-        (familyMember, index) => {
-          const memberData = data[familyMember];
-          return {
-            label: familyMember,
-            data: sortedDates.map((date) => memberData[date] || 0),
-            backgroundColor: [colors[index % colors.length]],
-            borderColor: [colors[index % colors.length].replace("0.7", "1")],
-            borderWidth: 1,
-          };
-        }
-      );
+      const datasets: BarDataset[] = familyMembers.map((familyMember, index) => {
+        const memberData = data[familyMember];
+        return {
+          label: familyMember,
+          data: sortedDates.map((date) => memberData[date] || 0),
+          backgroundColor: [colors[index % colors.length]],
+          borderColor: [colors[index % colors.length].replace("0.7", "1")],
+          borderWidth: 1,
+        };
+      });
 
       const barChartData: BarChartData = {
         labels: sortedDates,
-        datasets: datasets,
-        summary: data.summary, // もしあれば、サマリーを含める
+        datasets,
+        summary: data.summary,
       };
 
       console.log("取得した棒グラフデータ:", barChartData);
       setBarChartData(barChartData);
       setLlmSummary(data.summary);
-      setError(null); // 成功した場合はエラーをクリア
-    } catch (error) {
+      setError(null);
+    } catch (error: AxiosError | any) {
       console.error("Error:", error);
       setError("データの取得に失敗しました。");
     }
-  }, [selectedYear, selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChildName]);
 
-  // 円グラフ用データの取得
   const fetchPieData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/pie-graph",
-        {
-          params: {
-            year: selectedYear,
-            month: selectedMonth,
-            child_name: selectedChild,
-          },
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-          },
-        }
-      );
+      console.log("fetchPieData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
+      const response = await axios.get<any>("http://localhost:8000/api/v1/pie-graph", {
+        params: {
+          year: selectedYear,
+          month: selectedMonth,
+          child_name: selectedChildName,
+        },
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
 
       const data = response.data;
       const labels = Object.keys(data);
       const values = Object.values(data) as number[];
 
       const pieChartData: PieChartData = {
-        labels: labels,
+        labels,
         datasets: [
           {
             label: "割合",
             data: values,
             backgroundColor: colors,
-            borderColor: colors.map((color) => color.replace("0.7", "1")),
+            borderColor: colors.map(color => color.replace("0.7", "1")),
             borderWidth: 1,
           },
         ],
       };
       setPieChartData(pieChartData);
       console.log("取得した円グラフデータ:", pieChartData);
-    } catch (error) {
+    } catch (error: AxiosError | any) {
       console.error("Error:", error);
       setError("データの取得に失敗しました。");
     }
-  }, [selectedYear, selectedMonth, selectedChild]);
+  }, [selectedYear, selectedMonth, selectedChildName]);
 
-  useEffect(() => {
-    fetchPieData();
-  }, [fetchPieData]);
-
-  const getAuthToken = async () => {
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        return await user.getIdToken(/* forceRefresh */ true);
-      } else {
-        throw new Error("User not logged in.");
-      }
-    } catch (error) {
-      console.error("Error getting auth token:", error);
-      throw error;
+  const getAuthToken = async (): Promise<string> => {
+    const user = auth.currentUser;
+    if (user) {
+      return await user.getIdToken(true);
+    } else {
+      throw new Error("User not logged in.");
     }
   };
+
   return (
     <div>
       <Header />
       <div className="p-6 min-h-screen flex flex-col">
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          分析条件を選択してください
+          確認したい月を選択してください
           <div className="flex items-center justify-between mt-6">
             <div className="relative flex items-center space-x-4">
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                onChange={e => setSelectedYear(parseInt(e.target.value))}
               >
                 {Array.from({ length: 1 }, (_, i) => (
                   <option key={selectedYear - i} value={selectedYear - i}>
@@ -219,7 +195,7 @@ const MonthlyAnalysis: React.FC = () => {
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                onChange={e => setSelectedMonth(parseInt(e.target.value))}
               >
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -229,8 +205,8 @@ const MonthlyAnalysis: React.FC = () => {
               </select>
               <select
                 className="p-4 text-md text-custom-blue bg-custom-light-green shadow-inner"
-                value={selectedChild}
-                onChange={(e) => setSelectedChild(e.target.value)}
+                value={selectedChildName}
+                onChange={e => setSelectedChildName(e.target.value)}
               >
                 <option value="">お子様を選択</option>
                 {children.map((child, index) => (
@@ -260,10 +236,9 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <OpenaiAnalysis month={selectedMonth} />
+          <OpenaiAnalysis year={selectedYear} month={selectedMonth} selectedChildName={selectedChildName} />
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
@@ -276,22 +251,22 @@ const MonthlyAnalysis: React.FC = () => {
             </div>
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
-              <div className="overflow-x-auto" >
-              {barChartData ? (
-               <div
-               style={{
-                 minWidth: "500px",
-                 height: "500px",
-                 display: "flex",
-                 justifyContent: "center",
-                 alignItems: "flex-end",
-               }}
-             >
-               <BarChart data={barChartData} />
-             </div>
-              ) : (
-                <div>Loading...</div>
-              )}
+              <div className="overflow-x-auto">
+                {barChartData ? (
+                  <div
+                    style={{
+                      minWidth: "500px",
+                      height: "500px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <BarChart data={barChartData} />
+                  </div>
+                ) : (
+                  <div>Loading...</div>
+                )}
               </div>
             </div>
           </div>
@@ -300,7 +275,7 @@ const MonthlyAnalysis: React.FC = () => {
           <RecordList
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
-            selectedChild={selectedChild}
+            selectedChildName={selectedChildName}
             bearerToken={authToken}
           />
         </div>

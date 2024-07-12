@@ -6,7 +6,6 @@ import axios from 'axios';
 import {stripePromise} from '../../lib/stripe';
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-// This is your test secret API key.
 
 const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -100,4 +99,4 @@ const App = () => {
   )
 }
 
-export default App;
+export default CheckoutForm;

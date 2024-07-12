@@ -14,8 +14,8 @@ const RecordForm: React.FC = () => {
   const child_conditions = ['☀️☀️', '☀️', '☁️', '☂️', '☂️☂️'];
 
   const [selectedAdultName, setSelectedAdultName] = useState<string>('');
-  const [selectedChild, setSelectedChild] = useState<string>('');
-  const [selectedActivity, setSelectedActivity] = useState<string>('');
+  const [selectedChildName, setSelectedChildName] = useState<string>('');
+  const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [selectedSubActivity, setSelectedSubActivity] = useState<string>('');
   const [childCondition, setChildCondition] = useState<string>('');
   const [selectedPlace, setSelectedPlace] = useState<string>('');
@@ -74,8 +74,8 @@ const RecordForm: React.FC = () => {
 
       const requestBody = {
         with_member: selectedAdultName,
-        child_name: selectedChild,
-        events: selectedSubActivity,
+        child_name: selectedChildName,
+        events: selectedEvent,
         child_condition: childCondition,
         place: selectedPlace,
         share_start_at: shareStartAt,
@@ -95,8 +95,8 @@ const RecordForm: React.FC = () => {
 
       // フォームのステートをリセット
       setSelectedAdultName('');
-      setSelectedChild('');
-      setSelectedActivity('');
+      setSelectedChildName('');
+      setSelectedEvent('');
       setSelectedSubActivity('');
       setChildCondition('');
       setSelectedPlace('');
@@ -106,7 +106,6 @@ const RecordForm: React.FC = () => {
       setEndTime('');
 
     } catch (error: any) {
-
       console.error('ドキュメント追加エラー: ', error);
 
       if (axios.isAxiosError(error)) {
@@ -149,8 +148,8 @@ const RecordForm: React.FC = () => {
                     type="radio"
                     name="child"
                     value={child}
-                    checked={selectedChild === child}
-                    onChange={(e) => setSelectedChild(e.target.value)}
+                    checked={selectedChildName === child}
+                    onChange={(e) => selectedChildName(e.target.value)}
                     className="form-radio"
                   />
                   <span className="ml-2">{child}</span>
@@ -167,8 +166,8 @@ const RecordForm: React.FC = () => {
                     type="radio"
                     name="activity"
                     value={activity}
-                    checked={selectedActivity === activity}
-                    onChange={(e) => setSelectedActivity(e.target.value)}
+                    checked={selectedEvent === activity}
+                    onChange={(e) => setSelectedEvent(e.target.value)}
                     className="form-radio"
                   />
                   <span className="ml-2">{activity}</span>
@@ -176,7 +175,7 @@ const RecordForm: React.FC = () => {
               ))}
             </div>
           </div>
-          {selectedActivity === '遊び' && (
+          {selectedEvent === '遊び' && (
             <div className="mb-4">
               <label htmlFor="sub_activity" className="block text-lg font-semibold mb-2">遊びの種類</label>
               <div className="flex flex-wrap">
@@ -196,7 +195,7 @@ const RecordForm: React.FC = () => {
               </div>
             </div>
           )}
-          {selectedActivity === '生活' && (
+          {selectedEvent === '生活' && (
             <div className="mb-4">
               <label htmlFor="sub_activity" className="block text-lg font-semibold mb-2">生活の種類</label>
               <div className="flex flex-wrap">
@@ -216,7 +215,7 @@ const RecordForm: React.FC = () => {
               </div>
             </div>
           )}
-          {selectedActivity === '見守り' && (
+          {selectedEvent === '見守り' && (
             <div className="mb-4">
               <label htmlFor="sub_activity" className="block text-lg font-semibold mb-2">見守りの種類</label>
               <div className="flex flex-wrap">
@@ -316,5 +315,58 @@ const RecordForm: React.FC = () => {
     </div>
   );
 };
+
+const RadioGroup: React.FC<{
+  label: string;
+  name: string;
+  options: string[];
+  selectedOption: string;
+  onChange: (value: string) => void;
+}> = ({ label, name, options, selectedOption, onChange }) => (
+  <div className="mb-4">
+    <label htmlFor={name} className="block text-lg font-semibold mb-2">{label}</label>
+    <div className="flex space-x-4">
+      {options.map((option, index) => (
+        <label key={index} className="inline-flex items-center">
+          <input
+            type="radio"
+            name={name}
+            value={option}
+            checked={selectedOption === option}
+            onChange={(e) => onChange(e.target.value)}
+            className="form-radio"
+          />
+          <span className="ml-2">{option}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
+const DateTimeInput: React.FC<{
+  label: string;
+  date: string;
+  time: string;
+  onDateChange: (date: string) => void;
+  onTimeChange: (time: string) => void;
+}> = ({ label, date, time, onDateChange, onTimeChange }) => (
+  <div className="mb-4">
+    <label className="block text-lg font-semibold mb-2">{label}</label>
+    <input
+      type="date"
+      value={date}
+      onChange={(e) => onDateChange(e.target.value)}
+      required
+      className="w-full p-2 border border-gray-300 rounded mb-2"
+    />
+    <input
+      type="time"
+      value={time}
+      onChange={(e) => onTimeChange(e.target.value)}
+      required
+      className="w-full p-2 border border-gray-300 rounded"
+    />
+  </div>
+);
 
 export default RecordForm;

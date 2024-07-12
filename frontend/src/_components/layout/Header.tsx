@@ -5,6 +5,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
 import ButtonHeader from './ButtonHeader';
 import Image from 'next/image';
+import Link from 'next/link'; // next/linkをインポート
 import { useUserInfo } from '../../hooks/useUserInfo';
 
 const Header: React.FC = () => {
@@ -34,9 +35,9 @@ const Header: React.FC = () => {
     <header className="flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-4 dark:bg-neutral-800 shadow-md">
       <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
         <div className="flex items-center justify-between w-full">
-          <a className="flex items-center text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="/">
+          <Link className="flex items-center text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="/">
             <Image src="/LogoIcon.svg" alt="Logo" width={320} height={120} className="mr-2" />   
-          </a>
+          </Link>
         </div>
         <div
           id="navbar-collapse-with-animation"
@@ -61,9 +62,9 @@ const Header: React.FC = () => {
                 >
                   ログイン
                 </a>
-                <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">
+                <Link className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">
                   アプリの使い方
-                </a>
+                </Link>
               </>
             )}
           </div>

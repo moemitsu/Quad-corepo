@@ -109,37 +109,37 @@ def get_each_detail_lists_by_month(db: Session, stakeholder_id: UUID, child_name
 def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
     try:
-      new_record = models.TimeShareRecords(
-        stakeholder_id=stakeholder_id,
-        with_member=with_member,
-        child_name=child_name,
-        events=events,
-        child_condition=child_condition,
-        place=place,
-        share_start_at=share_start_at,
-        share_end_at=share_end_at
-      )
-      logger.info(new_record)
-      db.add(new_record)
-      db.commit()
-      db.refresh(new_record)
-      return new_record
+        new_record = models.TimeShareRecords(
+            stakeholder_id=stakeholder_id,
+            with_member=with_member,
+            child_name=child_name,
+            events=events,
+            child_condition=child_condition,
+            place=place,
+            share_start_at=share_start_at,
+            share_end_at=share_end_at
+        )
+        logger.info(new_record)
+        db.add(new_record)
+        db.commit()
+        db.refresh(new_record)
+        return new_record
     except Exception as e:
-      logger.error(f"Error creating record: {e}")
-      raise
+        logger.error(f"Error creating record: {e}")
+        raise
 
 
 # LLMに分析してもらうためのデータを取得
 def get_all_data_for_analysis(db: Session):
-  return db.query(
-    models.TimeShareRecords.with_member,
-    models.TimeShareRecords.child_name,
-    models.TimeShareRecords.events,
-    models.TimeShareRecords.child_condition,
-    models.TimeShareRecords.place,
-    models.TimeShareRecords.share_start_at,
-    models.TimeShareRecords.share_end_at
-  ).all()
+    return db.query(
+        models.TimeShareRecords.with_member,
+        models.TimeShareRecords.child_name,
+        models.TimeShareRecords.events,
+        models.TimeShareRecords.child_condition,
+        models.TimeShareRecords.place,
+        models.TimeShareRecords.share_start_at,
+        models.TimeShareRecords.share_end_at
+    ).all()
 
 # 確認用　TimeShareRecordsのデータをすべて取得する関数
 def get_all_records(db: Session):
