@@ -149,7 +149,7 @@ const RecordForm: React.FC = () => {
                     name="child"
                     value={child}
                     checked={selectedChildName === child}
-                    onChange={(e) => selectedChildName(e.target.value)}
+                    onChange={(e) => setSelectedChildName(e.target.value)}
                     className="form-radio"
                   />
                   <span className="ml-2">{child}</span>
