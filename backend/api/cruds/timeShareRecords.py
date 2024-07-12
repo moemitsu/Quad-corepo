@@ -9,9 +9,6 @@ from fastapi import HTTPException
 from api.database import models
 from api.schemas import schemas
 
-#TODO:不要であれば削除
-#logger = logging.getLogger(f'custom.{__name__}')
-
 logger = getLogger(__name__)
 
 

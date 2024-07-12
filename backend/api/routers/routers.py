@@ -2,7 +2,6 @@ from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-import logging
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -30,7 +29,7 @@ client = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY')
 )
 
-logger = logging.getLogger(__name__)
+
 
 def get_db():
     db = SessionLocal()
@@ -112,6 +111,7 @@ def update_user(user_id: int, request: schemas.UserReq, token: str = Depends(ver
 def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db)):
     firebase_id = token['uid']
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    logger.info('------------------ get names')
     if not stakeholder:
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     names = userCrud.get_names(db, stakeholder.id)

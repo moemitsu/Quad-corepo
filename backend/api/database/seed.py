@@ -59,7 +59,7 @@ def seed_data(db: Session):
     start_date = datetime(2024, 4, 1, 8, 0, 0)
     end_date = datetime(2024, 7, 31, 22, 0, 0)
 
-    for _ in range(100):  # 100個のレコードを生成
+    for _ in range(300):  # 100個のレコードを生成
         share_start_at = random_date(start_date, end_date)
         share_end_at = share_start_at + timedelta(minutes=random.randint(30, 120))
         child_user = random.choice(child_users)
