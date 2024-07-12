@@ -1,8 +1,12 @@
+
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
+import { useRouter } from 'next/navigation';
+
+const router = useRouter();
 
 interface OpenaiAnalysisProps {
   year: number;
@@ -15,6 +19,7 @@ interface AnalysisData {
 }
 
 const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedChildName }) => {
+
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -62,11 +67,16 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
     setViewCount(viewCount + 1);
   };
 
+  const handleRegisterClick = () => {
+    router.push('/payment');
+  };
+
   if (!user) {
     return <p>ログインしてください。</p>;
   }
 
   return (
+
     <div className="flex mt-4 items-center justify-center flex-col">
       {viewCount < 4 ? (
         <button
@@ -92,7 +102,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
         <div className={`relative bg-white p-6 rounded-lg shadow-md self-start flex items-center mt-4 ${viewCount >= 4 ? 'blur-sm' : ''}`}>
           <div>
             <h3 className="text-2xl font-semibold mb-2">LLMでの分析</h3>
-            <p>{month}月のLLMでの分析結果がここに入ります</p>
+            <p>{month}月のLLMでの分析結果です</p>
             <p>{data.advice}</p>
           </div>
           <div className="absolute top-1/2 left-full transform -translate-y-1/2 w-0 h-0 border-t-8 
@@ -107,7 +117,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
           loop
           muted
           autoPlay
-          className="w-32 h-40 object-cover"
+          className="w-96 h-60"
         />
       </div>
     </div>
