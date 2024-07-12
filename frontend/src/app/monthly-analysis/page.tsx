@@ -1,3 +1,5 @@
+// MonthlyAnalysis.tsx
+
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -72,6 +74,7 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
+      console.log("fetchData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
       const response = await axios.get<any>("http://localhost:8000/api/v1/bar-graph", {
         params: {
           year: selectedYear,
@@ -125,6 +128,7 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchPieData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
+      console.log("fetchPieData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
       const response = await axios.get<any>("http://localhost:8000/api/v1/pie-graph", {
         params: {
           year: selectedYear,
@@ -174,7 +178,7 @@ const MonthlyAnalysis: React.FC = () => {
       <Header />
       <div className="p-6 min-h-screen flex flex-col">
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          分析条件を選択してください
+          確認したい月を選択してください
           <div className="flex items-center justify-between mt-6">
             <div className="relative flex items-center space-x-4">
               <select
@@ -232,7 +236,7 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <OpenaiAnalysis month={selectedMonth} selectedChildName={selectedChildName} />
+          <OpenaiAnalysis year={selectedYear} month={selectedMonth} selectedChildName={selectedChildName} />
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

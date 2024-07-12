@@ -12,7 +12,7 @@ export default function Home() {
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
 
-  useEffect(() => {
+  const handleButtonClick = () => {
     if (loading) {
       // ローディング中は何もしない
       return;
@@ -20,8 +20,11 @@ export default function Home() {
     if (user) {
       // ユーザーが認証済みの場合は、グラフやLLM分析結果のページにリダイレクト
       router.push('/monthly-analysis');
+    } else {
+      // ユーザーが認証されていない場合は、ログインページにリダイレクト
+      router.push('/login');
     }
-  }, [user, loading, router]);
+  };
 
   return (
     <div>
@@ -47,7 +50,7 @@ export default function Home() {
         <div className="flex items-center mt-4">
           <button
             className="px-6 py-3 bg-custom-teal text-md text-white rounded-full shadow-md hover:bg-custom-blue transition-colors"
-            onClick={() => router.push("/family-registration")}
+            onClick={handleButtonClick}
           >
             使ってみる
           </button>
