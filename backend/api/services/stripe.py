@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 load_dotenv()  # 環境変数を読み込む
 # Initialize the logger
 logger = getLogger(__name__)
-
 # stripe.api_key = os.getenv('STRIPE_MY_SECRET_KEY')
 # endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
 # print(os.getenv('STRIPE_SECRET_KEY'))
@@ -28,8 +27,9 @@ def create_checkout_session():
             ],
             mode='subscription',
             success_url='http://localhost:3000/payment/success',
-            cancel_url='http://localhost:3000/payment/cancel',
+            cancel_url='http://localhost:3000/monthly-analysis',
         )
+        logger.info('------------------ {CHECKOUT_SESSION_ID}',checkout_session)
         return checkout_session.client_secret
     except Exception as e:
         raise e

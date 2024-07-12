@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../hooks/useAuth';
 import Header from "../../../_components/layout/Header";
 import Footer from "../../../_components/layout/Footer";
@@ -21,7 +21,7 @@ const SuccessPage = () => {
             },
           });
           setTimeout(() => {
-            router.push('/monthly-analysis');
+            router.push('../monthly-analysis');
           }, 5000);
         } catch (error) {
           console.error('Payment post error:', error);
