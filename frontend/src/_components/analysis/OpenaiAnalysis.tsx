@@ -1,9 +1,10 @@
 // src/_components/analysis/OpenaiAnalysis.tsx
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
+import { useRouter } from 'next/navigation';
 
 interface OpenaiAnalysisProps {
   selectedYear: number;
@@ -20,6 +21,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ selectedYear, selectedM
   const [data, setData] = useState<AnalysisData | null>(null);
   const [viewCount, setViewCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const fetchData = async () => {
     if (user) {
@@ -36,7 +38,6 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ selectedYear, selectedM
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(data)
         setData(response.data);
       } catch (error) {
         console.error('データ取得に失敗しました', error);
@@ -49,6 +50,10 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ selectedYear, selectedM
   const handleViewClick = () => {
     setViewCount(viewCount + 1);
     fetchData();
+  };
+
+  const handleRegisterClick = () => {
+    router.push('/payment');
   };
 
   if (!user) {
@@ -81,7 +86,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ selectedYear, selectedM
                 <p>{data ? data.advice : 'データを取得できませんでした。'}</p>
               </div>
               <p className="mt-4">続きを見たい場合は会員登録をしてください。</p>
-              <button className="p-2 mt-2 bg-custom-blue text-white rounded">
+              <button onClick={handleRegisterClick} className="p-2 mt-2 bg-custom-blue text-white rounded">
                 登録はこちら
               </button>
             </>
