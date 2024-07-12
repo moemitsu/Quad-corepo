@@ -4,7 +4,7 @@ import axios from 'axios';
 interface TotalHoursProps {
   selectedYear: number;
   selectedMonth: number;
-  selectedChild: string;
+  selectedChildName: string;
   bearerToken: string;
 }
 
@@ -18,7 +18,7 @@ interface ApiResponse {
   };
 }
 
-const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, selectedChild, bearerToken }) => {
+const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, selectedChildName, bearerToken }) => {
   const [totalHours, setTotalHours] = useState<number>(0);
   const [memberHours, setMemberHours] = useState<MemberHours>({});
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,7 +31,7 @@ const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, se
           params: {
             year: selectedYear,
             month: selectedMonth,
-            child_name: selectedChild,
+            child_name: selectedChildName,
           },
           headers: {
             Authorization: `Bearer ${bearerToken}`,
@@ -60,10 +60,10 @@ const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, se
       }
     };
 
-    if (selectedChild) {
+    if (selectedChildName) {
       fetchTotalHours();
     }
-  }, [selectedYear, selectedMonth, selectedChild, bearerToken]);
+  }, [selectedYear, selectedMonth, selectedChildName, bearerToken]);
 
   // 分を時間と分に変換して、小数点以下を四捨五入する関数
   const formatHours = (minutes: number): string => {
@@ -82,7 +82,7 @@ const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, se
 
   return (
     <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-      <h3 className="text-xl text-custom-blue mb-2">{selectedMonth}月に{selectedChild}さんと一緒に過ごした時間の合計</h3>
+      <h3 className="text-xl text-custom-blue mb-2">{selectedMonth}月に{selectedChildName}さんと一緒に過ごした時間の合計</h3>
       <div>
         <p>全合計: {formatHours(totalHours * 60)}</p>
         <div className="flex flex-wrap">
