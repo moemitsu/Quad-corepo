@@ -59,11 +59,10 @@ origins = [
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # または特定のドメインをリストに追加
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]# OPTIONSを追加
-    # allow_headers=["Authorization", "Content-Type"]
+    allow_headers=["*"],
 )
 # ルーターの登録
 app.include_router(app_router)
