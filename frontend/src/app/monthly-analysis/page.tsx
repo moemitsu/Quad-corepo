@@ -269,21 +269,16 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-
           <OpenaiAnalysis 
             year={selectedYear}
             month={selectedMonth}
             selectedChildName={selectedChildName}/>
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-        <TotalHours selectedYear={selectedYear}
+          <TotalHours selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             selectedChildName={selectedChildName}
             bearerToken={authToken} />
-          <OpenaiAnalysis year={selectedYear} month={selectedMonth} selectedChildName={selectedChildName} />
-        </div>
-        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
