@@ -1,28 +1,20 @@
 'use client';
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { BarChartData, BarDataset } from '../../types';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
+import { BarChartData } from '../../types';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface BarChartProps {
   data: BarChartData;
-  options?: any;
+  options?: ChartOptions<'bar'>;
 }
-
-// const formatDate = (dateString: string): string => {
-//   const date = new Date(dateString);
-//   const month = date.getMonth() + 1;
-//   const day = date.getDate();
-//   return `${month}/${day}`;
-// };
 
 const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   if (!data || !data.datasets) return <div>Loading...</div>;
 
-  const chartOptions = {
-    ...options,
+  const defaultOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -69,6 +61,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
       },
     },
   };
+
+  const chartOptions = { ...defaultOptions, ...options };
 
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>

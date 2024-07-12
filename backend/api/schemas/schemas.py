@@ -7,6 +7,12 @@ from typing import List
 class Error(BaseModel):
   error: str
 
+# ログイン済みのユーザーをヘッダーに表示させるため
+class StakeholderRes(BaseModel):
+  stakeholder_id: UUID
+  stakeholder_name: str
+  message: str
+
 # 新規登録のためのリクエストとレスポンスモデル
 class SignUpReq(BaseModel):
   stakeholder_name: str

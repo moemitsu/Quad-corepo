@@ -2,7 +2,6 @@ from logging import config, getLogger
 from fastapi import FastAPI, HTTPException, Depends, Query, Body, APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-import logging
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -30,7 +29,7 @@ client = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY')
 )
 
-logger = logging.getLogger(__name__)
+
 
 def get_db():
     db = SessionLocal()
@@ -40,6 +39,25 @@ def get_db():
         db.close()
 
 # 以下メソッド
+# ログイン中のヘッダーに常に「stakeholder_nameさんこんにちは」と表示させる
+@router.get('/api/v1/user-info', response_model=schemas.StakeholderRes)
+def get_user_info(
+    token: str = Depends(verify_token),
+    db: Session = Depends(get_db)
+):
+    firebase_id = token['uid']
+    logger.info(f'Firebase ID: {firebase_id}')
+    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    if not stakeholder:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return schemas.StakeholderRes(
+        stakeholder_id=stakeholder.id,
+        stakeholder_name=stakeholder.stakeholder_name,
+        message=f'{stakeholder.stakeholder_name}さん、こんにちは'
+    )
+
+
 # ユーザー情報登録（登録画面⓷）トークン認証込みで書き直し済み TODO 要動作確認
 @router.post('/api/v1/user', response_model=schemas.UserRes, responses={400: {'model': schemas.Error}})
 def post_user(
@@ -91,11 +109,17 @@ def update_user(user_id: int, request: schemas.UserReq, token: str = Depends(ver
 # adult_nameとchild_nameの取得（記録画面⓶）
 @router.get('/api/v1/names', response_model=schemas.NamesRes, responses={400: {'model': schemas.Error}})
 def get_names(token: str = Depends(verify_token), db: Session = Depends(get_db)):
+    logger.info(f"Token received: {token}")
     firebase_id = token['uid']
+    logger.info(f"Firebase ID: {firebase_id}")
+    
     stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    logger.info('------------------ get names')
     if not stakeholder:
+        logger.error('Stakeholder not found')
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     names = userCrud.get_names(db, stakeholder.id)
+    logger.info(f"Names fetched: {names}")
     return schemas.NamesRes(adult_names=names['adult_names'], child_names=names['child_names'])
 
 # 記録追加（記録画面⓶）
@@ -112,7 +136,6 @@ def create_record(
             logger.error("Stakeholder not found")
             raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
         try:
-            print('------------------create record2')
             record = timeShareRecordsCrud.create_record(
                 db=db,
                 stakeholder_id=stakeholder.id,
@@ -200,7 +223,6 @@ def get_each_detail_lists(
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
 
-
 # LLM分析
 @router.get('/api/v1/analysis', response_model=schemas.Completion)
 def analysis(
@@ -271,11 +293,11 @@ def analysis(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an excellent analyst and a kind advisor."},
-                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese.\n\n{summary}\n\n"}
+                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese, use a friendly tone, address the father, mother, and children with 'さん', and provide detailed analysis and specific recommendations for places to visit.\n\n{summary}\n\n"}
                 ],
                 max_tokens=2000,
                 n=1,
-                temperature=0.5
+                temperature=0.7
             )
             advice = response.choices[0].message.content.strip()
         except Exception as e:

@@ -20,7 +20,6 @@ const LoginForm: React.FC = () => {
       if (userCredential && userCredential.user) {
         console.log('IDトークン:', idToken); // トークンをコンソールに出力
         console.log('UID:', userCredential.user.uid); // UIDをコンソールに出力
-        
 
         // ログイン成功後にリダイレクト
         router.push('/monthly-analysis');

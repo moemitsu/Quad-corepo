@@ -1,4 +1,3 @@
-// src/_components/RecordList.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -6,58 +5,51 @@ import axios from 'axios';
 
 interface Record {
   id: number;
-  // stakeholder_id: string;
   with_member: string;
-  // child_name: string;
   events: string;
   child_condition: string;
   place: string;
   share_start_at: string;
   share_end_at: string;
 }
+
 interface RecordListProps {
   selectedYear: number;
   selectedMonth: number;
-  selectedChild: string;
+  selectedChildName: string;
   bearerToken: string;
 }
 
-const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, selectedChild, bearerToken }) => {
+const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, selectedChildName, bearerToken }) => {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/family-records', {
-        params: {
-          year: selectedYear,
-          month: selectedMonth,
-          child_name: selectedChild,
-        },
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-        },
-      });
-        console.log('----------------------data1')
+          params: {
+            year: selectedYear,
+            month: selectedMonth,
+            child_name: selectedChildName,
+          },
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
         setRecords(response.data);
         setLoading(false);
-        console.log('----------------------data2')
-      } catch (error) {
-        console.log('----------------------data3')
+      } catch (error: any) {
         setError('データの取得に失敗しました');
         setLoading(false);
       }
     };
 
-    if (selectedChild) {
-      console.log('----------------------data4')
+    if (selectedChildName) {
       fetchData();
     }
-  }, [selectedYear, selectedMonth, selectedChild, bearerToken]);
-
+  }, [selectedYear, selectedMonth, selectedChildName, bearerToken]);
 
   if (loading) {
     return <p>読み込み中...</p>;
@@ -74,7 +66,6 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
         {records.map(record => (
           <li key={record.id} className="mb-2">
             <div className="p-4 bg-white shadow rounded">
-              {/* <p><strong>子供の名前:</strong> {record.child_name}</p> */}
               <p><strong>保護者:</strong> {record.with_member}</p>
               <p><strong>イベント:</strong> {record.events}</p>
               <p><strong>ご機嫌:</strong> {record.child_condition}</p>
