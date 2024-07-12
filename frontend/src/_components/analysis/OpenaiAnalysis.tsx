@@ -6,7 +6,6 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
 import { useRouter } from 'next/navigation';
 
-const router = useRouter();
 
 interface OpenaiAnalysisProps {
   year: number;
@@ -19,7 +18,7 @@ interface AnalysisData {
 }
 
 const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedChildName }) => {
-
+  const router = useRouter();
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
