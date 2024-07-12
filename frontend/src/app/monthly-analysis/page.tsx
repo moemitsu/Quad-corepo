@@ -11,7 +11,34 @@ import Footer from "../../_components/layout/Footer";
 import RecordList from "../../_components/analysis/RecordList";
 import axios, { AxiosError } from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { BarDataset, PieChartData, BarChartData, colors } from "../../types";
+import { BarDataset, PieChartData, BarChartData,colors } from "../../types"; 
+import TotalHours from "@/_components/analysis/TotalHours";
+
+// 名前からハッシュ値を生成する関数
+const stringToHash = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash; // 32bit整数に変換
+  }
+  return hash;
+};
+
+// ハッシュ値から一意の色を生成する関数
+const hashToColor = (hash: number): string => {
+  const r = (hash & 0xFF0000) >> 16;
+  const g = (hash & 0x00FF00) >> 8;
+  const b = hash & 0x0000FF;
+  return `rgba(${r}, ${g}, ${b}, 0.5)`;
+};
+
+// 名前から一意の色を取得する関数
+const nameToColor = (name: string): string => {
+  const hash = stringToHash(name);
+  return hashToColor(hash);
+};
+
+
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<BarChartData | null>(null);
@@ -98,16 +125,21 @@ const MonthlyAnalysis: React.FC = () => {
       });
 
       const sortedDates = Array.from(dates).sort();
-      const datasets: BarDataset[] = familyMembers.map((familyMember, index) => {
-        const memberData = data[familyMember];
-        return {
-          label: familyMember,
-          data: sortedDates.map((date) => memberData[date] || 0),
-          backgroundColor: [colors[index % colors.length]],
-          borderColor: [colors[index % colors.length].replace("0.7", "1")],
-          borderWidth: 1,
-        };
-      });
+
+      // データセットの作成
+      const datasets: BarDataset[] = familyMembers.map(
+        (familyMember, index) => {
+          const memberData = data[familyMember];
+          const color = nameToColor(familyMember);
+          return {
+            label: familyMember,
+            data: sortedDates.map((date) => memberData[date] || 0),
+            backgroundColor: [color],
+          borderColor: [color.replace("0.7", "1")],
+            borderWidth: 1,
+          };
+        }
+      );
 
       const barChartData: BarChartData = {
         labels: sortedDates,
@@ -150,8 +182,8 @@ const MonthlyAnalysis: React.FC = () => {
           {
             label: "割合",
             data: values,
-            backgroundColor: colors,
-            borderColor: colors.map(color => color.replace("0.7", "1")),
+            backgroundColor: labels.map(label => nameToColor(label)),
+            borderColor: labels.map(label => nameToColor(label).replace("0.7", "1")),
             borderWidth: 1,
           },
         ],
@@ -232,13 +264,26 @@ const MonthlyAnalysis: React.FC = () => {
             role="alert"
           >
             <strong className="font-bold">エラー:</strong>
-            <span className="block sm:inline"> {error}</span>
+            <span className="block sm:inline"> {error}
+            </span>
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+
+          <OpenaiAnalysis 
+            year={selectedYear}
+            month={selectedMonth}
+            selectedChildName={selectedChildName}/>
+        </div>
+        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+        <TotalHours selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            selectedChildName={selectedChildName}
+            bearerToken={authToken} />
           <OpenaiAnalysis year={selectedYear} month={selectedMonth} selectedChildName={selectedChildName} />
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>

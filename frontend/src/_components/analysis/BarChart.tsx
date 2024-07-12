@@ -66,8 +66,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
 
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>
-      <div style={{ width: `${data.labels.length * 100}px`, height: '400px' }}>
-        <Bar data={data} options={chartOptions} />
+      <div style={{ width: `${data.labels.length * 120}px`,height: '400px' }}>
+        <Bar data={{ ...data }} options={chartOptions} />
       </div>
     </div>
   );
