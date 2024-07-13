@@ -4,10 +4,10 @@ from uuid import UUID
 from typing import List, Dict, Any
 
 # 支払いのためのリクエストとレスポンスモデル
-class StripeReq(BaseModel):
+class PaymentsReq(BaseModel):
   stakeholder_id: UUID
   user_id: int
-class StripeRes(BaseModel):
+class PaymentsRes(BaseModel):
   message: str
   payment_id: int
 

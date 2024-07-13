@@ -2,9 +2,16 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth';
 
+interface UserInfo
+{
+  stakeholder_id: string; // UUID型をstring型として定義
+  stakeholder_name: string;
+  message: string;
+}
+
 export const useUserInfo = () => {
   const { user } = useAuth();
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
