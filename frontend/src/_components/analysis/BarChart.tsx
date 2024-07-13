@@ -51,11 +51,11 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
           font: {
             size: 16,
           },
-        },
+        }, 
+        beginAtZero: true,
+        suggestedMin: 1, // Minimum value to display on the y-axis
+        suggestedMax: 10, // Maximum value to display on the y-axis
         ticks: {
-          beginAtZero: true,
-          suggestedMin: 1, // Minimum value to display on the y-axis
-          suggestedMax: 18, // Maximum value to display on the y-axis
           stepSize: 1, // Step size for y-axis ticks
         },
       },
@@ -65,8 +65,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   const chartOptions = { ...defaultOptions, ...options };
 
   return (
-    <div style={{ width: '100%', overflowX: 'auto' }}>
-      <div style={{ width: `${data.labels.length * 120}px`,height: '400px' }}>
+    <div style={{ width: '100%'}}>
+      <div style={{ width: `${data.labels.length * 120}px`,height: 'auto' }}>
         <Bar data={{ ...data }} options={chartOptions} />
       </div>
     </div>
