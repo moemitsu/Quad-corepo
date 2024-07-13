@@ -9,14 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()  # 環境変数を読み込む
 
-Firebase1 = os.getenv('FIREBASE_UID1')
-Firebase2 = os.getenv('FIREBASE_UID2')
-
-
 def seed_data(db: Session):
     # UUIDの生成
     stakeholder1_id = uuid4()
     stakeholder2_id = uuid4()
+    
+    Firebase1 = os.getenv('FIREBASE_UID1')
+    Firebase2 = os.getenv('FIREBASE_UID2')
 
     # シード用のデータ
     surnames = ['佐藤', '鈴木', '高橋', '田中', '伊藤', '山本', '中村', '小林', '加藤', '吉田']
@@ -34,8 +33,8 @@ def seed_data(db: Session):
 
     # ステークホルダーとユーザーの生成
     stakeholders = [
-        Stakeholder(id=stakeholder1_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id='`${Firebase1}`'),
-        Stakeholder(id=stakeholder2_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id='`${Firebase2}`')
+        Stakeholder(id=stakeholder1_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id=f'{Firebase1}'),
+        Stakeholder(id=stakeholder2_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id=f'{Firebase2}')
     ]
 
     users = [

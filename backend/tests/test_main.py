@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from api.database.db import get_db, Base
 from api.main import app
 import starlette.status
+import subprocess 
 ASYNC_DB_URL = "postgresql+asyncpg://postgres:password@db:5432/sectionfdb"
 
 
@@ -20,7 +21,16 @@ async def async_client() -> AsyncClient:
     # テスト用にオンメモリのpostgresテーブルを初期化（関数ごとにリセット）
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        print('--------------db clear')
         await conn.run_sync(Base.metadata.create_all)
+        print('--------------db create')
+
+    # シーディング処理
+    try:
+        subprocess.run(["poetry", "run", "python", "-m", "api.database.seed"], check=True)
+        print('--------------seeding complete')
+    except subprocess.CalledProcessError as e:
+        print(f'Seeding failed: {e}')
 
     # DIを使ってFastAPIのDBの向き先をテスト用DBに変更
     async def get_test_db():
@@ -34,8 +44,15 @@ async def async_client() -> AsyncClient:
         yield client
 
 @pytest.mark.asyncio
-async def test_create_and_read(async_client):
+async def test_hello_world(async_client):
     response = await async_client.get("/")
     assert response.status_code == starlette.status.HTTP_200_OK
-    # response_obj = response.json()
-    # assert response_obj[0]["id"] == 1
+
+@pytest.mark.asyncio
+async def test_get_all_time_share_records(async_client):
+    response = await async_client.get("/api/v1/total-data")
+    print(response.status_code)
+    print(response.text)
+    assert response.status_code == starlette.status.HTTP_200_OK
+    response_obj = response.json()
+    assert len(response_obj) >= 1
