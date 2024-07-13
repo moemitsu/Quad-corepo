@@ -11,7 +11,7 @@ import Footer from "../../_components/layout/Footer";
 import RecordList from "../../_components/analysis/RecordList";
 import axios, { AxiosError } from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { BarDataset, PieChartData, BarChartData,colors } from "../../types"; 
+import { BarDataset, PieChartData, BarChartData, colors } from "../../types";
 import TotalHours from "@/_components/analysis/TotalHours";
 
 // 名前からハッシュ値を生成する関数
@@ -26,9 +26,9 @@ const stringToHash = (str: string): number => {
 
 // ハッシュ値から一意の色を生成する関数
 const hashToColor = (hash: number): string => {
-  const r = (hash & 0xFF0000) >> 16;
-  const g = (hash & 0x00FF00) >> 8;
-  const b = hash & 0x0000FF;
+  const r = (hash & 0xff0000) >> 16;
+  const g = (hash & 0x00ff00) >> 8;
+  const b = hash & 0x0000ff;
   return `rgba(${r}, ${g}, ${b}, 0.5)`;
 };
 
@@ -37,8 +37,6 @@ const nameToColor = (name: string): string => {
   const hash = stringToHash(name);
   return hashToColor(hash);
 };
-
-
 
 const MonthlyAnalysis: React.FC = () => {
   const [barChartData, setBarChartData] = useState<BarChartData | null>(null);
@@ -82,13 +80,18 @@ const MonthlyAnalysis: React.FC = () => {
 
   const fetchChildren = async (token: string) => {
     try {
-      const response = await axios.get<{ child_names: string[] }>("http://localhost:8000/api/v1/names", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get<{ child_names: string[] }>(
+        "http://localhost:8000/api/v1/names",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const childNames = response.data.child_names.filter(name => name !== "");
+      const childNames = response.data.child_names.filter(
+        (name) => name !== ""
+      );
       console.log("子供の名前", childNames);
       setChildren(childNames);
       setError(null);
@@ -101,25 +104,34 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
-      console.log("fetchData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
-      const response = await axios.get<any>("http://localhost:8000/api/v1/bar-graph", {
-        params: {
-          year: selectedYear,
-          month: selectedMonth,
-          child_name: selectedChildName,
-        },
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-        },
+      console.log("fetchData called with:", {
+        year: selectedYear,
+        month: selectedMonth,
+        child_name: selectedChildName,
       });
+      const response = await axios.get<any>(
+        "http://localhost:8000/api/v1/bar-graph",
+        {
+          params: {
+            year: selectedYear,
+            month: selectedMonth,
+            child_name: selectedChildName,
+          },
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
 
       const data = response.data;
       console.log("取得した生データ:", data);
 
-      const familyMembers = Object.keys(data).filter(key => key !== "summary");
+      const familyMembers = Object.keys(data).filter(
+        (key) => key !== "summary"
+      );
       const dates = new Set<string>();
-      familyMembers.forEach(member => {
-        Object.keys(data[member]).forEach(date => {
+      familyMembers.forEach((member) => {
+        Object.keys(data[member]).forEach((date) => {
           dates.add(date);
         });
       });
@@ -135,7 +147,7 @@ const MonthlyAnalysis: React.FC = () => {
             label: familyMember,
             data: sortedDates.map((date) => memberData[date] || 0),
             backgroundColor: [color],
-          borderColor: [color.replace("0.7", "1")],
+            borderColor: [color.replace("0.7", "1")],
             borderWidth: 1,
           };
         }
@@ -160,17 +172,24 @@ const MonthlyAnalysis: React.FC = () => {
   const fetchPieData = useCallback(async () => {
     try {
       const bearerToken = await getAuthToken();
-      console.log("fetchPieData called with:", { year: selectedYear, month: selectedMonth, child_name: selectedChildName });
-      const response = await axios.get<any>("http://localhost:8000/api/v1/pie-graph", {
-        params: {
-          year: selectedYear,
-          month: selectedMonth,
-          child_name: selectedChildName,
-        },
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-        },
+      console.log("fetchPieData called with:", {
+        year: selectedYear,
+        month: selectedMonth,
+        child_name: selectedChildName,
       });
+      const response = await axios.get<any>(
+        "http://localhost:8000/api/v1/pie-graph",
+        {
+          params: {
+            year: selectedYear,
+            month: selectedMonth,
+            child_name: selectedChildName,
+          },
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
 
       const data = response.data;
       const labels = Object.keys(data);
@@ -182,8 +201,10 @@ const MonthlyAnalysis: React.FC = () => {
           {
             label: "割合",
             data: values,
-            backgroundColor: labels.map(label => nameToColor(label)),
-            borderColor: labels.map(label => nameToColor(label).replace("0.7", "1")),
+            backgroundColor: labels.map((label) => nameToColor(label)),
+            borderColor: labels.map((label) =>
+              nameToColor(label).replace("0.7", "1")
+            ),
             borderWidth: 1,
           },
         ],
@@ -209,14 +230,14 @@ const MonthlyAnalysis: React.FC = () => {
     <div>
       <Header />
       <div className="p-6 min-h-screen flex flex-col">
-        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          確認したい月を選択してください
+        <div className="mt-30 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+          分析したい月を選択してください
           <div className="flex items-center justify-between mt-6">
             <div className="relative flex items-center space-x-4">
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedYear}
-                onChange={e => setSelectedYear(parseInt(e.target.value))}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
               >
                 {Array.from({ length: 1 }, (_, i) => (
                   <option key={selectedYear - i} value={selectedYear - i}>
@@ -227,7 +248,7 @@ const MonthlyAnalysis: React.FC = () => {
               <select
                 className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedMonth}
-                onChange={e => setSelectedMonth(parseInt(e.target.value))}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
               >
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -238,7 +259,7 @@ const MonthlyAnalysis: React.FC = () => {
               <select
                 className="p-4 text-md text-custom-blue bg-custom-light-green shadow-inner"
                 value={selectedChildName}
-                onChange={e => setSelectedChildName(e.target.value)}
+                onChange={(e) => setSelectedChildName(e.target.value)}
               >
                 <option value="">お子様を選択</option>
                 {children.map((child, index) => (
@@ -264,26 +285,23 @@ const MonthlyAnalysis: React.FC = () => {
             role="alert"
           >
             <strong className="font-bold">エラー:</strong>
-            <span className="block sm:inline"> {error}
-            </span>
+            <span className="block sm:inline"> {error}</span>
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-
-          <OpenaiAnalysis 
+          <OpenaiAnalysis
             year={selectedYear}
             month={selectedMonth}
-            selectedChildName={selectedChildName}/>
+            selectedChildName={selectedChildName}
+          />
         </div>
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-        <TotalHours selectedYear={selectedYear}
+          <TotalHours
+            selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             selectedChildName={selectedChildName}
-            bearerToken={authToken} />
-          <OpenaiAnalysis year={selectedYear} month={selectedMonth} selectedChildName={selectedChildName} />
-        </div>
-        <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-
+            bearerToken={authToken}
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
@@ -300,8 +318,8 @@ const MonthlyAnalysis: React.FC = () => {
                 {barChartData ? (
                   <div
                     style={{
-                      minWidth: "500px",
-                      height: "500px",
+                      minWidth: "auto",
+                      height: "auto",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "flex-end",
