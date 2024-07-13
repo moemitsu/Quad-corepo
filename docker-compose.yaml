@@ -36,7 +36,7 @@ services:
     volumes:
       - ./backend/api:/src/api
       - ./backend/.dockervenv:/src/.venv:rw
-      - ./backend/test:/src/test
+      - ./backend/tests:/src/tests
       - ./backend/logs:/src/logs
       - ./backend/.env:/src/.env
       - ./backend/entrypoint.sh:/src/entrypoint.sh
