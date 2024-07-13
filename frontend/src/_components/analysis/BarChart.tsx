@@ -52,10 +52,10 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
             size: 16,
           },
         },
+        beginAtZero: true,
+        suggestedMin: 1, // Minimum value to display on the y-axis
+        suggestedMax: 6, // Maximum value to display on the y-axis
         ticks: {
-          beginAtZero: true,
-          suggestedMin: 1, // Minimum value to display on the y-axis
-          suggestedMax: 18, // Maximum value to display on the y-axis
           stepSize: 1, // Step size for y-axis ticks
         },
       },
