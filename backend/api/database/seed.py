@@ -4,6 +4,14 @@ from api.database.db import SessionLocal
 from api.database.models import Stakeholder, User, Payments, TimeShareRecords
 from uuid import uuid4
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # 環境変数を読み込む
+
+Firebase1 = os.getenv('FIREBASE_UID1')
+Firebase2 = os.getenv('FIREBASE_UID2')
+
 
 def seed_data(db: Session):
     # UUIDの生成
@@ -26,8 +34,8 @@ def seed_data(db: Session):
 
     # ステークホルダーとユーザーの生成
     stakeholders = [
-        Stakeholder(id=stakeholder1_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id=''),
-        Stakeholder(id=stakeholder2_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id='')
+        Stakeholder(id=stakeholder1_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id='`${Firebase1}`'),
+        Stakeholder(id=stakeholder2_id, stakeholder_name=f'{random.choice(surnames)}家', firebase_id='`${Firebase2}`')
     ]
 
     users = [
@@ -59,7 +67,7 @@ def seed_data(db: Session):
     start_date = datetime(2024, 4, 1, 8, 0, 0)
     end_date = datetime(2024, 7, 31, 22, 0, 0)
 
-    for _ in range(300):  # 100個のレコードを生成
+    for _ in range(10):  # 100個のレコードを生成
         share_start_at = random_date(start_date, end_date)
         share_end_at = share_start_at + timedelta(minutes=random.randint(30, 120))
         child_user = random.choice(child_users)
