@@ -2,50 +2,26 @@
 ```
 | 機能         | メソッド | パス          | 説明                       |
 |--------------|---------|--------------|----------------------------|
-| 新規登録 | POST | `/api/v1/signup` | firebaseの新規登録をする |
 | ユーザー情報登録 | POST | `/api/v1/user` | 新規登録時にUser情報を登録 |
+| ユーザー情報表示 | GET | `/api/v1/user-info` | ヘッダーに名前表示のための取得 |
 | ユーザー情報編集 | PUT | `/api/v1/user/{user_id}` | ユーザー情報の更新 |
 | 利用者と子供の名前の取得 | GET | `/api/v1/names` | 利用者と子どもの名前を取得（記録の追加用） |
-| 記録の追加 | POST | `/api/v1/time-share-records` | 子どもとの時間の記録を登録 |
+| 記録の追加 | POST | `/api/v1/record` | 子どもとの時間の記録を登録 |
 | 棒グラフ表示用データを取得 | GET | `/api/v1/bar-graph` | 各月画面に表示されるすべてのデータを取得 |
 | 円グラフ表示用データを取得 | GET | `/api/v1/pie-graph` | 各月画面に表示されるすべてのデータを取得 |
-| 家族データ一覧の取得 | GET | c` | 各月画面の表示に使用されたデータの詳細を取得 |
+| 家族データ一覧の取得 | GET | `/api/v1/family-records` | 各月画面の表示に使用されたデータの詳細を取得 |
 | LLM分析 | POST | `/api/v1/analysis` | LLMにデータとテキストを送信して分析結果を取得する |
+| stripe決済 | POST | `/stripe/create-checkout-session` | Stripeチェックアウト方式デフォルト |
+| stripe決済 | POST | `/stripe/session-status` | Stripeチェックアウト方式デフォルト |
+| 決済済登録 | POST | `/payments/api/v1/payments` | 決済完了すると、DBにレコードされる |
 ```
 <!--第2段階で実装
 | 記録の更新 | PUT | `/api/v1/records/{record_id}` | 特定の記録の更新 |
 -->
 
-# サインイン認証関連エンドポイント
-## 新規登録 [POST /auth/register]
-新しいユーザーを登録するためのエンドポイント：Stakeholderテーブル
-リクエストボディの、"stakeholder_name"はStakeholderテーブルに、"adult_name"と"child_name"はUserテーブルにポストされる。
-+ Request
-  + Header
-    ```
-    {
-      "Authorization": "Bearer ${idToken}"
-    }
-    ```
-  + Body
-    ```
-  {
-    "stakeholder_name": "さとう",
-    "firebase_id":Firebaseから受け取ったuid
-  }
-    ```
-  + Response 200 OK
-  + Body
-    ```
-    {
-      "message": "新規登録が完了しました。"
-    }
-    ```
-
 # ユーザー情報管理エンドポイント
 ## ユーザー登録 [POST /api/v1/user]
-認証後にユーザーの情報を登録するためのエンドポイント
-<!-- TO DO ここでsatakeholder_idを入れるために、一回GETしないといけないのかな？ -->
+ユーザーの情報を登録するためのエンドポイント
 + Request
   + Header
     ```
@@ -99,7 +75,7 @@
       "user_id": "12345"
     }
     ```
-## 利用者と子供の名前の取得 [GET /api/v1/user]
+## 利用者と子供の名前の取得 [GET /api/v1/names]
 利用者と子どもの名前を取得（記録の追加用）
 + Request
   + Header
@@ -304,4 +280,32 @@
       "summary": "LLMによる要約",
       "sentiment": "ポジティブ"
     }
+    ```
+
+# Stripe決済
+## Stripe決済チェックアウト方式 [POST /stripe/create-checkout-session ]
++ Request (application/json)
++ Response 200 (application/json)
+## Stripe決済チェックアウト方式 [POST /stripe/session-status ]
++ Request (application/json)
++ Response 200 (application/json)
+## 決済済登録 [POST /payments/api/v1/payments ]
++ Request (application/json)
+  + Header
+    ```
+    {
+      "Authorization": "Bearer ${idToken}"
+    }
+    ```
+  + Body
+    ```
+    {
+    "id":"id"
+    stakeholder_id:"---------uuid---------"
+    user_id=1
+    }
+    ```
++ Response 200 (application/json)
+  + Body
+    ```
     ```
