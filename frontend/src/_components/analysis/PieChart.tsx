@@ -2,7 +2,7 @@
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { PieChartData } from '../../types/index'; // パスを適切に修正してください
+import { PieChartData } from '../../types/index'; 
 import { ChartOptions, TooltipItem } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -40,7 +40,9 @@ const PieChart: React.FC<PieChartProps> = ({ data, options }) => {
     ...options,
   };
 
-  return <Pie data={data} options={chartOptions} />;
+  return (
+   <Pie data={data} options={chartOptions} />
+  )
 };
 
 export default PieChart;

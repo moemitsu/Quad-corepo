@@ -1,26 +1,42 @@
-'use client';
-import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
-import { BarChartData } from '../../types';
+"use client";
+import React from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from "chart.js";
+import { BarChartData } from "../../types";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface BarChartProps {
   data: BarChartData;
-  options?: ChartOptions<'bar'>;
+  options?: ChartOptions<"bar">;
 }
 
 const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   if (!data || !data.datasets) return <div>Loading...</div>;
 
-  const defaultOptions: ChartOptions<'bar'> = {
+  const defaultOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         display: true,
-        position: 'bottom',
+        position: "bottom",
         labels: {
           font: {
             size: 16,
@@ -33,7 +49,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
         display: true,
         title: {
           display: true,
-          text: '日付',
+          text: "日付",
           font: {
             size: 16,
           },
@@ -47,14 +63,14 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
         display: true,
         title: {
           display: true,
-          text: '時間',
+          text: "時間",
           font: {
             size: 16,
           },
-        }, 
+        },
         beginAtZero: true,
         suggestedMin: 1, // Minimum value to display on the y-axis
-        suggestedMax: 10, // Maximum value to display on the y-axis
+        suggestedMax: 'undefined', // Maximum value to display on the y-axis
         ticks: {
           stepSize: 1, // Step size for y-axis ticks
         },
@@ -65,8 +81,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   const chartOptions = { ...defaultOptions, ...options };
 
   return (
-    <div style={{ width: '100%'}}>
-      <div style={{ width: `${data.labels.length * 120}px`,height: 'auto' }}>
+    <div style={{ width: "100%",height:"100%" }}>
+      <div style={{ width:"100%", height: "50vh" }}>
         <Bar data={{ ...data }} options={chartOptions} />
       </div>
     </div>

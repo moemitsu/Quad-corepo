@@ -230,7 +230,7 @@ const MonthlyAnalysis: React.FC = () => {
     <div>
       <Header />
       <div className="p-6 min-h-screen flex flex-col">
-        <div className="mt-30 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+        <div className="mt-40 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
           分析したい月を選択してください
           <div className="flex items-center justify-between mt-6">
             <div className="relative flex items-center space-x-4">
@@ -302,8 +302,8 @@ const MonthlyAnalysis: React.FC = () => {
             selectedChildName={selectedChildName}
             bearerToken={authToken}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="md:col-span-1 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
               {pieChartData ? (
                 <PieChart data={pieChartData} />
@@ -312,21 +312,13 @@ const MonthlyAnalysis: React.FC = () => {
               )}
               {error && <p>{error}</p>}
             </div>
-            <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
+            <div className="md:col-span-2 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
               <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
               <div className="overflow-x-auto">
                 {barChartData ? (
-                  <div
-                    style={{
-                      minWidth: "auto",
-                      height: "auto",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "flex-end",
-                    }}
-                  >
+                  <div>
                     <BarChart data={barChartData} />
-                  </div>
+                  </div >
                 ) : (
                   <div>Loading...</div>
                 )}
