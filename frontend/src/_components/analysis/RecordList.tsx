@@ -149,13 +149,13 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
       <ul className="max-h-96 overflow-y-auto">
         {filteredRecords.map(record => (
           <li key={record.id} className="mb-2">
-            <div className="p-4 bg-white shadow rounded">
-              <p><strong>保護者:</strong> {record.with_member}</p>
-              <p><strong>イベント:</strong> {record.events}</p>
-              <p><strong>ご機嫌:</strong> {record.child_condition}</p>
-              <p><strong>場所:</strong> {record.place}</p>
-              <p><strong>開始時間:</strong> {new Date(record.share_start_at).toLocaleString()}</p>
-              <p><strong>終了時間:</strong> {new Date(record.share_end_at).toLocaleString()}</p>
+            <div className="p-4 bg-white shadow rounded flex flex-wrap">
+              <p className="w-full md:w-1/7"><strong>保護者:</strong> {record.with_member}</p>
+              <p className="w-full md:w-1/6"><strong>ご機嫌:</strong> {record.child_condition}</p>
+              <p className="w-full md:w-1/6"><strong>イベント:</strong> {record.events}</p>       
+              <p className="w-full md:w-1/6"><strong>場所:</strong> {record.place}</p>
+              <p className="w-full md:w-1/5"><strong>開始時間:</strong> {new Date(record.share_start_at).toLocaleString()}</p>
+              <p className="w-full md:w-1/5"><strong>終了時間:</strong> {new Date(record.share_end_at).toLocaleString()}</p>
             </div>
           </li>
         ))}
