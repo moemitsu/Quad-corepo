@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -25,6 +23,18 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // State for filters
+  const [selectedWithMember, setSelectedWithMember] = useState<string>('');
+  const [selectedEvent, setSelectedEvent] = useState<string>('');
+  const [selectedChildCondition, setSelectedChildCondition] = useState<string>('');
+  const [selectedPlace, setSelectedPlace] = useState<string>('');
+
+  // State for options
+  const [withMemberOptions, setWithMemberOptions] = useState<string[]>([]);
+  const [eventOptions, setEventOptions] = useState<string[]>([]);
+  const [childConditionOptions, setChildConditionOptions] = useState<string[]>([]);
+  const [placeOptions, setPlaceOptions] = useState<string[]>([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,8 +48,21 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
             Authorization: `Bearer ${bearerToken}`,
           },
         });
-        setRecords(response.data);
+
+        const fetchedRecords: Record[] = response.data;
+        setRecords(fetchedRecords);
         setLoading(false);
+
+        // Extract unique values for dropdown options
+        const withMembers = [...new Set(fetchedRecords.map(record => record.with_member))];
+        const events = [...new Set(fetchedRecords.map(record => record.events))];
+        const childConditions = [...new Set(fetchedRecords.map(record => record.child_condition))];
+        const places = [...new Set(fetchedRecords.map(record => record.place))];
+
+        setWithMemberOptions(withMembers);
+        setEventOptions(events);
+        setChildConditionOptions(childConditions);
+        setPlaceOptions(places);
       } catch (error: any) {
         setError('データの取得に失敗しました');
         setLoading(false);
@@ -50,6 +73,14 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
       fetchData();
     }
   }, [selectedYear, selectedMonth, selectedChildName, bearerToken]);
+
+  // Filtered records based on selected criteria
+  const filteredRecords = records.filter(record =>
+    (selectedWithMember ? record.with_member === selectedWithMember : true) &&
+    (selectedEvent ? record.events === selectedEvent : true) &&
+    (selectedChildCondition ? record.child_condition === selectedChildCondition : true) &&
+    (selectedPlace ? record.place === selectedPlace : true)
+  );
 
   if (loading) {
     return <p>読み込み中...</p>;
@@ -62,8 +93,61 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">記録リスト</h2>
+
+      {/* Dropdown selectors */}
+      <div className="flex mb-4 space-x-4">
+        {/* Dropdown for with_member */}
+        <select
+          value={selectedWithMember}
+          onChange={(e) => setSelectedWithMember(e.target.value)}
+          className="border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">保護者で絞り込む</option>
+          {withMemberOptions.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+
+        {/* Dropdown for events */}
+        <select
+          value={selectedEvent}
+          onChange={(e) => setSelectedEvent(e.target.value)}
+          className="border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">イベントで絞り込む</option>
+          {eventOptions.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+
+        {/* Dropdown for child_condition */}
+        <select
+          value={selectedChildCondition}
+          onChange={(e) => setSelectedChildCondition(e.target.value)}
+          className="border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">ご機嫌で絞り込む</option>
+          {childConditionOptions.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+
+        {/* Dropdown for place */}
+        <select
+          value={selectedPlace}
+          onChange={(e) => setSelectedPlace(e.target.value)}
+          className="border border-gray-300 rounded px-2 py-1"
+        >
+          <option value="">場所で絞り込む</option>
+          {placeOptions.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Display filtered records */}
       <ul className="max-h-96 overflow-y-auto">
-        {records.map(record => (
+        {filteredRecords.map(record => (
           <li key={record.id} className="mb-2">
             <div className="p-4 bg-white shadow rounded">
               <p><strong>保護者:</strong> {record.with_member}</p>
