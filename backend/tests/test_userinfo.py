@@ -90,4 +90,3 @@ async def test_user_info(async_client):
     # response_objにstakeholder_nameの行がない。messageの中に入ってしまうようだ。TODO 理由調べる
     assert 'message' in response_obj
     assert 'こんにちは' in response_obj['message']
-    
