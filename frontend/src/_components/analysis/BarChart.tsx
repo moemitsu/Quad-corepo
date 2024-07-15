@@ -26,7 +26,7 @@ interface BarChartProps {
   data: BarChartData;
   options?: ChartOptions<"bar">;
 }
-
+// 棒グラフのx,y軸の設定
 const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   if (!data || !data.datasets) return <div>Loading...</div>;
 
@@ -69,10 +69,10 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
           },
         },
         beginAtZero: true,
-        suggestedMin: 1, // Minimum value to display on the y-axis
-        suggestedMax: 'undefined', // Maximum value to display on the y-axis
+        suggestedMin: 1, 
+        suggestedMax: 'undefined',// 最大値を自動で設定
         ticks: {
-          stepSize: 1, // Step size for y-axis ticks
+          stepSize: 1, 
         },
       },
     },

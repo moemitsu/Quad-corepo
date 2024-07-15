@@ -1,7 +1,9 @@
+'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import router from 'next/router';
 
 interface SearchConditionProps {
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
@@ -16,8 +18,10 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
 }) => {
   const [children, setChildren] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
   const auth = getAuth();
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // JavaScriptの月は0から始まるため
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -35,6 +39,12 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
 
     return () => unsubscribe();
   }, [auth]);
+
+  useEffect(() => {
+    setIsClient(true);
+    setSelectedYear(currentYear); // 初期設定
+    setSelectedMonth(currentMonth); // 初期設定
+  }, []);
 
   const fetchChildren = async (token: string) => {
     try {
@@ -67,14 +77,19 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
     }
   };
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-      分析条件を選択してください
+    <div className="mt-40 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
+      分析したい年月とお子様を選択してください
       <div className="flex items-center justify-between mt-6">
         <div className="relative flex items-center space-x-4">
           <select
             className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            defaultValue={currentYear} // 初期設定
           >
             {Array.from({ length: 1 }, (_, i) => (
               <option key={new Date().getFullYear() - i} value={new Date().getFullYear() - i}>
@@ -85,6 +100,7 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
           <select
             className="p-4 text-xl text-custom-blue bg-custom-light-green shadow-inner"
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+            defaultValue={currentMonth} // 初期設定
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>
@@ -126,4 +142,6 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
   );
 };
 
-export default SearchCondition;
+const DynamicSearchCondition = dynamic(() => Promise.resolve(SearchCondition), { ssr: false });
+
+export default DynamicSearchCondition;

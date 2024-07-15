@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -53,7 +54,7 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
         setRecords(fetchedRecords);
         setLoading(false);
 
-        // Extract unique values for dropdown options
+       //データからドロップダウンリストを生成
         const withMembers = [...new Set(fetchedRecords.map(record => record.with_member))];
         const events = [...new Set(fetchedRecords.map(record => record.events))];
         const childConditions = [...new Set(fetchedRecords.map(record => record.child_condition))];
@@ -74,7 +75,7 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
     }
   }, [selectedYear, selectedMonth, selectedChildName, bearerToken]);
 
-  // Filtered records based on selected criteria
+  // 選択から抽出してリストを表示
   const filteredRecords = records.filter(record =>
     (selectedWithMember ? record.with_member === selectedWithMember : true) &&
     (selectedEvent ? record.events === selectedEvent : true) &&
@@ -92,7 +93,7 @@ const RecordList: React.FC<RecordListProps> = ({ selectedYear, selectedMonth, se
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">記録リスト</h2>
+      <h2 className="text-xl font-semibold mb-4">{selectedMonth}月の{selectedChildName}さんの記録リスト</h2>
 
       {/* Dropdown selectors */}
       <div className="flex mb-4 space-x-4">

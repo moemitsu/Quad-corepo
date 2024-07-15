@@ -1,12 +1,9 @@
-
 'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../lib/firebase';
 import { useRouter } from 'next/navigation';
-
-const router = useRouter();
 
 interface OpenaiAnalysisProps {
   year: number;
@@ -19,7 +16,7 @@ interface AnalysisData {
 }
 
 const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedChildName }) => {
-
+  const router = useRouter();
   const [user] = useAuthState(auth);
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -76,7 +73,6 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
   }
 
   return (
-
     <div className="flex mt-4 items-center justify-center flex-col">
       {viewCount < 4 ? (
         <button
@@ -88,7 +84,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
         </button>
       ) : (
         <button
-          onClick={() => alert('有料会員登録はこちらから')}
+          onClick={handleRegisterClick}
           className="p-2 mt-4 bg-custom-teal text-white rounded"
         >
           有料会員登録はこちら

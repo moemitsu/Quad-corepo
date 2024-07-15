@@ -144,42 +144,48 @@ const UnifyChart: React.FC<UnifyChartProps> = ({
   }, [selectedYear, selectedMonth, selectedChildName, authToken]);
 
   useEffect(() => {
-    fetchData();
-    fetchPieData();
-  }, [fetchData, fetchPieData]);
+    if (selectedChildName) {
+      fetchData();
+      fetchPieData();
+    }
+  }, [fetchData, fetchPieData, selectedChildName]);
 
   return (
     <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-    <TotalHours
-      selectedYear={selectedYear}
-      selectedMonth={selectedMonth}
-      selectedChildName={selectedChildName}
-      bearerToken={authToken}
-    />
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <div className="md:col-span-1 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-        <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
-        {pieChartData ? (
-          <PieChart data={pieChartData} />
-        ) : (
-          <div>Loading...</div>
-        )}
-        {error && <p>{error}</p>}
-      </div>
-      <div className="md:col-span-2 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-        <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
-        <div className="overflow-x-auto">
-          {barChartData ? (
-            <div>
-              <BarChart data={barChartData} />
-            </div >
-          ) : (
-            <div>Loading...</div>
-          )}
+      <TotalHours
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        selectedChildName={selectedChildName}
+        bearerToken={authToken}
+      />
+      {!selectedChildName ? (
+        <div className="text-center text-dark-500">お子様を選択してください</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="md:col-span-1 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
+            <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
+            {pieChartData ? (
+              <PieChart data={pieChartData} />
+            ) : (
+              <div>Loading...</div>
+            )}
+            {error && <p>{error}</p>}
+          </div>
+          <div className="md:col-span-2 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
+            <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
+            <div className="overflow-x-auto">
+              {barChartData ? (
+                <div>
+                  <BarChart data={barChartData} />
+                </div>
+              ) : (
+                <div>Loading...</div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  </div>
   );
 };
 
