@@ -55,4 +55,5 @@ async def test_get_all_time_share_records(async_client):
     print(response.text)
     assert response.status_code == starlette.status.HTTP_200_OK
     response_obj = response.json()
+    print(response_obj)
     assert len(response_obj) >= 1
