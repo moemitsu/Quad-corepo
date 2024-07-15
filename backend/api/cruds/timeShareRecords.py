@@ -99,7 +99,7 @@ def get_each_detail_lists_by_month(db: Session, stakeholder_id: UUID, child_name
             models.TimeShareRecords.share_start_at >= start_date,
             models.TimeShareRecords.share_end_at <= end_date
         ).order_by(models.TimeShareRecords.share_start_at).all()
-
+        logger.info(f'timeShareRecords102------------------------------------familydata{records}')
         return records
     except Exception as e:
         logger.error(f"Error fetching records: {e}")
