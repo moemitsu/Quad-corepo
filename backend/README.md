@@ -75,6 +75,25 @@
       "user_id": "12345"
     }
     ```
+## ユーザー情報表示 [GET /api/v1/user-info]
+ヘッダーに名前表示のための取得
++ Request
+  + Header
+    ```
+    {
+      "Authorization": "Bearer ${idToken}"
+    }
+    ```
++ Response 201 Created
+  + Body
+    ```
+    {
+    "stakeholder_id" = "--------uuid----------"
+    "stakeholder_name" = "佐藤"
+    "message"=f'{stakeholder.stakeholder_name}さん、こんにちは'
+    }
+    ```
+
 ## 利用者と子供の名前の取得 [GET /api/v1/names]
 利用者と子どもの名前を取得（記録の追加用）
 + Request
