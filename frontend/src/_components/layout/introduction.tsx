@@ -11,7 +11,7 @@ const Introduction: FC = () => {
   };
 
   return (
-    <section className="p-8 lg:p-16 dark:bg-gray-100 dark:text-gray-800">
+    <section className="p-10 lg:p-16 dark:bg-gray-100 dark:text-gray-800">
       <div className="container mx-auto space-y-12">
         <div className="flex flex-col overflow-hidden rounded-md shadow-sm lg:flex-row">
           <img
@@ -23,7 +23,7 @@ const Introduction: FC = () => {
             <span className="text-xs uppercase dark:text-gray-600">活動を残す</span>
             <h3 className="text-3xl font-bold">過ごした時間を記録</h3>
             <p className="my-6 dark:text-gray-600">
-              誰とどんな活動（過ごし方）をしたか、ごきげん度などを記録します。
+              誰と、どのような活動（過ごし方）をしたか、ごきげん度などを記録します。
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@ const Introduction: FC = () => {
             <span className="text-xs uppercase dark:text-gray-600">プランの提案</span>
             <h3 className="text-3xl font-bold">AIによる分析と提案</h3>
             <p className="my-6 dark:text-gray-600">
-            家族が喜ぶ、最適な過ごし方をご提案（※）。
+            家族が喜ぶ、最適な過ごし方をご提案します（※）。
             </p>
             <button type="button" className="self-start text-sm" onClick={handleButtonClick}>
               <p>※3回まで無料お試しが可能。</p>
