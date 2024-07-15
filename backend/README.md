@@ -1,5 +1,5 @@
 # corepo API仕様書
-```
+
 | 機能         | メソッド | パス          | 説明                       |
 |--------------|---------|--------------|----------------------------|
 | ユーザー情報登録 | POST | `/api/v1/user` | 新規登録時にUser情報を登録 |
@@ -14,7 +14,7 @@
 | stripe決済 | POST | `/stripe/create-checkout-session` | Stripeチェックアウト方式デフォルト |
 | stripe決済 | POST | `/stripe/session-status` | Stripeチェックアウト方式デフォルト |
 | 決済済登録 | POST | `/payments/api/v1/payments` | 決済完了すると、DBにレコードされる |
-```
+
 <!--第2段階で実装
 | 記録の更新 | PUT | `/api/v1/records/{record_id}` | 特定の記録の更新 |
 -->
