@@ -75,7 +75,7 @@ const ButtonHeader: React.FC = () => {
             <Link href="/family-registration" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               登録情報の変更
             </Link>
-            <Link href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
+            <Link href="/share" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} onClick={closeMenu}>
               家族で共有する
             </Link>
           </div>
