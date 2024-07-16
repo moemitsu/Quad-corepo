@@ -130,7 +130,9 @@ def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_nam
 
 
 # LLMに分析してもらうためのデータを取得
-def get_all_data_for_analysis(db: Session):
+def get_all_data_for_analysis(db: Session, stakeholder_id: int, child_name: str, year: int, month: int):
+    start_date = f"{year}-{month}-01"
+    end_date = f"{year}-{month}-{calendar.monthrange(year, month)[1]}"
     return db.query(
         models.TimeShareRecords.with_member,
         models.TimeShareRecords.child_name,
@@ -139,6 +141,13 @@ def get_all_data_for_analysis(db: Session):
         models.TimeShareRecords.place,
         models.TimeShareRecords.share_start_at,
         models.TimeShareRecords.share_end_at
+    ).filter(
+        and_(
+            models.TimeShareRecords.stakeholder_id == stakeholder_id,
+            models.TimeShareRecords.child_name == child_name,
+            models.TimeShareRecords.share_start_at >= start_date,
+            models.TimeShareRecords.share_end_at <= end_date
+        )
     ).all()
 
 # 確認用　TimeShareRecordsのデータをすべて取得する関数

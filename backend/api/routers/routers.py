@@ -30,8 +30,6 @@ client = OpenAI(
     api_key = os.getenv('OPENAI_API_KEY')
 )
 
-
-
 def get_db():
     db = SessionLocal()
     try:
@@ -239,12 +237,8 @@ def analysis(
     db: Session = Depends(get_db)
 ):
     logger.info("analysis endpoint called")
-    firebase_id = token['uid']
-    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
-    if not stakeholder:
-        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     # データベースからデータを取得
-    records = timeShareRecordsCrud.get_records_by_month(db, stakeholder.id, child_name, year, month)
+    records = timeShareRecordsCrud.get_records_by_month(db, child_name, year, month)
     print(f'データ:', records)
     logger.debug(f"Records fetched: {records}")
     if not records:
@@ -262,60 +256,59 @@ def analysis(
             "share_end_at": record.share_end_at
         })
 
-        df = pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-        df['share_start_at'] = pd.to_datetime(df['share_start_at'])
-        df['share_end_at'] = pd.to_datetime(df['share_end_at'])
-        # share_end_atとshare_start_atの差分を計算し、分単位に変換
-        df['interaction_time'] = (df['share_end_at'] - df['share_start_at']).dt.total_seconds() / 60
-        
-        # 時間の集計
-        try:
-            time_summary = df.groupby('with_member')['interaction_time'].sum().reset_index()
-        except KeyError as e:
-            raise HTTPException(status_code=500, detail=f'KeyError in time_summary:{str(e)}')
-        # 行先と子供の機嫌の関連性分析
-        try:
-            condition_analysis = df.groupby(['place', 'child_condition']).size().reset_index(name='count')
-        except KeyError as e:
-            raise HTTPException(status_code=500, detail=f'KeyError in condition_analysis:{str(e)}')
-        # 時間パターンの分析
-        try:
-            time_pattern = df.groupby(['with_member', 'place', 'events']).agg({'interaction_time': 'sum'}).reset_index()
-        except KeyError as e:
-            raise HTTPException(status_code=500, detail=f'KeyError in time_pattern:{str(e)}')
+    df['share_start_at'] = pd.to_datetime(df['share_start_at'])
+    df['share_end_at'] = pd.to_datetime(df['share_end_at'])
+    # share_end_atとshare_start_atの差分を計算し、分単位に変換
+    df['interaction_time'] = (df['share_end_at'] - df['share_start_at']).dt.total_seconds() / 60
+    
+    # 時間の集計
+    try:
+        time_summary = df.groupby('with_member')['interaction_time'].sum().reset_index()
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=f'KeyError in time_summary:{str(e)}')
+    # 行先と子供の機嫌の関連性分析
+    try:
+        condition_analysis = df.groupby(['place', 'child_condition']).size().reset_index(name='count')
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=f'KeyError in condition_analysis:{str(e)}')
+    # 時間パターンの分析
+    try:
+        time_pattern = df.groupby(['with_member', 'place', 'events']).agg({'interaction_time': 'sum'}).reset_index()
+    except KeyError as e:
+        raise HTTPException(status_code=500, detail=f'KeyError in time_pattern:{str(e)}')
 
-        summary = f"""
-        家族の触れ合い時間の総計：
-        {time_summary}
+    summary = f"""
+    家族の触れ合い時間の総計：
+    {time_summary}
 
-        行き先と子供の機嫌の関連性：
-        {condition_analysis}
+    行き先と子供の機嫌の関連性：
+    {condition_analysis}
 
-        時間パターン分析：
-        {time_pattern}
-        """
-        print('time_summary', time_summary)
-        print('condition_analysis', condition_analysis)
-        print('time_pattern', time_pattern)
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are an excellent analyst and a kind advisor."},
-                    {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese, use a friendly tone, address the father, mother, and children with 'さん', and provide detailed analysis and specific recommendations for places to visit.\n\n{summary}\n\n"}
-                ],
-                max_tokens=2000,
-                n=1,
-                temperature=0.7
-            )
-            advice = response.choices[0].message.content.strip()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f'OpenAI API Error:{str(e)}')
-        logger.info("Generated advice: " + advice)
-        print(advice)
-        return schemas.Completion(advice=advice)
-
+    時間パターン分析：
+    {time_pattern}
+    """
+    print('time_summary', time_summary)
+    print('condition_analysis', condition_analysis)
+    print('time_pattern', time_pattern)
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an excellent analyst and a kind advisor."},
+                {"role": "user", "content": f"Based on the data, please provide advice for the family to spend better time together. The response should be in Japanese, use a friendly tone, address the father, mother, and children with 'さん', and provide detailed analysis and specific recommendations for places to visit.\n\n{summary}\n\n"}
+            ],
+            max_tokens=2000,
+            n=1,
+            temperature=0.7
+        )
+        advice = response.choices[0].message.content.strip()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'OpenAI API Error:{str(e)}')
+    logger.info("Generated advice: " + advice)
+    print(advice)
+    return schemas.Completion(advice=advice)
 
 # 確認用　TODO あとで消す
 @router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
