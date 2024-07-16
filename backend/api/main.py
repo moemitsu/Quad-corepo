@@ -68,11 +68,11 @@ app.add_middleware(
 app.include_router(app_router)
 app.include_router(stripe_router, prefix="/stripe", tags=["stripe"])
 
-# @app.get("/")
-# async def read_root():
-#   logger.info("Root endpoint called")
-#   print("------------------Root endpoint called")
-#   return {"message": "Welcome to the FastAPI application"}
+@app.get("/")
+async def read_root():
+  logger.info("Root endpoint called")
+  print("------------------Root endpoint called")
+  return {"message": "Welcome to the FastAPI application"}
 
 # @app.get("/protected-route")
 # async def protected_route(request: Request):

@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth';
 
-export interface UserInfo {
+interface UserInfo
+{
+  stakeholder_id: string; // UUID型をstring型として定義
+  stakeholder_name: string;
   message: string;
 }
 
