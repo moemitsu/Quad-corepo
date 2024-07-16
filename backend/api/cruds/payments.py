@@ -21,5 +21,5 @@ def success_payment(db: Session, stakeholder_id: UUID, user_id: int):
         db.refresh(new_record)
         return new_record
     except Exception as e:
-      logger.error(f"Error creating record: {e}")
-      raise
+        logger.error(f"Error creating record: {e}")
+        raise
