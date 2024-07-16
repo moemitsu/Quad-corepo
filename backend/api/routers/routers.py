@@ -227,7 +227,6 @@ def get_each_detail_lists(
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
 
-# LLM分析
 @router.get('/api/v1/analysis', response_model=schemas.Completion)
 def analysis(
     token: str = Depends(verify_token),
@@ -237,8 +236,12 @@ def analysis(
     db: Session = Depends(get_db)
 ):
     logger.info("analysis endpoint called")
+    firebase_id = token['uid']
+    stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+    if not stakeholder:
+        raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     # データベースからデータを取得
-    records = timeShareRecordsCrud.get_records_by_month(db, child_name, year, month)
+    records = timeShareRecordsCrud.get_records_by_month(db, stakeholder.id, child_name, year, month)
     print(f'データ:', records)
     logger.debug(f"Records fetched: {records}")
     if not records:

@@ -112,18 +112,18 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
                 <p className={viewCount >= 4 && showOverlay ? 'blur-md' : ''}>{data && parse(data.advice)}</p>
                 {viewCount >= 4 && showOverlay && (
                   <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-white bg-opacity-75">
-                    <p className="text-xl font-bold text-gray-800 mb-4">3回以上のデータ分析は有料会員登録が必要です</p>
+                    <p className="text-xl font-bold text-gray-800 mb-4">月3回以上のデータ分析はAI分析使い放題プランへのアップグレードが必要です</p>
                     <button
                       onClick={handleRegisterClick}
                       className="p-2 px-2 m-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
                     >
-                      会員登録はこちら
+                      AI分析使い放題プランへアップグレード
                     </button>
                     <button
                       onClick={handleDismissOverlay}
                       className="p-2 px-2 m-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
                     >
-                      登録しない
+                      アップグレードしない
                     </button>
                   </div>
                 )}
