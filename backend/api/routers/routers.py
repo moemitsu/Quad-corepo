@@ -16,6 +16,7 @@ import api.cruds.payments as paymentsCrud
 import api.cruds.stakeholder as stakeholderCrud
 import api.cruds.user as userCrud
 from api.lib.auth import verify_token
+from datetime import datetime
 
 models.Base.metadata.create_all(bind=engine)
 load_dotenv()
@@ -199,9 +200,14 @@ def get_bar_data(
         with_member = record[0]
         date = record[1]
         total_hours = record[2]
+
+        # 日付をフォーマット
+        date_obj = datetime.strptime(str(date), "%Y-%m-%d")
+        formatted_date = date_obj.strftime("%-m/%-d(%a)")  # 例: 6/24(月)
+
         if with_member not in result:
             result[with_member] = {}
-        result[with_member][str(date)] = total_hours
+        result[with_member][formatted_date] = total_hours
 
     return result
 
