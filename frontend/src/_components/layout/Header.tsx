@@ -32,7 +32,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-2 dark:bg-neutral-800 shadow-md ">
+    <header className="fixed top-0 left-0 right-0 z-50 flex flex-wrap sm:justify-start sm:flex-nowrap w-full bg-white text-sm py-1 dark:bg-neutral-800 shadow-md ">
       <nav className="max-w-full w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
         <div className="flex items-center justify-between w-full">
           <Link className="flex items-center text-8xl text-custom-blue font-semibold dark:text-white mr-auto" href="/">
