@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import router from 'next/router';
+import { useRouter } from "next/navigation";
 
 interface SearchConditionProps {
   setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
@@ -20,6 +20,7 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const auth = getAuth();
+  const router = useRouter(); 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1; // JavaScriptの月は0から始まるため
 
@@ -125,7 +126,7 @@ const SearchCondition: React.FC<SearchConditionProps> = ({
             className="p-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
             onClick={() => router.push("/record-activity")}
           >
-            記録を追加
+            記録を追加する
           </button>
         </div>
       </div>

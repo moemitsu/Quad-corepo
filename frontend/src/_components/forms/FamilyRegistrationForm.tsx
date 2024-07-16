@@ -95,9 +95,10 @@ const FamilyRegistrationForm: React.FC = () => {
 
 
   return (
-    <div className="p-6 min-h-screen flex flex-col justify-center items-center">
-      <div className="p-6 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-4xl font-bold mb-6 text-center text-custom-blue">家族の情報を登録</h2>
+    <div className="p-16 min-h-screen flex flex-col justify-start items-center pt-28">
+      <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-3xl">
+        <h2 className="text-4xl font-bold mb-6 text-center text-custom-blue">アカウントを作成</h2>
+        <p className="text-sm text-center text-gray-500 mb-10">メールアドレス、パスワード、家族情報を入力してください</p>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-lg font-semibold mb-2 text-custom-blue">メールアドレス</label>
@@ -110,7 +111,7 @@ const FamilyRegistrationForm: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-8">
             <label htmlFor="password" className="block text-lg font-semibold mb-2 text-custom-blue">パスワード <span className="text-sm text-gray-500">(半角英数6文字以上)</span></label>
             <input
               type="password"
@@ -175,7 +176,7 @@ const FamilyRegistrationForm: React.FC = () => {
             </button>
           </div>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <button type="submit" className="w-full p-2 bg-custom-teal text-white rounded">登録</button>
+          <button type="submit" className="w-full p-3 bg-custom-teal text-white rounded">登録</button>
         </form>
       </div>
     </div>

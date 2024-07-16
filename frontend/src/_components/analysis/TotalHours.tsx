@@ -82,7 +82,7 @@ const TotalHours: React.FC<TotalHoursProps> = ({ selectedYear, selectedMonth, se
 
   return (
     <div className="bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-      <h3 className="text-xl text-custom-blue mb-2">{selectedMonth}月に{selectedChildName}さんと一緒に過ごした時間の合計</h3>
+      <h3 className="text-xl text-custom-blue font-semibold mb-2">{selectedMonth}月に{selectedChildName}さんと一緒に過ごした時間</h3>
       <div>
         <p>合計: {formatHours(totalHours * 60)}</p>
         <div className="flex flex-wrap">

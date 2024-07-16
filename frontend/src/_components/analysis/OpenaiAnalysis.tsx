@@ -79,7 +79,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
   }
 
   return (
-    <div className="flex flex-col items-center mt-4">
+    <div className="flex flex-col items-center">
       {viewCount === 0 ? (
         <div className="flex items-center">
           <button
@@ -87,8 +87,9 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
             className="p-2 px-2 m-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
             disabled={loading}
           >
-            {loading ? 'データ分析中...' : 'AIによる分析結果を表示する'}
-          </button>
+            {loading ? 'データ分析中...' : 'AIによる分析結果を表示する'} 
+            <p className="text-xs text-gray-200 mt-2">（月3回までアップグレードなしで利用可能）</p>    
+          </button>        
           <div className="relative">
             <div className="absolute top-1/2 left-full transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-custom-light-blue"></div>
           </div>
@@ -104,9 +105,9 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
         </div>
       ) : (
         <div className="flex items-start w-full">
-          <div className="relative bg-white p-6 rounded-lg shadow-md mt-4 flex-grow">
+          <div className="relative bg-custom-light-green bg-opacity-50 shadow-inner p-6 rounded-lg mt-4 flex-grow">
             <div>
-              <h3 className="text-2xl font-semibold mb-2">AI分析</h3>
+              <h3 className="text-2xl text-custom-blue font-semibold mb-2">AI分析</h3>
               <h4>{month}月のAI分析結果です</h4>
               <div className="relative">
                 <p className={viewCount >= 4 && showOverlay ? 'blur-md' : ''}>{data && parse(data.advice)}</p>
@@ -129,7 +130,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
                 )}
               </div>
               {viewCount < 4 && (
-                <div className="flex justify-center">
+                <div className="p-6 flex justify-center">
                   <button
                     onClick={handleViewClick}
                     className="p-2 px-2 m-2 bg-custom-teal text-md text-white rounded shadow-md hover:bg-custom-blue transition-colors"
