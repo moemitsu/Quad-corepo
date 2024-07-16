@@ -9,12 +9,6 @@ from dotenv import load_dotenv
 load_dotenv()  # 環境変数を読み込む
 logger = getLogger(__name__)
 
-# Paymentsテーブルのid取得
-def get_payments_id(db: Session, id: int):
-  return db.query(models.Payments).filter(models.Payments.id == id)
-
-
-
 def success_payment(db: Session, stakeholder_id: UUID, user_id: int):
     print("Payment was successful.")
     try:

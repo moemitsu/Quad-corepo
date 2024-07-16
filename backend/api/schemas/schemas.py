@@ -99,8 +99,8 @@ class TimeShareRecordResponse(BaseModel):
   place: str
   share_start_at: datetime
   share_end_at: datetime
-  class Config:
-    from_attributes = True
+  # class Config:
+  #   from_attributes = True
 
 
 # LLM動作確認用

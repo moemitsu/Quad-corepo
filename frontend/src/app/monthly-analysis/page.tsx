@@ -289,7 +289,7 @@ const MonthlyAnalysis: React.FC = () => {
           </div>
         )}
         <div className="mt-4 bg-white bg-opacity-50 p-6 rounded-lg shadow-md">
-          <OpenaiAnalysis
+          <OpenaiAnalysis 
             year={selectedYear}
             month={selectedMonth}
             selectedChildName={selectedChildName}

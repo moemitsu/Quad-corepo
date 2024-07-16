@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from './useAuth';
 
-interface UserInfo {
-  message: string;
-  // 他のプロパティがある場合はここに追加
-}
-
 interface UseUserInfoReturn {
   userInfo: UserInfo | null;
   loading: boolean;
+}
+
+interface UserInfo
+{
+  stakeholder_id: string; // UUID型をstring型として定義
+  stakeholder_name: string;
+  message: string;
 }
 
 export const useUserInfo = (): UseUserInfoReturn => {
@@ -22,7 +24,7 @@ export const useUserInfo = (): UseUserInfoReturn => {
       if (!user) return;
       try {
         const token = await user.getIdToken();
-        const response = await axios.get('http://localhost:8000/api/v1/user-info', {
+        const response = await axios.get<UserInfo>('http://localhost:8000/api/v1/user-info', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

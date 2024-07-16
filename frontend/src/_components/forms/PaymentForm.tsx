@@ -10,6 +10,7 @@ import {stripePromise} from '../../lib/stripe';
 // This is your test secret API key.
 
 const PaymentRedirect: React.FC = () => {
+  const TestKey = process.env.NEXT_PUBLIC_MY_STRIPE_PUBLIC_KEY
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://js.stripe.com/v3/buy-button.js';
@@ -28,7 +29,7 @@ const PaymentRedirect: React.FC = () => {
         <div dangerouslySetInnerHTML={{__html: `
           <stripe-buy-button
             buy-button-id="buy_btn_1PaprZ2KB7MtryeCrlpCXjHw"
-            publishable-key="pk_test_51PZ1U92KB7MtryeC0GeQiocQwDstKH0qQdktlzLQWy107zqfdADAPoP7exKtQnBurFspFDRdIHAj08Vx86z0D0RL00zWPiol3J"
+            publishable-key=${TestKey}
           >
           </stripe-buy-button>
         `}} />
