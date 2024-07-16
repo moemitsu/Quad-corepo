@@ -19,7 +19,7 @@ export const useUserInfo = () => {
       if (!user) return;
       try {
         const token = await user.getIdToken();
-        const response = await axios.get('http://localhost:8000/api/v1/user-info', {
+        const response = await axios.get<UserInfo>('http://localhost:8000/api/v1/user-info', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
