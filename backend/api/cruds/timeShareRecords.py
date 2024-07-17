@@ -130,7 +130,7 @@ def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_nam
 
 
 # LLMに分析してもらうためのデータを取得
-def get_records_by_month(db: Session, stakeholder_id: int, child_name: str, year: int, month: int):
+def get_records_by_month_for_llm(db: Session, stakeholder_id: int, child_name: str, year: int, month: int):
     start_date = f"{year}-{month}-01"
     end_date = f"{year}-{month}-{calendar.monthrange(year, month)[1]}"
     return db.query(
