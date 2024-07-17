@@ -59,6 +59,17 @@ const RecordForm: React.FC = () => {
     fetchChildrenAndAdults();
   }, [user]);
 
+  // 開始日時が変更された時に終了日時も同じ値に設定する
+  useEffect(() => {
+    setEndDate(startDate);
+  }, [startDate]);
+
+// 開始時間が変更された時に終了日時も同じ値に設定する
+  // useEffect(() => {
+  //   setEndTime(startTime);
+  // }, [startTime]);
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -117,7 +128,7 @@ const RecordForm: React.FC = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen flex flex-col justify-center items-center">
+    <div className="p-6 bg-custom-light-green min-h-screen flex flex-col justify-center items-center">
       <div className="p-6 rounded-lg shadow-md w-full max-w-2xl bg-white">
         <h2 className="text-4xl font-bold mb-6 text-center">活動の記録</h2>
         <form onSubmit={handleSubmit}>
