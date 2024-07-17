@@ -241,7 +241,7 @@ def analysis(
     if not stakeholder:
         raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
     # データベースからデータを取得
-    records = timeShareRecordsCrud.get_records_by_month(db, stakeholder.id, child_name, year, month)
+    records = timeShareRecordsCrud.get_records_by_month_for_llm(db, stakeholder.id, child_name, year, month)
     print(f'データ:', records)
     logger.debug(f"Records fetched: {records}")
     if not records:
@@ -283,10 +283,10 @@ def analysis(
         raise HTTPException(status_code=500, detail=f'KeyError in time_pattern:{str(e)}')
 
     summary = f"""
-    家族の触れ合い時間の総計：
+    家族が{child_name}さんと一緒に過ごした時間の総計（時間、分で出す）：
     {time_summary}
 
-    行き先と子供の機嫌の関連性：
+    行き先と{child_name}さんの機嫌の関連性：
     {condition_analysis}
 
     時間パターン分析：
@@ -312,11 +312,3 @@ def analysis(
     logger.info("Generated advice: " + advice)
     print(advice)
     return schemas.Completion(advice=advice)
-
-# 確認用　TODO あとで消す
-@router.get("/api/v2/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(get_db)):
-    records = timeShareRecordsCrud.get_all_records(db)
-    if not records:
-        raise HTTPException(status_code=404, detail="記録が見つかりません")
-    return records
