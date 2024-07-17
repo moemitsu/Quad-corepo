@@ -320,3 +320,24 @@ def get_all_time_share_records(db: Session = Depends(get_db)):
     if not records:
         raise HTTPException(status_code=404, detail="記録が見つかりません")
     return records
+
+# 全ての子供の家族データ一覧の取得
+@router.get("/api/v1/family-records/all", response_model=List[schemas.DetailListRes])
+def get_each_detail_lists_for_all_children(
+    token: str = Depends(verify_token),
+    year: int = Query(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        firebase_id = token['uid']
+        stakeholder = stakeholderCrud.get_firebase_id(db, firebase_id)
+        if not stakeholder:
+            raise HTTPException(status_code=400, detail='ユーザーが見つかりません')
+        records = timeShareRecordsCrud.get_each_detail_lists_by_month_for_all_children(db, stakeholder.id, year)
+        if not records:
+            raise HTTPException(status_code=404, detail="記録が見つかりません")
+        return records
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="サーバーエラーが発生しました")

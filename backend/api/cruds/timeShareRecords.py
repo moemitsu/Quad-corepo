@@ -12,7 +12,7 @@ from api.schemas import schemas
 logger = getLogger(__name__)
 
 
-# クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得
+# クエリパラメータをもとにTimeShareRecordsテーブルから特定月のデータを取得（UUIDなし）
 def get_records_by_month(db: Session, child_name: str, year: int, month: int):
     logger.info(f"Fetching Records by Month: {month}")
     start_date = datetime.datetime(year, month, 1)
@@ -105,6 +105,27 @@ def get_each_detail_lists_by_month(db: Session, stakeholder_id: UUID, child_name
         logger.error(f"Error fetching records: {e}")
         raise HTTPException(status_code=500, detail="記録の取得中にエラーが発生しました")
 
+# 全月の全ての子の詳細一覧の取得
+def get_each_detail_lists_by_month_for_all_children(db: Session, stakeholder_id: UUID, year: int):
+    try:
+        records = []
+        for month in range(1, 13):  # 1から12までの月をループで処理
+            start_date = datetime.datetime(year, month, 1)
+            last_day = calendar.monthrange(year, month)[1]
+            end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
+            month_records = db.query(models.TimeShareRecords).filter(
+                models.TimeShareRecords.stakeholder_id == stakeholder_id,
+                models.TimeShareRecords.share_start_at >= start_date,
+                models.TimeShareRecords.share_end_at <= end_date
+            ).order_by(models.TimeShareRecords.share_start_at).all()
+            records.extend(month_records)
+        
+        logger.info(f'timeShareRecords103------------------------------------familydata{records}')
+        return records
+    except Exception as e:
+        logger.error(f"Error fetching records: {e}")
+        raise HTTPException(status_code=500, detail="記録の取得中にエラーが発生しました")
+    
 # 記録の追加
 def create_record(db: Session, stakeholder_id: UUID, with_member: str, child_name: str, events: str, child_condition: str, place: str, share_start_at: datetime, share_end_at: datetime):
     logger.info(f"Creating Record: Child={child_name}, Start={share_start_at}, End={share_end_at}")
@@ -154,3 +175,4 @@ def get_records_by_month(db: Session, stakeholder_id: int, child_name: str, year
 def get_all_records(db: Session):
     logger.info("Fetching all Records")
     return db.query(models.TimeShareRecords).all()
+

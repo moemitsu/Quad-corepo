@@ -8,6 +8,7 @@ import OpenaiAnalysis from "@/_components/analysis/OpenaiAnalysis";
 import UnifyChart from "@/_components/analysis/UnifyChart";
 import RecordList from "@/_components/analysis/RecordList";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import CheckEmpty from "@/_components/analysis/CheckEmpty";
 
 const Practice: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(2024);
@@ -29,6 +30,10 @@ const Practice: React.FC = () => {
   return (
     <div>
       <Header />
+      <div className="p-6 min-h-screen flex flex-col">
+      <CheckEmpty
+          isEmpty={true} // Example of passing isEmpty prop
+        />
       <div className="p-6 min-h-screen flex flex-col">
         <SearchCondition
           setSelectedYear={setSelectedYear}
@@ -56,6 +61,7 @@ const Practice: React.FC = () => {
             bearerToken={authToken}
           />
         </div>
+      </div>
       </div>
       <Footer />
     </div>
