@@ -108,7 +108,7 @@ const OpenaiAnalysis: React.FC<OpenaiAnalysisProps> = ({ year, month, selectedCh
           <div className="relative bg-custom-light-green bg-opacity-50 shadow-inner p-6 rounded-lg mt-4 flex-grow">
             <div>
               <h3 className="text-2xl text-custom-blue font-semibold mb-2">AI分析</h3>
-              <h4>{month}月のAI分析結果です</h4>
+              <h4 className='text-xl'>{month}月のAI分析結果です</h4>
               <div className="relative">
                 <p className={viewCount >= 4 && showOverlay ? 'blur-md' : ''}>{data && parse(data.advice)}</p>
                 {viewCount >= 4 && showOverlay && (

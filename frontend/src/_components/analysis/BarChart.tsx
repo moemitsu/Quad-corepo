@@ -26,9 +26,27 @@ interface BarChartProps {
   data: BarChartData;
   options?: ChartOptions<"bar">;
 }
+
+// 日付順に並び替える関数
+const sortDataByDate = (data: BarChartData): BarChartData => {
+  const sortedData = { ...data };
+  sortedData.labels = [...data.labels].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  sortedData.datasets = data.datasets.map(dataset => {
+    const sortedDataset = { ...dataset };
+    sortedDataset.data = sortedData.labels.map(label => {
+      const index = data.labels.indexOf(label);
+      return dataset.data[index];
+    });
+    return sortedDataset;
+  });
+  return sortedData;
+};
+
 // 棒グラフのx,y軸の設定
 const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   if (!data || !data.datasets) return <div>Loading...</div>;
+
+  const sortedData = sortDataByDate(data);
 
   const defaultOptions: ChartOptions<"bar"> = {
     responsive: true,
@@ -69,10 +87,10 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
           },
         },
         beginAtZero: true,
-        suggestedMin: 1, 
+        suggestedMin: 1,
         suggestedMax: 'undefined',// 最大値を自動で設定
         ticks: {
-          stepSize: 1, 
+          stepSize: 1,
         },
       },
     },
@@ -81,9 +99,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, options }) => {
   const chartOptions = { ...defaultOptions, ...options };
 
   return (
-    <div style={{ width: "100%",height:"100%" }}>
-      <div style={{ width:"100%", height: "50vh" }}>
-        <Bar data={{ ...data }} options={chartOptions} />
+    <div style={{ width: "100%", height: "100%" }}>
+      <div style={{ width: "100%", height: "50vh" }}>
+        <Bar data={sortedData} options={chartOptions} />
       </div>
     </div>
   );

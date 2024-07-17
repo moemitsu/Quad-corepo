@@ -70,19 +70,11 @@ app.include_router(stripe_router, prefix="/stripe", tags=["stripe"])
 
 @app.get("/")
 async def read_root():
-  logger.info("Root endpoint called")
-  print("------------------Root endpoint called")
-  return {"message": "Welcome to the FastAPI application"}
+    logger.info("Root endpoint called")
+    print("------------------Root endpoint called")
+    return {"message": "Welcome to the FastAPI application"}
 
 # @app.get("/protected-route")
 # async def protected_route(request: Request):
 #   user = request.state.user
 #   return {"message": f"Hello, {user['name']}"}
-
-@app.get("/api/v1/total-data", response_model=List[schemas.TimeShareRecordResponse])
-def get_all_time_share_records(db: Session = Depends(get_db)):
-    logger.info("all data")
-    records = crud.get_all_records(db)
-    if not records:
-        raise HTTPException(status_code=404, detail="記録が見つかりません")
-    return records
