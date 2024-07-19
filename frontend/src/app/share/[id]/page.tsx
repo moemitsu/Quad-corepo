@@ -1,36 +1,53 @@
-// src/app/share/[id]/page.tsx
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation"; // 正しいインポートを追加
-import Header from "@/_components/layout/Header";
-import Footer from "@/_components/layout/Footer";
+import { useRouter } from "next/navigation";
+import Header from "../../../_components/layout/Header";
+import Footer from "../../../_components/layout/Footer";
 import axios from "axios";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import MonthlyAnalysis from "@/app/monthly-analysis/page";
 
-const SharePage: React.FC = () => {
+const SharePage = ({ params }: { params: { id: string } }) => {
   const [isValid, setIsValid] = useState<boolean>(false);
-  const searchParams = new URLSearchParams(useSearchParams()); // useSearchParams()を正しく使う
-  const id = searchParams.get("id"); // クエリパラメータからidを取得する
-  const auth = getAuth();
-  console.log('id',id)
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [authToken, setAuthToken] = useState<string>("");
+  const router = useRouter();
+  const id = params.id;
 
   useEffect(() => {
     const validateLink = async () => {
-      if (id) { // ユーザーがログインしていることを確認
-        try {
-          const response = await axios.get(`http://localhost:3000/api/share-link?id=${id}`);
-          console.log(response.data);
-          setIsValid(response.data.isValid);
-        } catch (error) {
-          setIsValid(false);
-        }
-      } else {
-        setIsValid(false); // ユーザーがログインしていない場合は無効なリンクとみなす
+      try {
+        const response = await axios.get(`/api/share-link?id=${id}`);
+        console.log(response.data);
+        setIsValid(response.data.isValid);
+      } catch (error) {
+        console.error("Error validating link:", error);
+        setIsValid(false);
       }
+      setIsLoading(false);
     };
-    validateLink();
-  }, [id]); // idが変更されたときに再度呼び出す
+
+    const checkAuthState = () => {
+      const auth = getAuth();
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          user.getIdToken(/* forceRefresh */ true).then((token) => {
+            setAuthToken(token);
+            validateLink();
+          });
+        } else {
+          // 認証されていない場合、ログインページにリダイレクト
+          router.push("/login");
+        }
+      });
+    };
+
+    checkAuthState();
+  }, [id, router]);
+
+  if (isLoading) {
+    return <p>読み込み中...</p>;
+  }
 
   if (!isValid) {
     return <p>リンクが無効または期限切れです。</p>;
