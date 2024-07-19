@@ -36,7 +36,7 @@ export default function Home() {
       <main className="flex flex-col items-center justify-between relative">
         <div className="w-full h-[400px] sm:h-[600px] lg:h-[700px] xl:h-[900px] 2xl:h-[1200px] z-10 relative">
           <Image
-            src="/index2.jpg"
+            src="/index3.jpg"
             alt="Index Logo"
             layout="fill"
             objectFit="cover"
