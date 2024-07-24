@@ -13,6 +13,7 @@ import subprocess
 from unittest.mock import patch
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()  # 環境変数を読み込む
 ASYNC_DB_URL = "postgresql+asyncpg://postgres:password@db:5432/sectionfdb"
@@ -101,11 +102,29 @@ async def test_get_bar_graph(async_client):
             'year':2024,
             'month':7,
     }
-    response = await async_client.get("/api/v1/bar-graph", headers=headers,params=params)
-    print(response)
-    assert response.status_code == starlette.status.HTTP_200_OK
-    response_obj = response.json()
-    print('test_get_bar_graph108------------------------------get',response_obj)
-    # assert 'with_member' in response_obj[0]
-    # assert 'share_start_at' in response_obj[0]
-    # assert 'share_end_at' in response_obj[0]
+    # モックデータの作成
+    mock_data = [
+        ('母', '2024-07-01', 1.5),
+        ('父', '2024-07-02', 2.0),
+        ('母', '2024-07-03', 3.0)
+    ]
+    with patch('api.cruds.timeShareRecords.get_bar_graph_by_month', return_value=mock_data):
+        
+        headers = {'Authorization': 'Bearer test_token'}
+        params = {'child_name':child_names[0],'year':2024,'month':7,}
+        response = await async_client.get("/api/v1/bar-graph", headers=headers,params=params)
+        print(response)
+        assert response.status_code == starlette.status.HTTP_200_OK
+        response_obj = response.json()
+        print('test_get_bar_graph108------------------------------get',response_obj)
+        # レスポンスの構造を確認
+        assert '母' in response_obj
+        assert '父' in response_obj
+        assert response_obj['母']['7/1(Mon)'] == 1.5
+        assert response_obj['母']['7/3(Wed)'] == 3.0
+        assert response_obj['父']['7/2(Tue)'] == 2.0
+
+        # 確認用のデータがレスポンスに正しく含まれているか
+        assert len(response_obj) == 2
+        assert len(response_obj['母']) == 2
+        assert len(response_obj['父']) == 1

@@ -201,7 +201,7 @@ def get_bar_data(
 
         # 日付をフォーマット
         date_obj = datetime.strptime(str(date), "%Y-%m-%d")
-        formatted_date = date_obj.strftime("%-m/%-d(%a)")  # 例: 6/24(月)
+        formatted_date = date_obj.strftime("%-m/%-d(%a)")  # 例: 6/24(Mon)
 
         if with_member not in result:
             result[with_member] = {}
