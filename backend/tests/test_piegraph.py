@@ -106,6 +106,12 @@ async def test_get_pie_graph(async_client):
     assert response.status_code == starlette.status.HTTP_200_OK
     response_obj = response.json()
     print('test_get_pie_graph108------------------------------get',response_obj)
-    # assert 'with_member' in response_obj[0]
-    # assert 'share_start_at' in response_obj[0]
-    # assert 'share_end_at' in response_obj[0]
+    # レスポンスの構造を確認
+    assert '母' in response_obj
+    assert '父' in response_obj
+    assert 0 <= response_obj['母'] <= 100
+    assert 0 <= response_obj['父'] <= 100
+    
+    # データの正確性の確認（合計が100%になることを確認する）
+    total_percentage = sum(response_obj.values())
+    assert 99 <= total_percentage <= 101  # 小数点の誤差を考慮
