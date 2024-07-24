@@ -9,8 +9,10 @@ const LoginPage: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="p-6 min-h-screen flex flex-col justify-center items-center">
-        <LoginForm />
+      <div className="bg-custom-light-green min-h-screen flex flex-col justify-center items-center">
+        <div className="w-full max-w-xl"> 
+          <LoginForm />
+        </div> 
       </div>
       <Footer />
     </div>

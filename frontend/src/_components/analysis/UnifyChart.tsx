@@ -163,7 +163,7 @@ const UnifyChart: React.FC<UnifyChartProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="md:col-span-1 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-            <h3 className="text-xl text-custom-blue mb-2">家族との時間</h3>
+            <h3 className="text-xl text-custom-blue font-semibold mb-2">家族との時間</h3>
             {pieChartData ? (
               <PieChart data={pieChartData} />
             ) : (
@@ -172,7 +172,7 @@ const UnifyChart: React.FC<UnifyChartProps> = ({
             {error && <p>{error}</p>}
           </div>
           <div className="md:col-span-2 bg-custom-light-green bg-opacity-50 p-4 md:p-6 rounded-lg shadow-inner">
-            <h3 className="text-xl text-custom-blue mb-2">日別データ</h3>
+            <h3 className="text-xl text-custom-blue font-semibold mb-2">日別データ</h3>
             <div className="overflow-x-auto">
               {barChartData ? (
                 <div>

@@ -39,9 +39,10 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen flex flex-col justify-center items-center">
-      <div className="p-6 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-4xl font-bold mb-6 text-center text-custom-blue">ログイン</h2>
+    <div className="p-16 min-h-screen flex flex-col justify-start items-center pt-52">
+      <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-lg">
+        <h2 className="text-4xl font-bold mb-2 text-center text-custom-blue">ログイン</h2>
+        <p className="text-sm text-center text-gray-500 mb-10">アカウントにアクセスするにはログインしてください</p>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-lg font-semibold mb-2 text-custom-blue">メールアドレス</label>
@@ -73,7 +74,7 @@ const LoginForm: React.FC = () => {
           <button type="submit" className="w-full p-2 bg-custom-teal text-white rounded mb-4">ログイン</button>
         </form>
         <p className="text-center mb-2 text-custom-blue">アカウントをお持ちでない方</p>
-        <button onClick={handleRegister} className="w-full p-2 bg-custom-teal text-white rounded">会員登録</button>
+        <button onClick={handleRegister} className="w-full p-3 bg-custom-teal text-white rounded">会員登録</button>
       </div>
     </div>
   );
