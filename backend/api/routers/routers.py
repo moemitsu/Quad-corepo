@@ -308,6 +308,7 @@ def analysis(
         )
         advice = response.choices[0].message.content.strip()
     except Exception as e:
+        logger.error(f'OpenAI API Error: {str(e)}')
         raise HTTPException(status_code=500, detail=f'OpenAI API Error:{str(e)}')
     logger.info("Generated advice: " + advice)
     print(advice)
