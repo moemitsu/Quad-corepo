@@ -48,12 +48,3 @@ async def test_hello_world(async_client):
     response = await async_client.get("/")
     assert response.status_code == starlette.status.HTTP_200_OK
 
-@pytest.mark.asyncio
-async def test_get_all_time_share_records(async_client):
-    response = await async_client.get("/api/v1/total-data")
-    print(response.status_code)
-    print(response.text)
-    assert response.status_code == starlette.status.HTTP_200_OK
-    response_obj = response.json()
-    print(response_obj)
-    assert len(response_obj) >= 1

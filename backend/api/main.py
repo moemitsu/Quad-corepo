@@ -73,8 +73,3 @@ async def read_root():
     logger.info("Root endpoint called")
     print("------------------Root endpoint called")
     return {"message": "Welcome to the FastAPI application"}
-
-# @app.get("/protected-route")
-# async def protected_route(request: Request):
-#   user = request.state.user
-#   return {"message": f"Hello, {user['name']}"}
