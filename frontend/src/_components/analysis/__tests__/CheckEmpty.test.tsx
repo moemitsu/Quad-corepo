@@ -1,5 +1,5 @@
 // src/_components/analysis/__tests__/CheckEmpty.test.tsx
-
+'use client'
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';

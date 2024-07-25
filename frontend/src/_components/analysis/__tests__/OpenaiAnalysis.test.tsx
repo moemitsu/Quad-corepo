@@ -1,5 +1,5 @@
 // src/_components/analysis/__tests__/OpenaiAnalysis.test.tsx
-
+'use client'
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
