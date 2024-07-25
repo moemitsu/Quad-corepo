@@ -9,7 +9,7 @@ import UnifyChart from "@/_components/analysis/UnifyChart";
 import RecordList from "@/_components/analysis/RecordList";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const Practice: React.FC = () => {
+const MonthlyAnalysis: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(2024);
   const [selectedMonth, setSelectedMonth] = useState<number>(6);
   const [selectedChild, setSelectedChild] = useState<string>("");
@@ -62,4 +62,4 @@ const Practice: React.FC = () => {
   );
 };
 
-export default Practice;
+export default MonthlyAnalysis;
