@@ -6,12 +6,13 @@ export interface PieChartData {
     label: string;
     data: number[];
     backgroundColor: string[];
+    hoverBackgroundColor?: string[]; 
     borderColor: string[];
     borderWidth: number;
   }[];
 }
 export interface BarChartData {
-  summary(summary: any): unknown;
+  summary?: (summary: any) => unknown;
   labels: string[]; // 日付のラベル配列
   datasets: BarDataset[]; // データセットの配列
 }
