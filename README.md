@@ -2,10 +2,7 @@
 家族（特に子供）との時間を記録し、可視化および分析することで家族の絆を深めるための分析・提案サービス
 
 ![ダッシュボード画面]
-(https://github.com/user-attachments/assets/39c0327b-43a2-4d59-bf1d-4f83cebed3fb)
-(https://github.com/user-attachments/assets/01203c0a-cc96-48da-8d92-76ad4ff8ae69)
-(https://github.com/user-attachments/assets/f2cef917-3196-4bf2-9f95-1dfa150c891d)
-(https://github.com/user-attachments/assets/25b3746f-8e9a-4068-af57-82bce097e19a)
+(https://github.com/user-attachments/assets/39c0327b-43a2-4d59-bf1d-4f83cebed3fb,https://github.com/user-attachments/assets/01203c0a-cc96-48da-8d92-76ad4ff8ae69,https://github.com/user-attachments/assets/f2cef917-3196-4bf2-9f95-1dfa150c891d,https://github.com/user-attachments/assets/25b3746f-8e9a-4068-af57-82bce097e19a)
 
 ## 操作動画
 
