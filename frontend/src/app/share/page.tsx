@@ -28,6 +28,7 @@ const ShareLinkPage: React.FC = () => {
           createdAt: new Date(),
         });
         setLinkId(docRef.id); // ドキュメントIDをstateにセット
+        console.log('setLinkiD',docRef.id)
       } catch (error) {
         console.error('Error adding document: ', error);
       }
