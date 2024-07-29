@@ -2,13 +2,13 @@
 家族（特に子供）との時間を記録し、可視化および分析することで家族の絆を深めるための分析・提案サービス
 
 ![ランディングページ](https://github.com/user-attachments/assets/39c0327b-43a2-4d59-bf1d-4f83cebed3fb)
-![ダッシュボード画面①](https://github.com/user-attachments/assets/01203c0a-cc96-48da-8d92-76ad4ff8ae69)
+<!-- ![ダッシュボード画面①](https://github.com/user-attachments/assets/01203c0a-cc96-48da-8d92-76ad4ff8ae69)
 ![ダッシュボード画面②](https://github.com/user-attachments/assets/f2cef917-3196-4bf2-9f95-1dfa150c891d)
-![ダッシュボード画面③](https://github.com/user-attachments/assets/25b3746f-8e9a-4068-af57-82bce097e19a)
+![ダッシュボード画面③](https://github.com/user-attachments/assets/25b3746f-8e9a-4068-af57-82bce097e19a) -->
 
 ## 操作動画
 
-[操作動画を見る](link_to_your_demo_video)
+[操作動画を見る](https://github.com/user-attachments/assets/9fb08019-1b66-4399-9c36-c1701a1ebcef)
 
 ## 機能
 
@@ -32,7 +32,7 @@
 ```
 ### 3.dockerでビルドする
 ```sh
- $ docker compose up --build
+ $ docker compose up ーd --build
 ```
 ### 4.アプリにアクセスする
 ```sh
@@ -47,15 +47,15 @@ $ http://localhost:3000
  - Tailwind CSS: 3.4.4
  - Python: 3.12
  - FastAPI: 0.111.0
- - PostgreSQL（Dockerで起動）
+ - PostgreSQL（Dockerで起動）:16
  - Firebase: 10.12.3
  - Stripe: 16.1.0
  - OpenAI: 1.35.10
  - pandas: 2.2.2
  - Chart.js: 4.4.3
  - SQLAlchemy: 2.0.31
- - Docker:
- - aws:
+ - Docker:26.0.0
+ <!-- - aws: -->
 
-## システム構成
-![アーキテクチャ図](path_to_your_aws_image.png)
+<!-- ## システム構成
+![アーキテクチャ図](path_to_your_aws_image.png) -->
