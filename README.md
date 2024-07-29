@@ -55,7 +55,6 @@ $ http://localhost:3000
  - Chart.js: 4.4.3
  - SQLAlchemy: 2.0.31
  - Docker:26.0.0
- <!-- - aws: -->
 
 <!-- ## システム構成
 ![アーキテクチャ図](path_to_your_aws_image.png) -->
