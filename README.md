@@ -24,11 +24,11 @@
 
 ### 1. リポジトリのクローン
 ```sh 
- $ git clone https://github.com/yourusername/your-repository.git
+ $ git clone https://github.com/moemitsu/Quad-corepo
 ```
 ### 2.ルートディレクトリへ移動
 ```sh
- $ cd your-repository
+ $ cd Quad-corepo
 ```
 ### 3.dockerでビルドする
 ```sh
